@@ -173,43 +173,69 @@ export default function CategoryPage() {
               {[1, 2, 3].map((i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)}
             </div>
           ) : (
-            <div className="space-y-3">
-              {services.map((svc) => (
+            <div className="space-y-4">
+              {services.map((svc, index) => (
                 <button
                   key={svc.id}
                   onClick={() => navigate(`/service/${svc.slug}`)}
-                  className="flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-3 text-left transition-shadow hover:shadow-md"
+                  className="relative w-full overflow-hidden rounded-2xl text-left transition-shadow hover:shadow-lg group"
+                  style={{ minHeight: "140px" }}
                 >
-                  {/* Service thumbnail */}
-                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-secondary">
-                    {svc.image_url ? (
-                      <img src={svc.image_url} alt={svc.name} className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center">
-                        <span className="text-2xl opacity-30">✦</span>
-                      </div>
-                    )}
-                  </div>
+                  {/* Background image */}
+                  <img
+                    src={svc.image_url || heroImg}
+                    alt={svc.name}
+                    className="absolute inset-0 h-full w-full object-cover scale-110 group-hover:scale-105 transition-transform duration-700"
+                  />
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground mb-1">{svc.name}</p>
-                    {svc.badge && (
-                      <Badge className="mb-1 bg-accent/10 text-accent border-0 text-[8px] uppercase tracking-wider font-bold px-2 py-0.5">
-                        {svc.badge}
-                      </Badge>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      Starting from <span className="text-accent font-semibold">₹{Number(svc.price_standard).toLocaleString()}</span>
-                    </p>
-                  </div>
-
-                  {/* Quick add button */}
+                  {/* Gradient overlay — alternating directions */}
                   <div
-                    onClick={(e) => { e.stopPropagation(); handleQuickAdd(svc); }}
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary hover:bg-accent/10 transition-colors"
-                  >
-                    <Plus className="h-4 w-4 text-foreground" />
+                    className={`absolute inset-0 ${
+                      index % 2 === 0
+                        ? "bg-gradient-to-r from-foreground/85 via-foreground/60 to-foreground/20"
+                        : "bg-gradient-to-l from-foreground/85 via-foreground/60 to-foreground/20"
+                    }`}
+                  />
+
+                  {/* Glass border effect */}
+                  <div className="absolute inset-0 rounded-2xl border border-white/10" />
+
+                  {/* Content */}
+                  <div className="relative z-10 flex h-full min-h-[140px] flex-col justify-between p-5">
+                    <div>
+                      {svc.badge && (
+                        <Badge className="mb-2 glass-sm border-white/20 bg-white/10 text-primary-foreground text-[8px] uppercase tracking-wider font-bold px-2.5 py-0.5">
+                          {svc.badge}
+                        </Badge>
+                      )}
+                      <h4 className="text-lg font-display font-bold text-primary-foreground leading-tight">
+                        {svc.name}
+                      </h4>
+                    </div>
+
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider text-primary-foreground/50 mb-0.5">
+                          Starting from
+                        </p>
+                        <p className="text-xl font-display font-bold text-primary-foreground">
+                          ₹{Number(svc.price_standard).toLocaleString()}
+                        </p>
+                        {svc.turnaround_standard && (
+                          <p className="text-[10px] text-primary-foreground/40 mt-0.5">
+                            {svc.turnaround_standard}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Quick add button */}
+                      <div
+                        onClick={(e) => { e.stopPropagation(); handleQuickAdd(svc); }}
+                        className="flex h-11 w-11 items-center justify-center rounded-full glass-accent border-white/20 hover:scale-110 transition-transform"
+                      >
+                        <Plus className="h-5 w-5 text-accent-foreground" />
+                      </div>
+                    </div>
                   </div>
                 </button>
               ))}
