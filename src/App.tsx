@@ -37,6 +37,7 @@ import NotificationsPage from "@/pages/NotificationsPage";
 import ReferralPage from "@/pages/ReferralPage";
 import BlogPage from "@/pages/BlogPage";
 import MyComplaintsPage from "@/pages/MyComplaintsPage";
+import SupportPage from "@/pages/SupportPage";
 import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminLayout from "@/pages/admin/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
