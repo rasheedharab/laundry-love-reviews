@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Zap, Tag, X, Clock, ArrowRight } from "lucide-react";
@@ -8,9 +8,10 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { addDays, format } from "date-fns";
+import { addDays, format, isToday, parse, isBefore } from "date-fns";
 import AnimatedPage from "@/components/AnimatedPage";
 
+const SLOT_CAPACITY = 10;
 const timeSlots = ["08:00 AM — 10:00 AM", "10:00 AM — 12:00 PM", "01:00 PM — 03:00 PM", "04:00 PM — 06:00 PM"];
 
 export default function Checkout() {
@@ -25,6 +26,7 @@ export default function Checkout() {
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState<{ id: string; code: string; discount_percent: number | null; discount_amount: number | null } | null>(null);
   const [promoLoading, setPromoLoading] = useState(false);
+  const [slotCounts, setSlotCounts] = useState<Record<string, number>>({});
 
   const dates = useMemo(() => {
     const today = new Date();
@@ -33,6 +35,45 @@ export default function Checkout() {
       return { day: format(d, "EEE").toUpperCase(), date: format(d, "d"), full: d, month: format(d, "MMMM yyyy") };
     });
   }, []);
+
+  // Fetch slot availability when selected date changes
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      const dateStr = format(dates[selectedDate].full, "yyyy-MM-dd");
+      const { data } = await supabase.rpc("get_slot_availability", {
+        p_date: dateStr,
+        p_slots: timeSlots,
+      });
+      if (data) {
+        const counts: Record<string, number> = {};
+        (data as { time_slot: string; booked_count: number }[]).forEach((r) => {
+          counts[r.time_slot] = r.booked_count;
+        });
+        setSlotCounts(counts);
+      }
+    };
+    fetchAvailability();
+  }, [selectedDate, dates]);
+
+  const isSlotFull = (slot: string) => (slotCounts[slot] || 0) >= SLOT_CAPACITY;
+
+  const isSlotPast = (slot: string) => {
+    const pickupDate = dates[selectedDate].full;
+    if (!isToday(pickupDate)) return false;
+    // Parse end time from slot like "10:00 AM — 12:00 PM"
+    const endTimeStr = slot.split("—")[1]?.trim();
+    if (!endTimeStr) return false;
+    const endTime = parse(endTimeStr, "hh:mm a", new Date());
+    return isBefore(endTime, new Date());
+  };
+
+  const isSlotDisabled = (slot: string) => isSlotFull(slot) || isSlotPast(slot);
+
+  const getSlotLabel = (slot: string) => {
+    if (isSlotFull(slot)) return "Full";
+    if (isSlotPast(slot)) return "Past";
+    return `${SLOT_CAPACITY - (slotCounts[slot] || 0)} left`;
+  };
 
   const discount = promoApplied
     ? promoApplied.discount_percent ? total * promoApplied.discount_percent / 100 : (promoApplied.discount_amount || 0)
@@ -176,22 +217,33 @@ export default function Checkout() {
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent mb-3">Time Window</p>
             <div className="space-y-2">
-              {timeSlots.map((slot) => (
-                <button
-                  key={slot}
-                  onClick={() => setSelectedSlot(slot)}
-                  className={`w-full flex items-center justify-between rounded-2xl border-2 p-4 text-sm font-medium transition-all ${
-                    selectedSlot === slot ? "border-foreground" : "border-border"
-                  }`}
-                >
-                  <span className="text-foreground">{slot}</span>
-                  <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
-                    selectedSlot === slot ? "border-foreground bg-foreground" : "border-muted-foreground/40"
-                  }`}>
-                    {selectedSlot === slot && <div className="h-2 w-2 rounded-full bg-primary-foreground" />}
-                  </div>
-                </button>
-              ))}
+              {timeSlots.map((slot) => {
+                const disabled = isSlotDisabled(slot);
+                return (
+                  <button
+                    key={slot}
+                    onClick={() => !disabled && setSelectedSlot(slot)}
+                    disabled={disabled}
+                    className={`w-full flex items-center justify-between rounded-2xl border-2 p-4 text-sm font-medium transition-all ${
+                      disabled
+                        ? "border-border opacity-40 cursor-not-allowed"
+                        : selectedSlot === slot ? "border-foreground" : "border-border"
+                    }`}
+                  >
+                    <span className="text-foreground">{slot}</span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] font-semibold uppercase tracking-wider ${disabled ? "text-destructive" : "text-muted-foreground"}`}>
+                        {getSlotLabel(slot)}
+                      </span>
+                      <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
+                        disabled ? "border-muted-foreground/20" : selectedSlot === slot ? "border-foreground bg-foreground" : "border-muted-foreground/40"
+                      }`}>
+                        {!disabled && selectedSlot === slot && <div className="h-2 w-2 rounded-full bg-primary-foreground" />}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
