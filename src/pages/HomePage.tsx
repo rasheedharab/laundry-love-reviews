@@ -134,7 +134,25 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Search + Location */}
+          {/* Guest Sign-In Banner */}
+          {!user && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mx-5 mb-3 flex items-center justify-between rounded-2xl glass-accent px-4 py-3"
+            >
+              <p className="text-sm font-medium text-accent-foreground">Sign in for orders & rewards</p>
+              <Button
+                size="sm"
+                onClick={() => navigate("/login")}
+                className="h-8 rounded-xl bg-accent-foreground text-accent hover:bg-accent-foreground/90 text-xs font-semibold gap-1.5"
+              >
+                <LogIn className="h-3.5 w-3.5" /> Sign In
+              </Button>
+            </motion.div>
+          )}
+
+
           <div className="px-5 -mt-1 mb-4 space-y-3">
             <ServiceSearch />
             <button onClick={() => navigate("/select-outlet")} className="flex items-center gap-1.5">
