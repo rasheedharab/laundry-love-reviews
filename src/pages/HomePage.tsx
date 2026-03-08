@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
+import ScrollReveal from "@/components/ScrollReveal";
 import logoImg from "@/assets/logo.png";
 import heroBg from "@/assets/hero-bg.jpg";
 import type { Tables } from "@/integrations/supabase/types";
