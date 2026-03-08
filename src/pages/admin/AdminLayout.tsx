@@ -34,6 +34,8 @@ const navItems = [
   { to: "/admin/promos", icon: Tag, label: "Promo Codes" },
   { to: "/admin/ritual-steps", icon: ListOrdered, label: "Ritual Steps" },
   { to: "/admin/care-tips", icon: Lightbulb, label: "Care Tips" },
+  { to: "/admin/faqs", icon: MessageSquare, label: "FAQs" },
+  { to: "/admin/membership", icon: Crown, label: "Membership" },
   { to: "/admin/site-settings", icon: Settings, label: "Site Settings" },
   { to: "/admin/users", icon: Shield, label: "Users & Roles" },
 ];
