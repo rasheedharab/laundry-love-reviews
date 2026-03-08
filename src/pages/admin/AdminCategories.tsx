@@ -87,12 +87,14 @@ export default function AdminCategories() {
     setOpen(false);
     fetchData();
   };
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this category? Services in it won't be deleted.")) return;
-    const { error } = await supabase.from("service_categories").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await supabase.from("service_categories").delete().eq("id", deleteId);
     if (error) { toast.error(error.message); return; }
     toast.success("Deleted");
+    setDeleteId(null);
     fetchData();
   };
 
