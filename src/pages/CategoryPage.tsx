@@ -6,6 +6,7 @@ import { ArrowLeft, ShoppingBag, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import ListSkeleton from "@/components/skeletons/ListSkeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
