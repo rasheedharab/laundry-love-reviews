@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Star, Sun, Moon, Monitor, User, MessageSquareWarning, FileWarning, ShoppingBag, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
 import ComplaintDialog from "@/components/ComplaintDialog";
+import LoyaltyWidget from "@/components/LoyaltyWidget";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import AnimatedPage from "@/components/AnimatedPage";
@@ -134,6 +135,11 @@ export default function ProfilePage() {
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
             </motion.div>
           ))}
+        </div>
+
+        {/* Loyalty Points Widget */}
+        <div className="mb-6">
+          <LoyaltyWidget />
         </div>
 
         {/* Premium Club Card */}
