@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { MapPin, ChevronDown, ArrowRight, User, Truck, MessageCircle, Crown, Gift, ChevronRight, Sparkles, Copy, BookOpen, Bell, LogIn } from "lucide-react";
+import { MapPin, ChevronDown, ArrowRight, User, Truck, MessageCircle, Crown, Gift, ChevronRight, Sparkles, Copy, BookOpen, Bell, LogIn, Search, Leaf, CloudSun, Shirt, ShieldCheck, Package, Scissors, Briefcase, Wind } from "lucide-react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -33,19 +33,19 @@ const heroImages: Record<string, string> = {
 };
 
 const ritualSteps = [
-  { num: 1, title: "Inspection", icon: "🔍" },
-  { num: 2, title: "Spotting", icon: "✨" },
-  { num: 3, title: "Eco-Wash", icon: "🌿" },
-  { num: 4, title: "Drying", icon: "☁️" },
-  { num: 5, title: "Finishing", icon: "👔" },
-  { num: 6, title: "QC Check", icon: "✓" },
-  { num: 7, title: "Packaging", icon: "🎁" },
+  { num: 1, title: "Inspection", Icon: Search },
+  { num: 2, title: "Spotting", Icon: Sparkles },
+  { num: 3, title: "Eco-Wash", Icon: Leaf },
+  { num: 4, title: "Drying", Icon: CloudSun },
+  { num: 5, title: "Finishing", Icon: Shirt },
+  { num: 6, title: "QC Check", Icon: ShieldCheck },
+  { num: 7, title: "Packaging", Icon: Package },
 ];
 
 const careTips = [
-  { title: "Storing Silk", desc: "Keep silk garments in breathable cotton bags away from direct sunlight.", icon: "🧵" },
-  { title: "Leather Care 101", desc: "Condition leather every 3 months to maintain its supple texture.", icon: "👜" },
-  { title: "Wool Refresh", desc: "Steam instead of washing to preserve wool fibers and shape.", icon: "🧶" },
+  { title: "Storing Silk", desc: "Keep silk garments in breathable cotton bags away from direct sunlight.", Icon: Scissors },
+  { title: "Leather Care 101", desc: "Condition leather every 3 months to maintain its supple texture.", Icon: Briefcase },
+  { title: "Wool Refresh", desc: "Steam instead of washing to preserve wool fibers and shape.", Icon: Wind },
 ];
 
 function getGreeting(): string {
@@ -368,8 +368,8 @@ export default function HomePage() {
                       visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
                     }}
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-base">
-                      {step.icon}
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
+                      <step.Icon className="h-5 w-5 text-accent" strokeWidth={1.5} />
                     </div>
                     <div className="text-center">
                       <p className="text-[10px] text-accent font-bold">Step {step.num}</p>
@@ -436,8 +436,8 @@ export default function HomePage() {
                       visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
                     }}
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-base">
-                      {tip.icon}
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10">
+                      <tip.Icon className="h-5 w-5 text-accent" strokeWidth={1.5} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-foreground">{tip.title}</p>
@@ -520,7 +520,7 @@ export default function HomePage() {
 
           {/* Brand Footer */}
           <div className="mt-10 mb-6 flex justify-center">
-            <img src={logoImg} alt="White Rabbit" className="h-12 opacity-15" />
+            <img src={logoImg} alt="White Rabbit" className="h-16 opacity-15" />
           </div>
 
           {/* Chat FAB */}
