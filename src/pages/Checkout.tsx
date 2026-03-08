@@ -125,7 +125,7 @@ export default function Checkout() {
           {/* Service Level Toggle */}
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent mb-3">Service Level</p>
-            <div className="flex rounded-2xl border border-border bg-card p-1.5">
+            <div className="flex rounded-2xl glass p-1.5">
               <button
                 onClick={() => setServiceLevel("regular")}
                 className={`flex-1 rounded-xl py-3 text-sm font-semibold transition-all ${
