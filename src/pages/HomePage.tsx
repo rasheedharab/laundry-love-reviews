@@ -374,7 +374,7 @@ export default function HomePage() {
                   <motion.button
                     key={step.num}
                     onClick={() => navigate("/ritual")}
-                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 glass-hover"
+                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 glass-hover snap-start"
                     variants={{
                       hidden: { opacity: 0, y: 24, scale: 0.97 },
                       visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
