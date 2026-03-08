@@ -436,8 +436,8 @@ export default function HomePage() {
                       visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
                     }}
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-base">
-                      {tip.icon}
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10">
+                      <tip.Icon className="h-5 w-5 text-accent" strokeWidth={1.5} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-foreground">{tip.title}</p>
