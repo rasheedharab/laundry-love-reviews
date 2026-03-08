@@ -2,15 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import logoImg from "@/assets/logo.png";
 import onb1 from "@/assets/onboarding-1.png";
 import onb2 from "@/assets/onboarding-2.png";
 import onb3 from "@/assets/onboarding-3.png";
 
 const slides = [
-  { image: onb1, title: "Premium Garment Care", subtitle: "Expertise in every thread — trusted by those who value their wardrobe." },
-  { image: onb2, title: "Meticulous Attention", subtitle: "Hand-finished cleaning with specialized fabric preservation techniques." },
-  { image: onb3, title: "Doorstep Convenience", subtitle: "Scheduled pickup & delivery — luxury care without leaving home." },
+  { image: onb1, title: "Expertise in\nEvery Thread" },
+  { image: onb2, title: "Meticulous\nAttention to Detail" },
+  { image: onb3, title: "Doorstep\nConvenience" },
 ];
 
 export default function Onboarding() {
@@ -26,45 +25,74 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-background px-6 pt-12 pb-8">
-      <img src={logoImg} alt="White Rabbit" className="mb-8 h-16 w-auto" />
-
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={step}
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -40 }}
-          transition={{ duration: 0.3 }}
-          className="flex flex-1 flex-col items-center justify-center text-center"
-        >
-          <img src={slides[step].image} alt={slides[step].title} className="mb-8 h-56 w-56 object-contain" />
-          <h2 className="mb-3 text-2xl font-bold font-display text-foreground">{slides[step].title}</h2>
-          <p className="max-w-xs text-sm text-muted-foreground leading-relaxed">{slides[step].subtitle}</p>
-        </motion.div>
-      </AnimatePresence>
-
-      <div className="flex gap-2 mb-6">
-        {slides.map((_, i) => (
-          <div
-            key={i}
-            className={`h-1.5 rounded-full transition-all duration-300 ${i === step ? "w-6 bg-primary" : "w-1.5 bg-border"}`}
-          />
-        ))}
+    <div className="flex min-h-[100dvh] flex-col bg-background">
+      {/* Brand name */}
+      <div className="relative z-10 pt-10 pb-2 text-center">
+        <h1 className="text-lg font-display font-semibold tracking-[0.25em] uppercase text-foreground">
+          White Rabbit
+        </h1>
       </div>
 
-      <Button onClick={handleNext} className="w-full max-w-xs h-12 text-base font-semibold rounded-xl">
-        {step < slides.length - 1 ? "Next" : "Get Started"}
-      </Button>
+      {/* Hero image area */}
+      <div className="relative flex-1 overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="absolute inset-0"
+          >
+            <img
+              src={slides[step].image}
+              alt={slides[step].title}
+              className="h-full w-full object-cover"
+            />
+            {/* Gradient overlay at bottom for text readability */}
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 via-background/40 to-transparent" />
+          </motion.div>
+        </AnimatePresence>
 
-      {step < slides.length - 1 && (
-        <button
-          onClick={() => { localStorage.setItem("wr_onboarded", "1"); navigate("/login"); }}
-          className="mt-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        {/* Title overlaid on image */}
+        <div className="absolute inset-x-0 bottom-8 z-10 text-center px-6">
+          <AnimatePresence mode="wait">
+            <motion.h2
+              key={step}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.35 }}
+              className="text-3xl font-display font-bold leading-tight text-foreground whitespace-pre-line"
+            >
+              {slides[step].title}
+            </motion.h2>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Bottom section */}
+      <div className="px-6 pt-5 pb-8 flex flex-col items-center gap-5">
+        {/* Dots */}
+        <div className="flex gap-2">
+          {slides.map((_, i) => (
+            <div
+              key={i}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === step ? "w-6 bg-foreground" : "w-1.5 bg-border"
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Next / Get Started button */}
+        <Button
+          onClick={handleNext}
+          className="w-full h-13 text-base font-semibold rounded-xl bg-foreground text-background hover:bg-foreground/90"
         >
-          Skip
-        </button>
-      )}
+          {step < slides.length - 1 ? "Next" : "Get Started"}
+        </Button>
+      </div>
     </div>
   );
 }
