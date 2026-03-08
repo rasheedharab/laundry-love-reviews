@@ -293,7 +293,7 @@ export default function HomePage() {
                   variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
                 >
                   {categories.map((cat) => {
-                    const img = heroImages[cat.slug] || catDryCleaning;
+                    const img = cat.image_url || heroImages[cat.slug] || catDryCleaning;
                     return (
                       <motion.div
                         key={cat.id}

@@ -115,7 +115,7 @@ export default function CategoryPage() {
     toast.success(`${svc.name} added to cart`);
   };
 
-  const heroImg = heroImages[slug || ""] || catDryCleaning;
+  const heroImg = category?.image_url || heroImages[slug || ""] || catDryCleaning;
   const tagline = heroTaglines[slug || ""] || heroTaglines["dry-cleaning"];
 
   if (!category && loading) {
