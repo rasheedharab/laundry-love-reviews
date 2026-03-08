@@ -79,6 +79,7 @@ const App = () => (
         </TooltipProvider>
       </CartProvider>
     </AuthProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
