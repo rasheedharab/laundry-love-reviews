@@ -57,6 +57,10 @@ export default function Signup() {
         Already have an account?{" "}
         <Link to="/login" className="text-primary font-medium hover:underline">Sign In</Link>
       </p>
+
+      <button onClick={() => navigate("/home")} className="mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        Continue as Guest →
+      </button>
     </div>
   );
 }
