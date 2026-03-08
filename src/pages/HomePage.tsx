@@ -372,11 +372,14 @@ export default function HomePage() {
                   <motion.button
                     key={step.num}
                     onClick={() => navigate("/ritual")}
-                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 transition-shadow hover:shadow-md glass-hover"
+                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 glass-hover"
                     variants={{
                       hidden: { opacity: 0, y: 24, scale: 0.97 },
                       visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
                     }}
+                    whileHover={{ y: -3, scale: 1.04 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
                       <step.Icon className="h-5 w-5 text-accent" strokeWidth={1.5} />
