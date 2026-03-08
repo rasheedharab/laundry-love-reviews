@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, User, Camera } from "lucide-react";
+import { ArrowLeft, User, Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -15,7 +15,10 @@ export default function EditProfile() {
   const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({ full_name: "", phone: "" });
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -23,10 +26,59 @@ export default function EditProfile() {
       if (data) {
         setProfile(data);
         setForm({ full_name: data.full_name || "", phone: data.phone || "" });
+        setAvatarUrl(data.avatar_url);
       }
       setLoading(false);
     });
   }, [user]);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const filePath = `${user.id}/avatar.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) {
+      toast.error("Upload failed: " + uploadError.message);
+      setUploading(false);
+      return;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("avatars")
+      .getPublicUrl(filePath);
+
+    // Add cache-bust param
+    const urlWithBust = `${publicUrl}?t=${Date.now()}`;
+
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ avatar_url: urlWithBust })
+      .eq("user_id", user.id);
+
+    if (updateError) {
+      toast.error("Failed to save avatar");
+    } else {
+      setAvatarUrl(urlWithBust);
+      toast.success("Avatar updated!");
+    }
+    setUploading(false);
+  };
 
   const handleSave = async () => {
     if (!user || !profile) return;
@@ -64,16 +116,37 @@ export default function EditProfile() {
         </div>
       ) : (
         <>
-          {/* Avatar */}
+          {/* Avatar with upload */}
           <div className="flex flex-col items-center mb-8">
             <div className="relative">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-secondary">
-                <User className="h-10 w-10 text-muted-foreground" />
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-secondary overflow-hidden">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
+                ) : (
+                  <User className="h-10 w-10 text-muted-foreground" />
+                )}
+                {uploading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-background/60 rounded-full">
+                    <Loader2 className="h-6 w-6 text-accent animate-spin" />
+                  </div>
+                )}
               </div>
-              <button className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-md">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-md disabled:opacity-50"
+              >
                 <Camera className="h-3.5 w-3.5" />
               </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
             </div>
+            <p className="text-[10px] text-muted-foreground mt-2">Tap camera to change photo</p>
           </div>
 
           <div className="space-y-4">
