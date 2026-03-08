@@ -15,9 +15,14 @@ import CategoryPage from "@/pages/CategoryPage";
 import ServiceDetail from "@/pages/ServiceDetail";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
+import PaymentPage from "@/pages/PaymentPage";
 import OrderConfirmation from "@/pages/OrderConfirmation";
 import OrdersPage from "@/pages/OrdersPage";
+import TrackOrder from "@/pages/TrackOrder";
 import ProfilePage from "@/pages/ProfilePage";
+import MembershipPage from "@/pages/MembershipPage";
+import RitualPage from "@/pages/RitualPage";
+import SelectOutlet from "@/pages/SelectOutlet";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,7 +54,12 @@ const App = () => (
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/orders" element={<OrdersPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/membership" element={<MembershipPage />} />
+                <Route path="/ritual" element={<RitualPage />} />
+                <Route path="/select-outlet" element={<SelectOutlet />} />
               </Route>
+              <Route path="/payment" element={<PaymentPage />} />
+              <Route path="/track-order/:id" element={<TrackOrder />} />
               <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
