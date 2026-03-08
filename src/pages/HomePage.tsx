@@ -7,6 +7,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import CardGridSkeleton from "@/components/skeletons/CardGridSkeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
 import ScrollReveal from "@/components/ScrollReveal";
