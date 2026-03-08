@@ -83,6 +83,7 @@ const App = () => (
                 <Route path="/edit-profile" element={<EditProfile />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/referral" element={<ReferralPage />} />
+                <Route path="/blog" element={<BlogPage />} />
               </Route>
               {/* Admin routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
