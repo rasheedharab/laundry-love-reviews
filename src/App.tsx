@@ -23,6 +23,9 @@ import ProfilePage from "@/pages/ProfilePage";
 import MembershipPage from "@/pages/MembershipPage";
 import RitualPage from "@/pages/RitualPage";
 import SelectOutlet from "@/pages/SelectOutlet";
+import GarmentAdvisor from "@/pages/GarmentAdvisor";
+import SavedAddresses from "@/pages/SavedAddresses";
+import EditProfile from "@/pages/EditProfile";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
