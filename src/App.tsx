@@ -52,6 +52,8 @@ import AdminBlog from "@/pages/admin/AdminBlog";
 import AdminUsers from "@/pages/admin/AdminUsers";
 import AdminRitualSteps from "@/pages/admin/AdminRitualSteps";
 import AdminCareTips from "@/pages/admin/AdminCareTips";
+import AdminFaqs from "@/pages/admin/AdminFaqs";
+import AdminMembershipTiers from "@/pages/admin/AdminMembershipTiers";
 import AdminSiteSettings from "@/pages/admin/AdminSiteSettings";
 import NotFound from "@/pages/NotFound";
 
