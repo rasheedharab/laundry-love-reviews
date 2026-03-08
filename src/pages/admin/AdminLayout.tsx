@@ -32,7 +32,7 @@ export default function AdminLayout() {
       navigate("/admin/login");
       return;
     }
-    supabase
+    (supabase as any)
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)

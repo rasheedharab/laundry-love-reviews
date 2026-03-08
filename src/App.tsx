@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CartProvider } from "@/contexts/CartContext";
 import AppLayout from "@/components/AppLayout";
+import InAppNotificationListener from "@/components/InAppNotificationListener";
 import Onboarding from "@/pages/Onboarding";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
@@ -29,6 +30,12 @@ import SavedAddresses from "@/pages/SavedAddresses";
 import EditProfile from "@/pages/EditProfile";
 import NotificationsPage from "@/pages/NotificationsPage";
 import ReferralPage from "@/pages/ReferralPage";
+import AdminLogin from "@/pages/admin/AdminLogin";
+import AdminLayout from "@/pages/admin/AdminLayout";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminOrders from "@/pages/admin/AdminOrders";
+import AdminServices from "@/pages/admin/AdminServices";
+import AdminPromos from "@/pages/admin/AdminPromos";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +53,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <InAppNotificationListener />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<RootRedirect />} />
@@ -68,6 +76,14 @@ const App = () => (
                 <Route path="/edit-profile" element={<EditProfile />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/referral" element={<ReferralPage />} />
+              </Route>
+              {/* Admin routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="orders" element={<AdminOrders />} />
+                <Route path="services" element={<AdminServices />} />
+                <Route path="promos" element={<AdminPromos />} />
               </Route>
               <Route path="/garment-advisor" element={<GarmentAdvisor />} />
               <Route path="/payment" element={<PaymentPage />} />

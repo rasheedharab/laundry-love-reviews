@@ -21,7 +21,7 @@ export default function AdminLogin() {
       if (authError) throw authError;
 
       // Check admin role
-      const { data: roleData } = await supabase
+      const { data: roleData } = await (supabase as any)
         .from("user_roles")
         .select("role")
         .eq("user_id", authData.user.id)

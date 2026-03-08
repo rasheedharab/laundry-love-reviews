@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Search, MapPin, Clock, Navigation } from "lucide-react";
+import MapPlaceholder from "@/components/MapPlaceholder";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
