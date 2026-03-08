@@ -69,8 +69,14 @@ export default function HomePage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data: cats } = await supabase.from("service_categories").select("*").order("sort_order");
-    if (cats) setCategories(cats);
+    const [catsRes, ritualRes, tipsRes] = await Promise.all([
+      supabase.from("service_categories").select("*").order("sort_order"),
+      supabase.from("ritual_steps").select("id, step_number, title, icon").eq("is_active", true).order("step_number"),
+      supabase.from("care_tips").select("id, title, description, icon").eq("is_active", true).order("sort_order"),
+    ]);
+    if (catsRes.data) setCategories(catsRes.data);
+    setRitualSteps((ritualRes.data as RitualStepDB[]) || []);
+    setCareTips((tipsRes.data as CareTipDB[]) || []);
 
     if (user) {
       const [ordersRes, profileRes, notifRes] = await Promise.all([
