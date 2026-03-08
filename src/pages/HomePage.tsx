@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
 import ScrollReveal from "@/components/ScrollReveal";
+import ServiceSearch from "@/components/ServiceSearch";
 import logoImg from "@/assets/logo.png";
 import heroBg from "@/assets/hero-bg.jpg";
 import type { Tables } from "@/integrations/supabase/types";
@@ -131,8 +132,9 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Location selector */}
-          <div className="px-5 -mt-2 mb-4">
+          {/* Search + Location */}
+          <div className="px-5 -mt-1 mb-4 space-y-3">
+            <ServiceSearch />
             <button onClick={() => navigate("/select-outlet")} className="flex items-center gap-1.5">
               <MapPin className="h-4 w-4 text-accent" />
               <span className="text-sm font-medium text-foreground">Select Outlet/City</span>
