@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "robots.txt"],
+      includeAssets: ["favicon.png", "robots.txt"],
       manifest: {
         name: "White Rabbit — Luxury Laundry",
         short_name: "White Rabbit",
