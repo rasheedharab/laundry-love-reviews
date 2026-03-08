@@ -15,6 +15,9 @@ import {
   MessageSquare,
   FileText,
   Shield,
+  ListOrdered,
+  Lightbulb,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -29,6 +32,9 @@ const navItems = [
   { to: "/admin/complaints", icon: MessageSquare, label: "Complaints" },
   { to: "/admin/blog", icon: FileText, label: "Blog" },
   { to: "/admin/promos", icon: Tag, label: "Promo Codes" },
+  { to: "/admin/ritual-steps", icon: ListOrdered, label: "Ritual Steps" },
+  { to: "/admin/care-tips", icon: Lightbulb, label: "Care Tips" },
+  { to: "/admin/site-settings", icon: Settings, label: "Site Settings" },
   { to: "/admin/users", icon: Shield, label: "Users & Roles" },
 ];
 
