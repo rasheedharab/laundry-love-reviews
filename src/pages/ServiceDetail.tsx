@@ -197,7 +197,7 @@ export default function ServiceDetail() {
           {service.whats_included && service.whats_included.length > 0 && (
             <div className="mb-5">
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">What's Included</h3>
-              <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+              <div className="rounded-2xl glass p-5 space-y-3">
                 {service.whats_included.map((item, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10">
