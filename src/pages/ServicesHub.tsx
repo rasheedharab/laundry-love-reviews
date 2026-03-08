@@ -7,6 +7,7 @@ import AnimatedPage from "@/components/AnimatedPage";
 import ServiceSearch from "@/components/ServiceSearch";
 import { motion } from "framer-motion";
 import TiltCard from "@/components/TiltCard";
+import RippleTouch from "@/components/RippleTouch";
 import type { Tables } from "@/integrations/supabase/types";
 
 import catPartyWear from "@/assets/cat-party-wear.jpg";
