@@ -401,19 +401,20 @@ export default function HomePage() {
             <div className="px-5 mt-8">
               <button
                 onClick={() => navigate("/membership")}
-                className="w-full overflow-hidden rounded-2xl glass-dark p-5 text-left relative"
+                className="w-full overflow-hidden rounded-2xl p-5 text-left relative"
+                style={{ background: "hsl(24 22% 14% / 0.92)" }}
               >
                 <div className="absolute top-4 right-4">
-                  <Crown className="h-8 w-8 text-accent/40" />
+                  <Crown className="h-8 w-8 text-accent/50" />
                 </div>
-                <p className="text-[10px] text-primary-foreground/50 uppercase tracking-widest font-medium mb-1">Exclusive Access</p>
-                <p className="text-xl font-display font-bold text-primary-foreground leading-tight">Premium Club</p>
-                <p className="text-xs text-primary-foreground/60 mt-2 leading-relaxed max-w-[240px]">
+                <p className="text-[10px] text-white/50 uppercase tracking-widest font-medium mb-1">Exclusive Access</p>
+                <p className="text-xl font-display font-bold text-white leading-tight">Premium Club</p>
+                <p className="text-xs text-white/70 mt-2 leading-relaxed max-w-[240px]">
                   Unlock priority pickup, exclusive discounts, and complimentary garment care with our membership tiers.
                 </p>
                 <div className="mt-4 flex items-center gap-3">
                   {["Silver", "Gold", "Platinum"].map((tier) => (
-                    <span key={tier} className="text-[10px] font-semibold text-accent/80 uppercase tracking-wider bg-accent/10 px-2.5 py-1 rounded-full">
+                    <span key={tier} className="text-[10px] font-semibold text-accent uppercase tracking-wider bg-accent/15 px-2.5 py-1 rounded-full">
                       {tier}
                     </span>
                   ))}
