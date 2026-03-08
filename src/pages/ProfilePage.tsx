@@ -137,6 +137,11 @@ export default function ProfilePage() {
           ))}
         </div>
 
+        {/* Loyalty Points Widget */}
+        <div className="mb-6">
+          <LoyaltyWidget />
+        </div>
+
         {/* Premium Club Card */}
         <div className="mb-6 rounded-2xl glass-accent p-5 text-accent-foreground relative overflow-hidden">
           <div className="absolute top-4 right-4">
