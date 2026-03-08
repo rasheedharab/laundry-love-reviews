@@ -243,7 +243,7 @@ export default function HomePage() {
                   <button
                     key={step.num}
                     onClick={() => navigate("/ritual")}
-                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-4 transition-shadow hover:shadow-md"
+                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 transition-shadow hover:shadow-md"
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-base">
                       {step.icon}
