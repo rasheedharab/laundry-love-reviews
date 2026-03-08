@@ -52,6 +52,10 @@ export default function HomePage() {
   const [categories, setCategories] = useState<Tables<"service_categories">[]>([]);
   const [activeOrder, setActiveOrder] = useState<Tables<"orders"> | null>(null);
   const [loading, setLoading] = useState(true);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
