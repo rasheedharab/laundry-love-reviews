@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Zap } from "lucide-react";
+import { ArrowLeft, MapPin, Zap, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
@@ -20,6 +20,9 @@ export default function Checkout() {
   const [selectedDate, setSelectedDate] = useState(0);
   const [serviceLevel, setServiceLevel] = useState<"regular" | "express">("regular");
   const [loading, setLoading] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState<{ id: string; code: string; discount_percent: number | null; discount_amount: number | null } | null>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
 
   const dates = useMemo(() => {
     const today = new Date();
@@ -46,7 +49,9 @@ export default function Checkout() {
         pickup_time_slot: selectedSlot,
         address_id: addr?.id,
         subtotal: total,
-        total: total,
+        discount: discount,
+        total: finalTotal,
+        promo_code_id: promoApplied?.id || null,
       }).select().single();
 
       if (orderErr) throw orderErr;
@@ -64,7 +69,7 @@ export default function Checkout() {
       }
 
       clearCart();
-      navigate(`/payment`, { state: { orderId: order?.id, total } });
+      navigate(`/payment`, { state: { orderId: order?.id, total: finalTotal } });
     } catch (err: any) {
       toast.error(err.message || "Failed to place order");
     } finally {
@@ -77,7 +82,29 @@ export default function Checkout() {
     return null;
   }
 
+  const discount = promoApplied
+    ? promoApplied.discount_percent ? total * promoApplied.discount_percent / 100 : (promoApplied.discount_amount || 0)
+    : 0;
+  const finalTotal = Math.max(0, total - discount);
   const estReturn = format(addDays(dates[selectedDate].full, serviceLevel === "express" ? 2 : 5), "dd MMM yyyy");
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoLoading(true);
+    const { data, error } = await supabase
+      .from("promo_codes")
+      .select("*")
+      .eq("code", promoCode.trim().toUpperCase())
+      .eq("is_active", true)
+      .single();
+    if (error || !data) {
+      toast.error("Invalid or expired promo code");
+    } else {
+      setPromoApplied({ id: data.id, code: data.code, discount_percent: data.discount_percent, discount_amount: data.discount_amount });
+      toast.success(`Promo "${data.code}" applied!`);
+    }
+    setPromoLoading(false);
+  };
 
   return (
     <div className="pb-28">
@@ -177,11 +204,61 @@ export default function Checkout() {
           </div>
         </div>
 
+        {/* Promo Code */}
+        <div>
+          <p className="section-label mb-3">PROMO CODE</p>
+          <div className="rounded-2xl border border-border bg-card p-4">
+            {promoApplied ? (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Tag className="h-4 w-4 text-accent" />
+                  <span className="text-sm font-semibold text-accent">{promoApplied.code}</span>
+                  <span className="text-xs text-muted-foreground">
+                    ({promoApplied.discount_percent ? `${promoApplied.discount_percent}% off` : `₹${promoApplied.discount_amount} off`})
+                  </span>
+                </div>
+                <button onClick={() => setPromoApplied(null)} className="p-1 rounded-full hover:bg-secondary">
+                  <X className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Input
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  placeholder="Enter code"
+                  className="flex-1 rounded-xl border-border uppercase"
+                />
+                <Button
+                  onClick={handleApplyPromo}
+                  disabled={promoLoading || !promoCode.trim()}
+                  variant="outline"
+                  className="rounded-xl text-xs font-semibold"
+                >
+                  {promoLoading ? "..." : "Apply"}
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Processing Info */}
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Processing Atelier</p>
           <p className="text-sm font-semibold text-foreground">White Rabbit — Central Studio</p>
           <p className="text-xs text-muted-foreground mt-1">Est. return by {estReturn}</p>
+          {discount > 0 && (
+            <div className="mt-2 pt-2 border-t border-border">
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-foreground">₹{total.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-xs mt-1">
+                <span className="text-accent">Discount</span>
+                <span className="text-accent">-₹{discount.toLocaleString()}</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -193,7 +270,7 @@ export default function Checkout() {
             disabled={loading}
             className="w-full h-12 rounded-2xl bg-foreground text-primary-foreground text-sm font-semibold uppercase tracking-wider hover:bg-foreground/90"
           >
-            {loading ? "Processing..." : `Confirm Pickup → ₹${total.toLocaleString()}`}
+            {loading ? "Processing..." : `Confirm Pickup → ₹${finalTotal.toLocaleString()}`}
           </Button>
         </div>
       </div>
