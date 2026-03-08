@@ -83,7 +83,7 @@ export default function ServiceDetail() {
   const categorySlug = category?.slug || "";
   const heroImage = heroImageMap[categorySlug] || serviceHeroDefault;
 
-  const [justAdded, setJustAdded] = useState(false);
+
 
   const handleAdd = useCallback(() => {
     if (justAdded) return;
