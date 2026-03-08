@@ -98,7 +98,7 @@ export default function ProfilePage() {
             <button
               key={label}
               onClick={action}
-              className="flex w-full items-center gap-4 rounded-2xl bg-card p-4 text-left transition-colors hover:bg-secondary/50"
+              className="flex w-full items-center gap-4 rounded-2xl glass p-4 text-left transition-colors hover:bg-secondary/50"
             >
               <Icon className="h-5 w-5 text-foreground" />
               <span className="flex-1 text-sm font-medium text-foreground">{label}</span>
