@@ -106,6 +106,13 @@ export default function ProfilePage() {
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </button>
           ))}
+          <ComplaintDialog>
+            <button className="flex w-full items-center gap-4 rounded-2xl glass p-4 text-left transition-colors hover:bg-secondary/50">
+              <MessageSquareWarning className="h-5 w-5 text-foreground" />
+              <span className="flex-1 text-sm font-medium text-foreground">File a Complaint</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </button>
+          </ComplaintDialog>
         </div>
 
         {/* Theme Toggle */}
