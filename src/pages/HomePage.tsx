@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
 import logoImg from "@/assets/logo.png";
+import heroBg from "@/assets/hero-bg.jpg";
 import type { Tables } from "@/integrations/supabase/types";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -75,9 +76,11 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* Hero Section with gradient background */}
-          <div className="relative mx-5 mb-5 overflow-hidden rounded-2xl bg-gradient-to-b from-secondary via-secondary/80 to-background p-6 pt-8 pb-10">
-            <div className="relative z-10">
+          {/* Hero Section with background image */}
+          <div className="relative mx-5 mb-5 overflow-hidden rounded-2xl min-h-[340px] flex flex-col justify-end">
+            <img src={heroBg} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+            <div className="relative z-10 p-6 pb-7">
               <h1 className="mb-2 text-3xl font-display font-bold leading-tight text-foreground">
                 Expert care for<br />
                 <span className="text-foreground">your wardrobe.</span>
