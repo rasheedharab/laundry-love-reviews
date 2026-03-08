@@ -230,13 +230,27 @@
 }
 .skeleton-shimmer {
   background: linear-gradient(
-    90deg,
+    105deg,
     hsl(var(--muted)) 0%,
-    hsl(var(--gold) / 0.15) 50%,
+    hsl(var(--muted)) 35%,
+    hsl(var(--burnt-orange) / 0.12) 50%,
+    hsl(var(--muted)) 65%,
     hsl(var(--muted)) 100%
   );
   background-size: 200% 100%;
-  animation: shimmer 1.8s ease-in-out infinite;
+  animation: shimmer 2s ease-in-out infinite;
+}
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    105deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted)) 35%,
+    hsl(var(--burnt-orange) / 0.18) 50%,
+    hsl(var(--muted)) 65%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
 }
 
 /* Tier glow on selection */
