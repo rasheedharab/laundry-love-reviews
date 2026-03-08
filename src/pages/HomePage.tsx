@@ -247,12 +247,22 @@ export default function HomePage() {
                   Learn More
                 </button>
               </div>
-              <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
+              <motion.div
+                className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
+              >
                 {ritualSteps.map((step) => (
-                  <button
+                  <motion.button
                     key={step.num}
                     onClick={() => navigate("/ritual")}
-                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 transition-shadow hover:shadow-md"
+                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 transition-shadow hover:shadow-md glass-hover"
+                    variants={{
+                      hidden: { opacity: 0, y: 24, scale: 0.97 },
+                      visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
+                    }}
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-base">
                       {step.icon}
@@ -261,9 +271,9 @@ export default function HomePage() {
                       <p className="text-[10px] text-accent font-bold">Step {step.num}</p>
                       <p className="text-xs font-semibold text-foreground mt-0.5">{step.title}</p>
                     </div>
-                  </button>
+                  </motion.button>
                 ))}
-              </div>
+              </motion.div>
             </div>
           </ScrollReveal>
 
