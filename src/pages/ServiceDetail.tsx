@@ -83,9 +83,7 @@ export default function ServiceDetail() {
   const categorySlug = category?.slug || "";
   const heroImage = heroImageMap[categorySlug] || serviceHeroDefault;
 
-
-
-  const handleAdd = useCallback(() => {
+  const handleAdd = () => {
     if (justAdded) return;
     addItem({
       serviceId: service.id,
@@ -98,7 +96,7 @@ export default function ServiceDetail() {
     setJustAdded(true);
     toast.success(`${service.name} added to bag`);
     setTimeout(() => setJustAdded(false), 1200);
-  }, [service, category, tier, price, turnaround, addItem, justAdded]);
+  };
 
   return (
     <AnimatedPage>
