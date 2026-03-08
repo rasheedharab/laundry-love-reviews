@@ -206,7 +206,11 @@ export default function HomePage() {
           <ScrollReveal delay={0.05}>
             <div className="px-5 mt-6">
               <button
-                onClick={() => navigate("/services")}
+                onClick={() => {
+                  navigator.clipboard.writeText("WELCOME20");
+                  toast.success("Code WELCOME20 copied! Apply it at checkout.", { duration: 3000 });
+                  navigate("/services");
+                }}
                 className="w-full overflow-hidden rounded-2xl bg-gradient-to-r from-accent to-accent/80 p-5 text-left relative"
               >
                 <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-accent-foreground/20">
@@ -214,7 +218,10 @@ export default function HomePage() {
                 </div>
                 <p className="text-[10px] text-accent-foreground/70 uppercase tracking-widest font-medium mb-1">Limited Offer</p>
                 <p className="text-xl font-display font-bold text-accent-foreground leading-tight">First Order<br />20% Off</p>
-                <p className="text-xs text-accent-foreground/70 mt-2">Use code WELCOME20 at checkout</p>
+                <p className="text-xs text-accent-foreground/70 mt-2 flex items-center gap-1.5">
+                  Use code <span className="font-bold text-accent-foreground bg-accent-foreground/15 px-2 py-0.5 rounded-md">WELCOME20</span> at checkout
+                  <Copy className="h-3 w-3 text-accent-foreground/60" />
+                </p>
                 <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-accent-foreground uppercase tracking-wider">
                   Shop Now <ArrowRight className="h-3 w-3" />
                 </div>
