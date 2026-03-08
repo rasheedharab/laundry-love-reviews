@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import AnimatedPage from "@/components/AnimatedPage";
 import ServiceReviews from "@/components/ServiceReviews";
+import { addRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import type { Tables } from "@/integrations/supabase/types";
 
 import serviceHeroDefault from "@/assets/service-hero-default.jpg";
