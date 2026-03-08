@@ -127,13 +127,16 @@ export default function HomePage() {
                     </motion.span>
                   )}
                 </AnimatePresence>
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={() => navigate("/profile")}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 className="flex h-11 w-11 items-center justify-center rounded-full glass-sm"
               >
                 <User className="h-5 w-5 text-foreground" />
-              </button>
+              </motion.button>
             </div>
           </div>
 
