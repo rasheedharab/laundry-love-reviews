@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Zap, Tag, X, Clock, ArrowRight } from "lucide-react";
@@ -8,9 +8,10 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { addDays, format } from "date-fns";
+import { addDays, format, isToday, parse, isBefore } from "date-fns";
 import AnimatedPage from "@/components/AnimatedPage";
 
+const SLOT_CAPACITY = 10;
 const timeSlots = ["08:00 AM — 10:00 AM", "10:00 AM — 12:00 PM", "01:00 PM — 03:00 PM", "04:00 PM — 06:00 PM"];
 
 export default function Checkout() {
