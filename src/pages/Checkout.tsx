@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { addDays, format } from "date-fns";
+import AnimatedPage from "@/components/AnimatedPage";
 
 const timeSlots = ["08:00 AM – 10:00 AM", "10:00 AM – 12:00 PM", "02:00 PM – 04:00 PM", "04:00 PM – 06:00 PM"];
 
@@ -32,6 +33,12 @@ export default function Checkout() {
     });
   }, []);
 
+  const discount = promoApplied
+    ? promoApplied.discount_percent ? total * promoApplied.discount_percent / 100 : (promoApplied.discount_amount || 0)
+    : 0;
+  const finalTotal = Math.max(0, total - discount);
+  const estReturn = format(addDays(dates[selectedDate].full, serviceLevel === "express" ? 2 : 5), "dd MMM yyyy");
+
   const handlePlaceOrder = async () => {
     if (!user) { toast.error("Please sign in first"); return; }
     if (!address.trim()) { toast.error("Please enter a pickup address"); return; }
@@ -52,7 +59,8 @@ export default function Checkout() {
         discount: discount,
         total: finalTotal,
         promo_code_id: promoApplied?.id || null,
-      }).select().single();
+        service_level: serviceLevel,
+      } as any).select().single();
 
       if (orderErr) throw orderErr;
 
@@ -82,12 +90,6 @@ export default function Checkout() {
     return null;
   }
 
-  const discount = promoApplied
-    ? promoApplied.discount_percent ? total * promoApplied.discount_percent / 100 : (promoApplied.discount_amount || 0)
-    : 0;
-  const finalTotal = Math.max(0, total - discount);
-  const estReturn = format(addDays(dates[selectedDate].full, serviceLevel === "express" ? 2 : 5), "dd MMM yyyy");
-
   const handleApplyPromo = async () => {
     if (!promoCode.trim()) return;
     setPromoLoading(true);
@@ -107,173 +109,175 @@ export default function Checkout() {
   };
 
   return (
-    <div className="pb-28">
-      <div className="px-5 pt-6 pb-4">
-        <button onClick={() => navigate(-1)} className="mb-4 flex items-center gap-1 text-muted-foreground text-sm">
-          <ArrowLeft className="h-4 w-4" /> Back
-        </button>
-        <h1 className="text-xl font-display font-bold text-foreground uppercase tracking-wider">Schedule Pickup</h1>
-      </div>
-
-      <div className="px-5 space-y-5">
-        {/* Service Level Toggle */}
-        <div>
-          <p className="section-label mb-3">SERVICE LEVEL</p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setServiceLevel("regular")}
-              className={`flex-1 rounded-2xl border-2 p-3.5 text-center text-sm font-semibold transition-all ${
-                serviceLevel === "regular" ? "border-foreground bg-foreground text-primary-foreground" : "border-border text-foreground"
-              }`}
-            >
-              Regular
-            </button>
-            <button
-              onClick={() => setServiceLevel("express")}
-              className={`flex-1 rounded-2xl border-2 p-3.5 text-center text-sm font-semibold transition-all relative ${
-                serviceLevel === "express" ? "border-accent bg-accent text-accent-foreground" : "border-border text-foreground"
-              }`}
-            >
-              <Zap className="inline h-3.5 w-3.5 mr-1" />
-              Express
-              <span className="absolute -top-2 right-3 bg-accent text-accent-foreground text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-bold">
-                Priority
-              </span>
-            </button>
-          </div>
+    <AnimatedPage>
+      <div className="pb-28">
+        <div className="px-5 pt-6 pb-4">
+          <button onClick={() => navigate(-1)} className="mb-4 flex items-center gap-1 text-muted-foreground text-sm">
+            <ArrowLeft className="h-4 w-4" /> Back
+          </button>
+          <h1 className="text-xl font-display font-bold text-foreground uppercase tracking-wider">Schedule Pickup</h1>
         </div>
 
-        {/* Date Picker */}
-        <div>
-          <p className="section-label mb-3">SELECT DATE</p>
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-            {dates.map((d, i) => (
+        <div className="px-5 space-y-5">
+          {/* Service Level Toggle */}
+          <div>
+            <p className="section-label mb-3">SERVICE LEVEL</p>
+            <div className="flex gap-2">
               <button
-                key={i}
-                onClick={() => setSelectedDate(i)}
-                className={`flex flex-col items-center rounded-2xl border-2 px-4 py-3 min-w-[60px] transition-all ${
-                  selectedDate === i ? "border-foreground bg-foreground text-primary-foreground" : "border-border text-foreground"
+                onClick={() => setServiceLevel("regular")}
+                className={`flex-1 rounded-2xl border-2 p-3.5 text-center text-sm font-semibold transition-all ${
+                  serviceLevel === "regular" ? "border-foreground bg-foreground text-primary-foreground" : "border-border text-foreground"
                 }`}
               >
-                <span className="text-[10px] font-medium uppercase tracking-wider opacity-70">{d.day}</span>
-                <span className="text-lg font-bold">{d.date}</span>
+                Regular
               </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Time Slots */}
-        <div>
-          <p className="section-label mb-3">TIME WINDOW</p>
-          <div className="space-y-2">
-            {timeSlots.map((slot) => (
               <button
-                key={slot}
-                onClick={() => setSelectedSlot(slot)}
-                className={`w-full rounded-2xl border-2 p-3.5 text-left text-sm font-medium transition-all ${
-                  selectedSlot === slot ? "border-foreground bg-foreground/5" : "border-border"
+                onClick={() => setServiceLevel("express")}
+                className={`flex-1 rounded-2xl border-2 p-3.5 text-center text-sm font-semibold transition-all relative ${
+                  serviceLevel === "express" ? "border-accent bg-accent text-accent-foreground" : "border-border text-foreground"
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${
-                    selectedSlot === slot ? "border-foreground" : "border-muted-foreground"
-                  }`}>
-                    {selectedSlot === slot && <div className="h-2 w-2 rounded-full bg-foreground" />}
-                  </div>
-                  <span className="text-foreground">{slot}</span>
-                </div>
+                <Zap className="inline h-3.5 w-3.5 mr-1" />
+                Express
+                <span className="absolute -top-2 right-3 bg-accent text-accent-foreground text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-bold">
+                  Priority
+                </span>
               </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Pickup Address */}
-        <div>
-          <p className="section-label mb-3">PICKUP LOCATION</p>
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <MapPin className="h-4 w-4 text-accent" />
-              <span className="text-xs font-semibold text-foreground">Enter Address</span>
             </div>
-            <Input
-              placeholder="Full pickup address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="rounded-xl border-border"
-            />
           </div>
-        </div>
 
-        {/* Promo Code */}
-        <div>
-          <p className="section-label mb-3">PROMO CODE</p>
-          <div className="rounded-2xl border border-border bg-card p-4">
-            {promoApplied ? (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Tag className="h-4 w-4 text-accent" />
-                  <span className="text-sm font-semibold text-accent">{promoApplied.code}</span>
-                  <span className="text-xs text-muted-foreground">
-                    ({promoApplied.discount_percent ? `${promoApplied.discount_percent}% off` : `₹${promoApplied.discount_amount} off`})
-                  </span>
-                </div>
-                <button onClick={() => setPromoApplied(null)} className="p-1 rounded-full hover:bg-secondary">
-                  <X className="h-4 w-4 text-muted-foreground" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <Input
-                  value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value)}
-                  placeholder="Enter code"
-                  className="flex-1 rounded-xl border-border uppercase"
-                />
-                <Button
-                  onClick={handleApplyPromo}
-                  disabled={promoLoading || !promoCode.trim()}
-                  variant="outline"
-                  className="rounded-xl text-xs font-semibold"
+          {/* Date Picker */}
+          <div>
+            <p className="section-label mb-3">SELECT DATE</p>
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+              {dates.map((d, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedDate(i)}
+                  className={`flex flex-col items-center rounded-2xl border-2 px-4 py-3 min-w-[60px] transition-all ${
+                    selectedDate === i ? "border-foreground bg-foreground text-primary-foreground" : "border-border text-foreground"
+                  }`}
                 >
-                  {promoLoading ? "..." : "Apply"}
-                </Button>
+                  <span className="text-[10px] font-medium uppercase tracking-wider opacity-70">{d.day}</span>
+                  <span className="text-lg font-bold">{d.date}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Time Slots */}
+          <div>
+            <p className="section-label mb-3">TIME WINDOW</p>
+            <div className="space-y-2">
+              {timeSlots.map((slot) => (
+                <button
+                  key={slot}
+                  onClick={() => setSelectedSlot(slot)}
+                  className={`w-full rounded-2xl border-2 p-3.5 text-left text-sm font-medium transition-all ${
+                    selectedSlot === slot ? "border-foreground bg-foreground/5" : "border-border"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${
+                      selectedSlot === slot ? "border-foreground" : "border-muted-foreground"
+                    }`}>
+                      {selectedSlot === slot && <div className="h-2 w-2 rounded-full bg-foreground" />}
+                    </div>
+                    <span className="text-foreground">{slot}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Pickup Address */}
+          <div>
+            <p className="section-label mb-3">PICKUP LOCATION</p>
+            <div className="rounded-2xl border border-border bg-card p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="h-4 w-4 text-accent" />
+                <span className="text-xs font-semibold text-foreground">Enter Address</span>
+              </div>
+              <Input
+                placeholder="Full pickup address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="rounded-xl border-border"
+              />
+            </div>
+          </div>
+
+          {/* Promo Code */}
+          <div>
+            <p className="section-label mb-3">PROMO CODE</p>
+            <div className="rounded-2xl border border-border bg-card p-4">
+              {promoApplied ? (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Tag className="h-4 w-4 text-accent" />
+                    <span className="text-sm font-semibold text-accent">{promoApplied.code}</span>
+                    <span className="text-xs text-muted-foreground">
+                      ({promoApplied.discount_percent ? `${promoApplied.discount_percent}% off` : `₹${promoApplied.discount_amount} off`})
+                    </span>
+                  </div>
+                  <button onClick={() => setPromoApplied(null)} className="p-1 rounded-full hover:bg-secondary">
+                    <X className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Input
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    placeholder="Enter code"
+                    className="flex-1 rounded-xl border-border uppercase"
+                  />
+                  <Button
+                    onClick={handleApplyPromo}
+                    disabled={promoLoading || !promoCode.trim()}
+                    variant="outline"
+                    className="rounded-xl text-xs font-semibold"
+                  >
+                    {promoLoading ? "..." : "Apply"}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Processing Info */}
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Processing Atelier</p>
+            <p className="text-sm font-semibold text-foreground">White Rabbit — Central Studio</p>
+            <p className="text-xs text-muted-foreground mt-1">Est. return by {estReturn}</p>
+            {discount > 0 && (
+              <div className="mt-2 pt-2 border-t border-border">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-foreground">₹{total.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-xs mt-1">
+                  <span className="text-accent">Discount</span>
+                  <span className="text-accent">-₹{discount.toLocaleString()}</span>
+                </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* Processing Info */}
-        <div className="rounded-2xl border border-border bg-card p-4">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Processing Atelier</p>
-          <p className="text-sm font-semibold text-foreground">White Rabbit — Central Studio</p>
-          <p className="text-xs text-muted-foreground mt-1">Est. return by {estReturn}</p>
-          {discount > 0 && (
-            <div className="mt-2 pt-2 border-t border-border">
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span className="text-foreground">₹{total.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between text-xs mt-1">
-                <span className="text-accent">Discount</span>
-                <span className="text-accent">-₹{discount.toLocaleString()}</span>
-              </div>
-            </div>
-          )}
+        {/* Fixed CTA */}
+        <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-md px-5 py-3">
+          <div className="mx-auto max-w-lg">
+            <Button
+              onClick={handlePlaceOrder}
+              disabled={loading}
+              className="w-full h-12 rounded-2xl bg-foreground text-primary-foreground text-sm font-semibold uppercase tracking-wider hover:bg-foreground/90"
+            >
+              {loading ? "Processing..." : `Confirm Pickup → ₹${finalTotal.toLocaleString()}`}
+            </Button>
+          </div>
         </div>
       </div>
-
-      {/* Fixed CTA */}
-      <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-md px-5 py-3">
-        <div className="mx-auto max-w-lg">
-          <Button
-            onClick={handlePlaceOrder}
-            disabled={loading}
-            className="w-full h-12 rounded-2xl bg-foreground text-primary-foreground text-sm font-semibold uppercase tracking-wider hover:bg-foreground/90"
-          >
-            {loading ? "Processing..." : `Confirm Pickup → ₹${finalTotal.toLocaleString()}`}
-          </Button>
-        </div>
-      </div>
-    </div>
+    </AnimatedPage>
   );
 }
