@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { CheckCircle2, FileText, Search, Truck, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import OrderCardSkeleton from "@/components/skeletons/OrderCardSkeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
 import EmptyState from "@/components/EmptyState";
