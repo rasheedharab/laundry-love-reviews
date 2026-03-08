@@ -110,6 +110,8 @@ function AnimatedRoutes() {
           <Route path="promos" element={<AdminPromos />} />
           <Route path="ritual-steps" element={<AdminRitualSteps />} />
           <Route path="care-tips" element={<AdminCareTips />} />
+          <Route path="faqs" element={<AdminFaqs />} />
+          <Route path="membership" element={<AdminMembershipTiers />} />
           <Route path="site-settings" element={<AdminSiteSettings />} />
           <Route path="users" element={<AdminUsers />} />
         </Route>
