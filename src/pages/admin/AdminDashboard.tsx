@@ -1,27 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ShoppingBag, Users, IndianRupee, Star } from "lucide-react";
+import { ShoppingBag, Users, IndianRupee, Star, CalendarIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format, subMonths, startOfDay, endOfDay, eachMonthOfInterval, startOfMonth, isWithinInterval } from "date-fns";
 
-interface Stats {
-  totalOrders: number;
-  totalRevenue: number;
-  totalUsers: number;
-  avgRating: number;
-}
+interface OrderRow { id: string; total: number; created_at: string }
+interface ComplaintRow { status: string; created_at: string }
+interface ReviewRow { rating: number; created_at: string }
 
-interface MonthlyData {
-  month: string;
-  orders: number;
-  revenue: number;
-}
-
-interface ComplaintData {
-  name: string;
-  value: number;
-}
+interface MonthlyData { month: string; orders: number; revenue: number }
+interface ComplaintData { name: string; value: number }
 
 const COMPLAINT_COLORS = [
   "hsl(var(--primary))",
@@ -35,75 +29,96 @@ const chartConfig = {
   revenue: { label: "Revenue", color: "hsl(var(--accent))" },
 };
 
-function getLast6Months(): string[] {
-  const months: string[] = [];
-  const now = new Date();
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push(d.toLocaleDateString("en-US", { month: "short", year: "2-digit" }));
-  }
-  return months;
-}
-
-function getMonthKey(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
-}
+const presets = [
+  { label: "Last 30 days", from: subMonths(new Date(), 1), to: new Date() },
+  { label: "Last 3 months", from: subMonths(new Date(), 3), to: new Date() },
+  { label: "Last 6 months", from: subMonths(new Date(), 6), to: new Date() },
+  { label: "Last 12 months", from: subMonths(new Date(), 12), to: new Date() },
+];
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<Stats>({ totalOrders: 0, totalRevenue: 0, totalUsers: 0, avgRating: 0 });
-  const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
-  const [complaintData, setComplaintData] = useState<ComplaintData[]>([]);
+  const [allOrders, setAllOrders] = useState<OrderRow[]>([]);
+  const [allComplaints, setAllComplaints] = useState<ComplaintRow[]>([]);
+  const [allReviews, setAllReviews] = useState<ReviewRow[]>([]);
+  const [totalUsers, setTotalUsers] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  const [dateFrom, setDateFrom] = useState<Date>(subMonths(new Date(), 6));
+  const [dateTo, setDateTo] = useState<Date>(new Date());
+
   useEffect(() => {
-    const months = getLast6Months();
-
     Promise.all([
-      supabase.from("orders").select("id, total, created_at", { count: "exact" }),
+      supabase.from("orders").select("id, total, created_at"),
       supabase.from("profiles").select("id", { count: "exact" }),
-      supabase.from("reviews").select("rating"),
-      supabase.from("complaints").select("status"),
+      supabase.from("reviews").select("rating, created_at"),
+      supabase.from("complaints").select("status, created_at"),
     ]).then(([ordersRes, profilesRes, reviewsRes, complaintsRes]) => {
-      const orders = ordersRes.data ?? [];
-      const revenue = orders.reduce((sum, o) => sum + Number(o.total), 0);
-      const ratings = reviewsRes.data ?? [];
-      const avg = ratings.length ? ratings.reduce((s, r) => s + r.rating, 0) / ratings.length : 0;
-
-      setStats({
-        totalOrders: ordersRes.count ?? orders.length,
-        totalRevenue: revenue,
-        totalUsers: profilesRes.count ?? 0,
-        avgRating: Math.round(avg * 10) / 10,
-      });
-
-      // Monthly aggregation
-      const monthMap: Record<string, { orders: number; revenue: number }> = {};
-      months.forEach((m) => (monthMap[m] = { orders: 0, revenue: 0 }));
-      orders.forEach((o) => {
-        const key = getMonthKey(o.created_at);
-        if (monthMap[key]) {
-          monthMap[key].orders++;
-          monthMap[key].revenue += Number(o.total);
-        }
-      });
-      setMonthlyData(months.map((m) => ({ month: m, ...monthMap[m] })));
-
-      // Complaint status aggregation
-      const complaints = complaintsRes.data ?? [];
-      const statusMap: Record<string, number> = {};
-      complaints.forEach((c) => {
-        statusMap[c.status] = (statusMap[c.status] || 0) + 1;
-      });
-      const cData = Object.entries(statusMap).map(([name, value]) => ({
-        name: name.charAt(0).toUpperCase() + name.slice(1).replace("-", " "),
-        value,
-      }));
-      setComplaintData(cData.length ? cData : [{ name: "No data", value: 1 }]);
-
+      setAllOrders((ordersRes.data ?? []) as OrderRow[]);
+      setTotalUsers(profilesRes.count ?? 0);
+      setAllReviews((reviewsRes.data ?? []) as ReviewRow[]);
+      setAllComplaints((complaintsRes.data ?? []) as ComplaintRow[]);
       setLoading(false);
     });
   }, []);
+
+  const interval = useMemo(() => ({ start: startOfDay(dateFrom), end: endOfDay(dateTo) }), [dateFrom, dateTo]);
+
+  const filteredOrders = useMemo(() =>
+    allOrders.filter((o) => isWithinInterval(new Date(o.created_at), interval)),
+    [allOrders, interval]
+  );
+
+  const filteredComplaints = useMemo(() =>
+    allComplaints.filter((c) => isWithinInterval(new Date(c.created_at), interval)),
+    [allComplaints, interval]
+  );
+
+  const filteredReviews = useMemo(() =>
+    allReviews.filter((r) => isWithinInterval(new Date(r.created_at), interval)),
+    [allReviews, interval]
+  );
+
+  const stats = useMemo(() => {
+    const revenue = filteredOrders.reduce((sum, o) => sum + Number(o.total), 0);
+    const avg = filteredReviews.length
+      ? filteredReviews.reduce((s, r) => s + r.rating, 0) / filteredReviews.length
+      : 0;
+    return {
+      totalOrders: filteredOrders.length,
+      totalRevenue: revenue,
+      totalUsers,
+      avgRating: Math.round(avg * 10) / 10,
+    };
+  }, [filteredOrders, filteredReviews, totalUsers]);
+
+  const monthlyData = useMemo<MonthlyData[]>(() => {
+    const months = eachMonthOfInterval({ start: startOfMonth(dateFrom), end: dateTo });
+    const monthMap: Record<string, { orders: number; revenue: number }> = {};
+    months.forEach((m) => {
+      const key = format(m, "MMM yy");
+      monthMap[key] = { orders: 0, revenue: 0 };
+    });
+    filteredOrders.forEach((o) => {
+      const key = format(new Date(o.created_at), "MMM yy");
+      if (monthMap[key]) {
+        monthMap[key].orders++;
+        monthMap[key].revenue += Number(o.total);
+      }
+    });
+    return months.map((m) => ({ month: format(m, "MMM yy"), ...monthMap[format(m, "MMM yy")] }));
+  }, [filteredOrders, dateFrom, dateTo]);
+
+  const complaintData = useMemo<ComplaintData[]>(() => {
+    const statusMap: Record<string, number> = {};
+    filteredComplaints.forEach((c) => {
+      statusMap[c.status] = (statusMap[c.status] || 0) + 1;
+    });
+    const cData = Object.entries(statusMap).map(([name, value]) => ({
+      name: name.charAt(0).toUpperCase() + name.slice(1).replace("-", " "),
+      value,
+    }));
+    return cData.length ? cData : [{ name: "No data", value: 1 }];
+  }, [filteredComplaints]);
 
   const statCards = [
     { label: "Total Orders", value: stats.totalOrders, icon: ShoppingBag, color: "text-primary" },
@@ -114,7 +129,70 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-display font-bold text-foreground">Dashboard</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-xl font-display font-bold text-foreground">Dashboard</h1>
+
+        {/* Date Range Picker */}
+        <div className="flex flex-wrap items-center gap-2">
+          {presets.map((p) => (
+            <Button
+              key={p.label}
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "text-xs h-8",
+                format(dateFrom, "yyyy-MM-dd") === format(p.from, "yyyy-MM-dd") &&
+                format(dateTo, "yyyy-MM-dd") === format(p.to, "yyyy-MM-dd")
+                  ? "bg-secondary text-foreground"
+                  : "text-muted-foreground"
+              )}
+              onClick={() => { setDateFrom(p.from); setDateTo(p.to); }}
+            >
+              {p.label}
+            </Button>
+          ))}
+
+          <div className="flex items-center gap-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5">
+                  <CalendarIcon className="h-3.5 w-3.5" />
+                  {format(dateFrom, "MMM d, yy")}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="single"
+                  selected={dateFrom}
+                  onSelect={(d) => d && setDateFrom(d)}
+                  disabled={(d) => d > dateTo || d > new Date()}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+            <span className="text-xs text-muted-foreground">–</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5">
+                  <CalendarIcon className="h-3.5 w-3.5" />
+                  {format(dateTo, "MMM d, yy")}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="single"
+                  selected={dateTo}
+                  onSelect={(d) => d && setDateTo(d)}
+                  disabled={(d) => d < dateFrom || d > new Date()}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+      </div>
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -131,12 +209,9 @@ export default function AdminDashboard() {
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Order Trends */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              Order Trends (6 months)
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Order Trends</CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[260px] w-full">
@@ -151,12 +226,9 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Revenue Over Time */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              Revenue Over Time
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Revenue Over Time</CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[260px] w-full">
@@ -171,27 +243,16 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Complaint Resolution */}
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              Complaint Status Breakdown
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Complaint Status Breakdown</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <div className="h-[200px] w-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie
-                      data={complaintData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={85}
-                      paddingAngle={3}
-                      dataKey="value"
-                    >
+                    <Pie data={complaintData} cx="50%" cy="50%" innerRadius={50} outerRadius={85} paddingAngle={3} dataKey="value">
                       {complaintData.map((_, i) => (
                         <Cell key={i} fill={COMPLAINT_COLORS[i % COMPLAINT_COLORS.length]} />
                       ))}
@@ -203,10 +264,7 @@ export default function AdminDashboard() {
               <div className="flex flex-wrap gap-4">
                 {complaintData.map((d, i) => (
                   <div key={d.name} className="flex items-center gap-2">
-                    <div
-                      className="h-3 w-3 rounded-full"
-                      style={{ backgroundColor: COMPLAINT_COLORS[i % COMPLAINT_COLORS.length] }}
-                    />
+                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: COMPLAINT_COLORS[i % COMPLAINT_COLORS.length] }} />
                     <span className="text-sm text-muted-foreground">
                       {d.name}: <span className="font-semibold text-foreground">{d.value}</span>
                     </span>
