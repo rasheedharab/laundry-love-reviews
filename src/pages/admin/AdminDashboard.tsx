@@ -249,8 +249,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row items-center gap-6">
-              <div className="h-[200px] w-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
+              <ChartContainer config={{ complaints: { label: "Complaints", color: "hsl(var(--primary))" } }} className="h-[200px] w-[200px]">
                   <PieChart>
                     <Pie data={complaintData} cx="50%" cy="50%" innerRadius={50} outerRadius={85} paddingAngle={3} dataKey="value">
                       {complaintData.map((_, i) => (
@@ -259,8 +258,7 @@ export default function AdminDashboard() {
                     </Pie>
                     <ChartTooltip content={<ChartTooltipContent hideLabel />} />
                   </PieChart>
-                </ResponsiveContainer>
-              </div>
+              </ChartContainer>
               <div className="flex flex-wrap gap-4">
                 {complaintData.map((d, i) => (
                   <div key={d.name} className="flex items-center gap-2">
