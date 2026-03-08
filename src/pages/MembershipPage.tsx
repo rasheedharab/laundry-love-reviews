@@ -22,18 +22,7 @@ interface Tier {
   is_popular: boolean;
 }
 
-const ritualSteps = [
-  {
-    icon: "👔",
-    title: "White-Glove Collection",
-    desc: "Scheduled precisely to your calendar. Handled with utmost discretion in our signature garment carriers.",
-  },
-  {
-    icon: "✨",
-    title: "Bespoke Treatment",
-    desc: "Each piece is inspected by our master artisans and treated with eco-conscious, fabric-specific formulations.",
-  },
-];
+interface ClubStep { id: string; title: string; description: string | null; icon: string | null; step_number: number; }
 
 export default function MembershipPage() {
   const navigate = useNavigate();
