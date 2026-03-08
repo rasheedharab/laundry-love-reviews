@@ -69,10 +69,11 @@ export default function AdminFaqs() {
     fetchData();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this FAQ?")) return;
-    await supabase.from("faqs").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await supabase.from("faqs").delete().eq("id", deleteId);
     toast.success("FAQ deleted");
+    setDeleteId(null);
     fetchData();
   };
 
