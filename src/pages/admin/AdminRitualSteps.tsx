@@ -86,10 +86,11 @@ export default function AdminRitualSteps() {
     fetchData();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this ritual step?")) return;
-    await supabase.from("ritual_steps").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await supabase.from("ritual_steps").delete().eq("id", deleteId);
     toast.success("Step deleted");
+    setDeleteId(null);
     fetchData();
   };
 
