@@ -20,7 +20,7 @@ export default function Onboarding() {
     if (step < slides.length - 1) setStep(step + 1);
     else {
       localStorage.setItem("wr_onboarded", "1");
-      navigate("/login");
+      navigate("/home");
     }
   };
 
