@@ -2,7 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CartProvider } from "@/contexts/CartContext";
@@ -57,6 +58,61 @@ function RootRedirect() {
   return <Navigate to={onboarded ? "/home" : "/onboarding"} replace />;
 }
 
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<RootRedirect />} />
+        <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route element={<AppLayout />}>
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/services" element={<ServicesHub />} />
+          <Route path="/services/:slug" element={<CategoryPage />} />
+          <Route path="/service/:slug" element={<ServiceDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/membership" element={<MembershipPage />} />
+          <Route path="/ritual" element={<RitualPage />} />
+          <Route path="/select-outlet" element={<SelectOutlet />} />
+          <Route path="/saved-addresses" element={<ProtectedRoute><SavedAddresses /></ProtectedRoute>} />
+          <Route path="/edit-profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+          <Route path="/referral" element={<ProtectedRoute><ReferralPage /></ProtectedRoute>} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/my-complaints" element={<ProtectedRoute><MyComplaintsPage /></ProtectedRoute>} />
+        </Route>
+        {/* Admin routes */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="customers" element={<AdminCustomers />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="services" element={<AdminServices />} />
+          <Route path="outlets" element={<AdminOutlets />} />
+          <Route path="complaints" element={<AdminComplaints />} />
+          <Route path="blog" element={<AdminBlog />} />
+          <Route path="promos" element={<AdminPromos />} />
+          <Route path="users" element={<AdminUsers />} />
+        </Route>
+        <Route path="/garment-advisor" element={<GarmentAdvisor />} />
+        <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
+        <Route path="/track-order/:id" element={<ProtectedRoute><TrackOrder /></ProtectedRoute>} />
+        <Route path="/order-confirmation/:id" element={<ProtectedRoute><OrderConfirmation /></ProtectedRoute>} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
 function AppShell() {
   const { loading } = useAuth();
 
@@ -68,52 +124,7 @@ function AppShell() {
       <Sonner />
       <InAppNotificationListener />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<RootRedirect />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route element={<AppLayout />}>
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/services" element={<ServicesHub />} />
-            <Route path="/services/:slug" element={<CategoryPage />} />
-            <Route path="/service/:slug" element={<ServiceDetail />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-            <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/membership" element={<MembershipPage />} />
-            <Route path="/ritual" element={<RitualPage />} />
-            <Route path="/select-outlet" element={<SelectOutlet />} />
-            <Route path="/saved-addresses" element={<ProtectedRoute><SavedAddresses /></ProtectedRoute>} />
-            <Route path="/edit-profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
-            <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
-            <Route path="/referral" element={<ProtectedRoute><ReferralPage /></ProtectedRoute>} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/my-complaints" element={<ProtectedRoute><MyComplaintsPage /></ProtectedRoute>} />
-          </Route>
-          {/* Admin routes */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="orders" element={<AdminOrders />} />
-            <Route path="customers" element={<AdminCustomers />} />
-            <Route path="categories" element={<AdminCategories />} />
-            <Route path="services" element={<AdminServices />} />
-            <Route path="outlets" element={<AdminOutlets />} />
-            <Route path="complaints" element={<AdminComplaints />} />
-            <Route path="blog" element={<AdminBlog />} />
-            <Route path="promos" element={<AdminPromos />} />
-            <Route path="users" element={<AdminUsers />} />
-          </Route>
-          <Route path="/garment-advisor" element={<GarmentAdvisor />} />
-          <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
-          <Route path="/track-order/:id" element={<ProtectedRoute><TrackOrder /></ProtectedRoute>} />
-          <Route path="/order-confirmation/:id" element={<ProtectedRoute><OrderConfirmation /></ProtectedRoute>} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AnimatedRoutes />
       </BrowserRouter>
     </>
   );
