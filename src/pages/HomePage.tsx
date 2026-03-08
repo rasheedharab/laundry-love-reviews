@@ -2,10 +2,9 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { MapPin, ChevronDown, Sparkles, Wind, Briefcase, Layers, Armchair, Shirt, ArrowRight, Bell, Trophy } from "lucide-react";
+import { MapPin, ChevronDown, Sparkles, Wind, Briefcase, Layers, Armchair, Shirt, ArrowRight, User, Truck, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { StaggerContainer, StaggerItem } from "@/components/StaggerAnimation";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
 import logoImg from "@/assets/logo.png";
@@ -19,11 +18,8 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [categories, setCategories] = useState<Tables<"service_categories">[]>([]);
-  const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
   const [activeOrder, setActiveOrder] = useState<Tables<"orders"> | null>(null);
   const [loading, setLoading] = useState(true);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -31,176 +27,150 @@ export default function HomePage() {
     if (cats) setCategories(cats);
 
     if (user) {
-      const [{ data: prof }, { data: orders }, { data: points }, { count: unread }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("user_id", user.id).single(),
-        supabase.from("orders").select("*").eq("user_id", user.id).not("status", "in", '("completed","cancelled")').order("created_at", { ascending: false }).limit(1),
-        supabase.from("loyalty_points").select("points").eq("user_id", user.id),
-        supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("is_read", false),
-      ]);
-      if (prof) setProfile(prof);
+      const { data: orders } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("user_id", user.id)
+        .not("status", "in", '("completed","cancelled")')
+        .order("created_at", { ascending: false })
+        .limit(1);
       setActiveOrder(orders?.[0] ?? null);
-      setTotalPoints((points || []).reduce((s: number, p: any) => s + (p.points || 0), 0));
-      setUnreadCount(unread || 0);
     }
     setLoading(false);
   }, [user]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  // Realtime notifications count
-  useEffect(() => {
-    if (!user) return;
-    const channel = supabase
-      .channel("home-notif-count")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` }, () => {
-        setUnreadCount((c) => c + 1);
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [user]);
-
   return (
     <AnimatedPage>
       <PullToRefresh onRefresh={fetchData}>
-        <div className="px-5 pt-6 pb-4">
+        <div className="min-h-screen bg-background">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <p className="text-xs text-muted-foreground">Good day,</p>
-              <p className="text-base font-semibold text-foreground">{profile?.full_name || "Guest"}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => navigate("/notifications")}
-                className="relative flex h-9 w-9 items-center justify-center rounded-full bg-secondary"
+          <div className="flex items-center justify-between px-5 pt-6 pb-4">
+            <button
+              onClick={() => navigate("/select-outlet")}
+              className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5"
+            >
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Your Location</span>
+              </div>
+            </button>
+            <button
+              onClick={() => navigate("/profile")}
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card"
+            >
+              <User className="h-5 w-5 text-foreground" />
+            </button>
+          </div>
+
+          {/* Location selector below */}
+          <div className="px-5 -mt-2 mb-4">
+            <button
+              onClick={() => navigate("/select-outlet")}
+              className="flex items-center gap-1.5"
+            >
+              <MapPin className="h-4 w-4 text-accent" />
+              <span className="text-sm font-medium text-foreground">Select Outlet/City</span>
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </button>
+          </div>
+
+          {/* Hero Section with gradient background */}
+          <div className="relative mx-5 mb-5 overflow-hidden rounded-2xl bg-gradient-to-b from-secondary via-secondary/80 to-background p-6 pt-8 pb-10">
+            <div className="relative z-10">
+              <h1 className="mb-2 text-3xl font-display font-bold leading-tight text-foreground">
+                Expert care for<br />
+                <span className="text-foreground">your wardrobe.</span>
+              </h1>
+              <p className="mb-5 text-sm text-muted-foreground leading-relaxed">
+                High-end dry cleaning & laundry services<br />
+                crafted for modern luxury.
+              </p>
+              <Button
+                onClick={() => navigate("/services")}
+                className="h-11 rounded-full bg-accent text-accent-foreground text-xs font-bold uppercase tracking-wider px-6 hover:bg-accent/90"
               >
-                <Bell className="h-4 w-4 text-foreground" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-accent-foreground">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
-              </button>
-              <button className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">
-                <MapPin className="h-3 w-3" />
-                Mumbai
-                <ChevronDown className="h-3 w-3" />
-              </button>
+                Book Now
+              </Button>
             </div>
           </div>
 
-          {/* Loyalty Points Banner */}
-          {user && totalPoints > 0 && (
+          {/* Active Order Card */}
+          {activeOrder && (
             <button
-              onClick={() => navigate("/profile")}
-              className="mb-4 flex w-full items-center gap-3 rounded-xl bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/20 p-3 text-left"
+              onClick={() => navigate(`/track-order/${activeOrder.id}`)}
+              className="mx-5 mb-5 flex w-[calc(100%-2.5rem)] items-center gap-3 rounded-2xl bg-foreground p-4"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent/15">
-                <Trophy className="h-4 w-4 text-accent" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/20">
+                <Truck className="h-6 w-6 text-accent" />
               </div>
-              <div className="flex-1">
-                <p className="text-xs font-semibold text-foreground">{totalPoints.toLocaleString()} Points</p>
-                <p className="text-[10px] text-muted-foreground">White Rabbit Rewards</p>
+              <div className="flex-1 text-left">
+                <p className="text-sm font-semibold text-primary-foreground">
+                  Active Order #{activeOrder.id.slice(0, 4).toUpperCase()}
+                </p>
+                <p className="text-xs text-primary-foreground/60">
+                  {activeOrder.pickup_time_slot
+                    ? `Pickup scheduled for ${activeOrder.pickup_time_slot}`
+                    : `Status: ${activeOrder.status.replace("-", " ")}`}
+                </p>
               </div>
-              <ChevronDown className="h-4 w-4 text-accent rotate-[-90deg]" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-card">
+                <ArrowRight className="h-4 w-4 text-foreground" />
+              </div>
             </button>
           )}
 
-          {/* Hero */}
-          <div className="relative mb-6 overflow-hidden rounded-2xl bg-foreground p-6 text-primary-foreground">
-            <div className="relative z-10">
-              <h1 className="mb-1 text-xl font-display font-bold leading-tight">Expert care for<br />your wardrobe</h1>
-              <p className="mb-4 text-xs opacity-80">Premium cleaning & garment preservation</p>
-              <div className="flex gap-2">
-                <Button onClick={() => navigate("/services")} className="h-9 rounded-lg bg-accent text-accent-foreground text-xs font-semibold px-5 hover:bg-accent/90">
-                  Book Now
-                </Button>
-                <Button variant="outline" onClick={() => navigate("/ritual")} className="h-9 rounded-lg border-primary-foreground/30 text-primary-foreground text-xs font-semibold px-4 hover:bg-primary-foreground/10 bg-transparent">
-                  Our 7-Step Ritual
-                </Button>
+          {/* Our Services */}
+          <div className="px-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-display font-bold text-foreground">Our Services</h2>
+              <button onClick={() => navigate("/services")} className="text-xs font-semibold text-accent uppercase tracking-wider">
+                View All
+              </button>
+            </div>
+
+            {loading ? (
+              <div className="grid grid-cols-2 gap-3">
+                {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}
               </div>
-            </div>
-            <img src={logoImg} alt="" className="absolute -right-4 -bottom-4 h-28 w-28 opacity-10" />
-          </div>
-
-          {/* AI Care Advisor Banner */}
-          <button onClick={() => navigate("/garment-advisor")} className="mb-6 flex w-full items-center gap-3 rounded-xl border border-accent/20 bg-accent/5 p-4 text-left transition-shadow hover:shadow-md">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
-              <Sparkles className="h-5 w-5 text-accent" />
-            </div>
-            <div className="flex-1">
-              <p className="text-xs font-semibold text-accent">AI Care Advisor</p>
-              <p className="text-[10px] text-muted-foreground">Get expert fabric care tips instantly</p>
-            </div>
-            <ChevronDown className="h-4 w-4 text-accent rotate-[-90deg]" />
-          </button>
-
-          {/* Active Order Banner */}
-          <div className="mb-6 flex items-center gap-3 rounded-xl border border-border bg-card p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
-              <Sparkles className="h-5 w-5 text-accent" />
-            </div>
-            <div className="flex-1">
-              {activeOrder ? (
-                <>
-                  <p className="text-xs font-semibold text-foreground">
-                    Order #WR-{activeOrder.id.slice(0, 6).toUpperCase()}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground capitalize">{activeOrder.status.replace("-", " ")}</p>
-                </>
-              ) : (
-                <>
-                  <p className="text-xs font-semibold text-foreground">No active orders</p>
-                  <p className="text-[11px] text-muted-foreground">Book a service to get started</p>
-                </>
-              )}
-            </div>
-            {activeOrder ? (
-              <Button variant="outline" size="sm" className="text-xs h-8 rounded-lg" onClick={() => navigate(`/track-order/${activeOrder.id}`)}>
-                Track <ArrowRight className="h-3 w-3 ml-1" />
-              </Button>
             ) : (
-              <Button variant="outline" size="sm" className="text-xs h-8 rounded-lg" onClick={() => navigate("/services")}>
-                Browse
-              </Button>
+              <div className="grid grid-cols-2 gap-3">
+                {categories.slice(0, 4).map((cat) => {
+                  const Icon = iconMap[cat.icon || "sparkles"] || Sparkles;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => navigate(`/services/${cat.slug}`)}
+                      className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-5 pt-6 pb-5 transition-shadow hover:shadow-md"
+                    >
+                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-secondary">
+                        <Icon className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm font-semibold text-foreground leading-tight">{cat.name}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">
+                          {cat.description?.split(" ").slice(0, 2).join(" ") || "Premium Care"}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             )}
           </div>
 
-          {/* Services Grid */}
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-display font-semibold text-foreground">Our Services</h2>
-            <button onClick={() => navigate("/services")} className="text-xs text-primary font-medium">View all</button>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-3 gap-3">
-              {[1, 2, 3, 4, 5, 6].map((i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
-            </div>
-          ) : (
-            <StaggerContainer className="grid grid-cols-3 gap-3">
-              {categories.map((cat) => {
-                const Icon = iconMap[cat.icon || "sparkles"] || Sparkles;
-                return (
-                  <StaggerItem key={cat.id}>
-                    <button
-                      onClick={() => navigate(`/services/${cat.slug}`)}
-                      className="flex w-full flex-col items-center gap-2 rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-md"
-                    >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                        <Icon className="h-5 w-5 text-primary" />
-                      </div>
-                      <span className="text-[11px] font-medium text-foreground text-center leading-tight">{cat.name}</span>
-                    </button>
-                  </StaggerItem>
-                );
-              })}
-            </StaggerContainer>
-          )}
-
           {/* Brand Footer */}
-          <div className="mt-8 flex justify-center">
-            <img src={logoImg} alt="White Rabbit" className="h-10 opacity-20" />
+          <div className="mt-10 mb-6 flex justify-center">
+            <img src={logoImg} alt="White Rabbit" className="h-12 opacity-15" />
           </div>
+
+          {/* Chat FAB */}
+          <button
+            onClick={() => navigate("/garment-advisor")}
+            className="fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-accent shadow-lg shadow-accent/30 transition-transform hover:scale-105"
+          >
+            <MessageCircle className="h-6 w-6 text-accent-foreground" />
+          </button>
         </div>
       </PullToRefresh>
     </AnimatedPage>
