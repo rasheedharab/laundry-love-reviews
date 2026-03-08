@@ -54,6 +54,7 @@ export default function ProfilePage() {
     { icon: ClipboardList, label: "Order History", action: () => navigate("/orders") },
     { icon: Gift, label: "Refer a Friend", action: () => navigate("/referral") },
     { icon: Headphones, label: "Support & Concierge", action: () => {} },
+    { icon: FileWarning, label: "My Complaints", action: () => navigate("/my-complaints") },
   ];
 
   return (
