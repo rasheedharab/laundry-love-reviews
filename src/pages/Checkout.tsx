@@ -38,6 +38,23 @@ export default function Checkout() {
     });
   }, []);
 
+  // Fetch settings (time slots + capacity)
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const { data } = await supabase.from("site_settings").select("key, value").in("key", ["time_slots", "slot_capacity"]);
+      if (data) {
+        data.forEach((s: any) => {
+          if (s.key === "time_slots" && Array.isArray(s.value)) {
+            setTimeSlots(s.value);
+            setSelectedSlot(s.value[1] || s.value[0]);
+          }
+          if (s.key === "slot_capacity" && typeof s.value === "string") setSlotCapacity(parseInt(s.value) || DEFAULT_CAPACITY);
+        });
+      }
+    };
+    fetchSettings();
+  }, []);
+
   // Fetch slot availability when selected date changes
   useEffect(() => {
     const fetchAvailability = async () => {
@@ -55,7 +72,7 @@ export default function Checkout() {
       }
     };
     fetchAvailability();
-  }, [selectedDate, dates]);
+  }, [selectedDate, dates, timeSlots]);
 
   const isSlotFull = (slot: string) => (slotCounts[slot] || 0) >= SLOT_CAPACITY;
 
