@@ -21,7 +21,7 @@ export default function Login() {
     setLoading(true);
     try {
       await signIn(email, password);
-      navigate("/home");
+      navigate(redirectTo);
     } catch (err: any) {
       toast.error(err.message || "Login failed");
     } finally {
