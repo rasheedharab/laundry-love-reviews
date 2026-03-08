@@ -53,12 +53,21 @@ export default function HomePage() {
         <div className="relative z-10">
           <h1 className="mb-1 text-xl font-display font-bold leading-tight">Expert care for<br />your wardrobe</h1>
           <p className="mb-4 text-xs opacity-80">Premium cleaning & garment preservation</p>
-          <Button
-            onClick={() => navigate("/services")}
-            className="h-9 rounded-lg bg-accent text-accent-foreground text-xs font-semibold px-5 hover:bg-accent/90"
-          >
-            Book Now
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => navigate("/services")}
+              className="h-9 rounded-lg bg-accent text-accent-foreground text-xs font-semibold px-5 hover:bg-accent/90"
+            >
+              Book Now
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/ritual")}
+              className="h-9 rounded-lg border-primary-foreground/30 text-primary-foreground text-xs font-semibold px-4 hover:bg-primary-foreground/10 bg-transparent"
+            >
+              Our 7-Step Ritual
+            </Button>
+          </div>
         </div>
         <img src={logoImg} alt="" className="absolute -right-4 -bottom-4 h-28 w-28 opacity-10" />
       </div>
