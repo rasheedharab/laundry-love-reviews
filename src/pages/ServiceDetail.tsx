@@ -82,7 +82,7 @@ export default function ServiceDetail() {
   const price = tier === "express" && service.price_express ? service.price_express : service.price_standard;
   const turnaround = tier === "express" ? service.turnaround_express : service.turnaround_standard;
   const categorySlug = category?.slug || "";
-  const heroImage = heroImageMap[categorySlug] || serviceHeroDefault;
+  const heroImage = serviceImages[service.slug] || heroImageMap[categorySlug] || serviceHeroDefault;
 
   const handleAdd = () => {
     if (justAdded) return;
