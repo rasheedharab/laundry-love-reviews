@@ -83,10 +83,11 @@ export default function CategoryPage() {
   const handleQuickAdd = (svc: Tables<"services">) => {
     addItem({
       serviceId: svc.id,
-      name: svc.name,
+      serviceName: svc.name,
+      categoryName: category?.name || "",
       price: Number(svc.price_standard),
-      quantity: 1,
       tier: "standard",
+      turnaround: svc.turnaround_standard || "3-5 days",
     });
     toast.success(`${svc.name} added to cart`);
   };
