@@ -211,7 +211,7 @@ export default function HomePage() {
                   toast.success("Code WELCOME20 copied! Apply it at checkout.", { duration: 3000 });
                   navigate("/services");
                 }}
-                className="w-full overflow-hidden rounded-2xl bg-gradient-to-r from-accent to-accent/80 p-5 text-left relative"
+                className="w-full overflow-hidden rounded-2xl glass-accent p-5 text-left relative"
               >
                 <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-accent-foreground/20">
                   <Sparkles className="h-4 w-4 text-accent-foreground" />
