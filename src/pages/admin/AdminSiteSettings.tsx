@@ -67,10 +67,11 @@ export default function AdminSiteSettings() {
     fetchData();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this setting?")) return;
-    await supabase.from("site_settings").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await supabase.from("site_settings").delete().eq("id", deleteId);
     toast.success("Setting deleted");
+    setDeleteId(null);
     fetchData();
   };
 
