@@ -296,11 +296,14 @@ export default function HomePage() {
                       <motion.button
                         key={cat.id}
                         onClick={() => navigate(`/services/${cat.slug}`)}
-                        className="relative overflow-hidden rounded-2xl text-left transition-shadow hover:shadow-lg group glass-hover"
+                        className="relative overflow-hidden rounded-2xl text-left group glass-hover"
                         variants={{
                           hidden: { opacity: 0, y: 24, scale: 0.97 },
                           visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
                         }}
+                        whileHover={{ y: -4, boxShadow: "0 12px 28px -8px hsl(18 82% 40% / 0.18)" }}
+                        whileTap={{ scale: 0.97 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       >
                         <img
                           src={img}
