@@ -263,7 +263,7 @@ export default function HomePage() {
             <div className="px-5 mt-8">
               <button
                 onClick={() => navigate("/membership")}
-                className="w-full overflow-hidden rounded-2xl bg-foreground p-5 text-left relative"
+                className="w-full overflow-hidden rounded-2xl glass-dark p-5 text-left relative"
               >
                 <div className="absolute top-4 right-4">
                   <Crown className="h-8 w-8 text-accent/40" />
