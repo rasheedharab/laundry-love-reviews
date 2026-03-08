@@ -80,7 +80,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Premium Club Card */}
-        <div className="mb-6 rounded-2xl bg-gradient-to-br from-accent via-accent to-primary p-5 text-accent-foreground relative overflow-hidden">
+        <div className="mb-6 rounded-2xl glass-accent p-5 text-accent-foreground relative overflow-hidden">
           <div className="absolute top-4 right-4">
             <Star className="h-8 w-8 text-accent-foreground/20" />
           </div>
