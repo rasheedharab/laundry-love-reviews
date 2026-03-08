@@ -51,9 +51,7 @@ export default function OrdersPage() {
           </div>
 
           {loading ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => <Skeleton key={i} className="h-48 w-full rounded-2xl" />)}
-            </div>
+            <OrderCardSkeleton count={3} />
           ) : orders.length === 0 ? (
             <EmptyState variant="orders" title="No orders yet" description="Book a service to get started" />
           ) : (

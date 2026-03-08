@@ -192,9 +192,7 @@ export default function CategoryPage() {
 
           {/* Services List — staggered card animations */}
           {loading ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => <Skeleton key={i} className="h-[140px] w-full rounded-2xl" />)}
-            </div>
+            <ListSkeleton count={3} height="h-[140px]" showAvatar />
           ) : (
             <motion.div
               className="space-y-4"
