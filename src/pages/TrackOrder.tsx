@@ -101,8 +101,8 @@ export default function TrackOrder() {
           {order.status === "in-progress" ? "In Process" : order.status.replace("-", " ")}
         </Badge>
         {/* Realtime indicator */}
-        <div className="absolute top-3 left-3 flex items-center gap-1.5">
-          <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+      <div className="absolute top-3 left-3 flex items-center gap-1.5">
+          <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
           <span className="text-[9px] text-muted-foreground font-medium">LIVE</span>
         </div>
       </div>
