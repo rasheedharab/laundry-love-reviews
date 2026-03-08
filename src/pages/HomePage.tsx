@@ -85,7 +85,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between px-5 pt-6 pb-4">
             <button
               onClick={() => navigate("/select-outlet")}
-              className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5"
+              className="flex items-center gap-2 rounded-full glass-sm px-4 py-2.5"
             >
               <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Your Location</span>
             </button>
