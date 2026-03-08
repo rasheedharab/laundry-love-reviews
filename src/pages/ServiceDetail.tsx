@@ -5,6 +5,7 @@ import { ArrowLeft, Check, Clock, Zap, Star, Sparkles, ShoppingBag } from "lucid
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import ServiceDetailSkeleton from "@/components/skeletons/ServiceDetailSkeleton";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
