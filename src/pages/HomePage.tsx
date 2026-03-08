@@ -302,7 +302,7 @@ export default function HomePage() {
                         }}
                       >
                         <TiltCard className="relative overflow-hidden rounded-2xl text-left group cursor-pointer" tiltMax={6} scale={1.03}>
-                          <button onClick={() => navigate(`/services/${cat.slug}`)} className="w-full text-left">
+                          <RippleTouch as="button" onClick={() => navigate(`/services/${cat.slug}`)} className="w-full text-left rounded-2xl">
                             <img
                               src={img}
                               alt={cat.name}
@@ -315,7 +315,7 @@ export default function HomePage() {
                                 {cat.description || "Premium Care"}
                               </p>
                             </div>
-                          </button>
+                          </RippleTouch>
                         </TiltCard>
                       </motion.div>
                     );
