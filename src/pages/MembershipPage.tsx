@@ -1,34 +1,26 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, Star, Crown, Diamond } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
 
-const tiers = [
-  {
-    name: "Silver",
-    price: "₹499",
-    period: "/mo",
-    icon: Star,
-    features: ["Priority Pickup", "Standard Care"],
-    popular: false,
-  },
-  {
-    name: "Gold",
-    price: "₹999",
-    period: "/mo",
-    icon: Crown,
-    features: ["Priority Pickup", "Complimentary Eco-Bags", "Standard Care"],
-    popular: true,
-  },
-  {
-    name: "Platinum",
-    price: "₹1,999",
-    period: "/mo",
-    icon: Diamond,
-    features: ["Priority Pickup", "Complimentary Eco-Bags", "Artisan-only Care"],
-    popular: false,
-  },
-];
+const iconMap: Record<string, React.ComponentType<any>> = {
+  star: Star,
+  crown: Crown,
+  diamond: Diamond,
+};
+
+interface Tier {
+  id: string;
+  name: string;
+  price: string;
+  period: string;
+  icon: string;
+  features: string[];
+  is_popular: boolean;
+}
 
 const ritualSteps = [
   {
@@ -45,6 +37,20 @@ const ritualSteps = [
 
 export default function MembershipPage() {
   const navigate = useNavigate();
+  const [tiers, setTiers] = useState<Tier[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from("membership_tiers")
+      .select("id, name, price, period, icon, features, is_popular")
+      .eq("is_active", true)
+      .order("sort_order")
+      .then(({ data }) => {
+        setTiers((data as any) || []);
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div className="pb-8">
@@ -75,49 +81,64 @@ export default function MembershipPage() {
       <div className="px-5 mb-8">
         <h2 className="text-lg font-display font-bold text-foreground mb-4">Membership Tiers</h2>
         <div className="space-y-4">
-          {tiers.map((tier) => (
-            <div
-              key={tier.name}
-              className={`rounded-2xl border-2 p-5 relative ${
-                tier.popular ? "border-accent bg-accent/5" : "border-border bg-card"
-              }`}
-            >
-              {tier.popular && (
-                <Badge className="absolute -top-2.5 right-4 bg-accent text-accent-foreground border-0 text-[9px] uppercase tracking-wider font-bold px-2.5">
-                  Most Popular
-                </Badge>
-              )}
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-base font-display font-bold text-foreground">{tier.name}</p>
-                <tier.icon className={`h-5 w-5 ${tier.popular ? "text-accent" : "text-muted-foreground"}`} />
+          {loading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="rounded-2xl border-2 border-border p-5 space-y-3">
+                <Skeleton className="h-5 w-1/3 rounded-lg" />
+                <Skeleton className="h-8 w-1/4 rounded-lg" />
+                <Skeleton className="h-4 w-full rounded-lg" />
+                <Skeleton className="h-11 w-full rounded-xl" />
               </div>
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-foreground">{tier.price}</span>
-                <span className="text-sm text-muted-foreground">{tier.period}</span>
-              </div>
-              <div className="space-y-2.5 mb-5">
-                {tier.features.map((f) => (
-                  <div key={f} className="flex items-center gap-2.5">
-                    <div className={`h-5 w-5 rounded-full flex items-center justify-center ${
-                      tier.popular ? "bg-accent/20" : "bg-secondary"
-                    }`}>
-                      <Check className={`h-3 w-3 ${tier.popular ? "text-accent" : "text-primary"}`} />
-                    </div>
-                    <span className="text-sm text-foreground">{f}</span>
+            ))
+          ) : (
+            tiers.map((tier) => {
+              const IconComp = iconMap[tier.icon] || Star;
+              const features = Array.isArray(tier.features) ? tier.features : [];
+              return (
+                <div
+                  key={tier.id}
+                  className={`rounded-2xl border-2 p-5 relative ${
+                    tier.is_popular ? "border-accent bg-accent/5" : "border-border bg-card"
+                  }`}
+                >
+                  {tier.is_popular && (
+                    <Badge className="absolute -top-2.5 right-4 bg-accent text-accent-foreground border-0 text-[9px] uppercase tracking-wider font-bold px-2.5">
+                      Most Popular
+                    </Badge>
+                  )}
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-base font-display font-bold text-foreground">{tier.name}</p>
+                    <IconComp className={`h-5 w-5 ${tier.is_popular ? "text-accent" : "text-muted-foreground"}`} />
                   </div>
-                ))}
-              </div>
-              <Button
-                className={`w-full h-11 rounded-xl text-xs font-bold uppercase tracking-wider ${
-                  tier.popular
-                    ? "bg-accent text-accent-foreground hover:bg-accent/90"
-                    : "bg-foreground text-primary-foreground hover:bg-foreground/90"
-                }`}
-              >
-                Select {tier.name}
-              </Button>
-            </div>
-          ))}
+                  <div className="mb-4">
+                    <span className="text-3xl font-bold text-foreground">{tier.price}</span>
+                    <span className="text-sm text-muted-foreground">{tier.period}</span>
+                  </div>
+                  <div className="space-y-2.5 mb-5">
+                    {features.map((f: string) => (
+                      <div key={f} className="flex items-center gap-2.5">
+                        <div className={`h-5 w-5 rounded-full flex items-center justify-center ${
+                          tier.is_popular ? "bg-accent/20" : "bg-secondary"
+                        }`}>
+                          <Check className={`h-3 w-3 ${tier.is_popular ? "text-accent" : "text-primary"}`} />
+                        </div>
+                        <span className="text-sm text-foreground">{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    className={`w-full h-11 rounded-xl text-xs font-bold uppercase tracking-wider ${
+                      tier.is_popular
+                        ? "bg-accent text-accent-foreground hover:bg-accent/90"
+                        : "bg-foreground text-primary-foreground hover:bg-foreground/90"
+                    }`}
+                  >
+                    Select {tier.name}
+                  </Button>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 

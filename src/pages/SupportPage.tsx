@@ -1,44 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MessageCircle, Mail, Phone, MapPin, ChevronDown, ExternalLink, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedPage from "@/components/AnimatedPage";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
 
-const faqs = [
-  {
-    q: "How do I schedule a pickup?",
-    a: "Add items to your cart, proceed to checkout, and select your preferred pickup date & time slot. Our rider will arrive at your doorstep within the chosen window.",
-  },
-  {
-    q: "What is the turnaround time?",
-    a: "Standard service takes 48–72 hours. Express service delivers within 24 hours for an additional charge. Turnaround times are displayed on each service page.",
-  },
-  {
-    q: "How are prices calculated?",
-    a: "Prices are per garment or per kg depending on the service. You can view exact pricing on each service detail page before adding items to your cart.",
-  },
-  {
-    q: "Can I track my order?",
-    a: "Yes! Go to Orders from the bottom navigation and tap any order to see real-time status updates from pickup through delivery.",
-  },
-  {
-    q: "What if my garment is damaged?",
-    a: "We take utmost care, but in the rare event of damage, please file a complaint from your Profile page within 48 hours of delivery. Our team will investigate and resolve it promptly.",
-  },
-  {
-    q: "How do loyalty points work?",
-    a: "You earn 1 point for every ₹10 spent on completed orders. Points can be tracked in your Profile. Redemption options are coming soon!",
-  },
-  {
-    q: "Do you handle delicate fabrics like silk and wool?",
-    a: "Absolutely. We have specialised processes for silk, wool, cashmere, and other delicate fabrics. Check our Dry Cleaning and Leather Care categories for details.",
-  },
-  {
-    q: "What payment methods do you accept?",
-    a: "We accept Cash on Delivery, UPI, and all major credit/debit cards at the time of pickup or delivery.",
-  },
-];
+interface FAQ {
+  id: string;
+  question: string;
+  answer: string;
+}
 
 function FAQItem({ q, a, isOpen, toggle }: { q: string; a: string; isOpen: boolean; toggle: () => void }) {
   return (
@@ -80,6 +53,20 @@ function FAQItem({ q, a, isOpen, toggle }: { q: string; a: string; isOpen: boole
 export default function SupportPage() {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from("faqs")
+      .select("id, question, answer")
+      .eq("is_active", true)
+      .order("sort_order")
+      .then(({ data }) => {
+        setFaqs(data || []);
+        setLoading(false);
+      });
+  }, []);
 
   const contactOptions = [
     {
@@ -176,15 +163,23 @@ export default function SupportPage() {
         <div>
           <p className="section-label mb-3">FREQUENTLY ASKED QUESTIONS</p>
           <div className="space-y-2">
-            {faqs.map((faq, i) => (
-              <FAQItem
-                key={i}
-                q={faq.q}
-                a={faq.a}
-                isOpen={openFaq === i}
-                toggle={() => setOpenFaq(openFaq === i ? null : i)}
-              />
-            ))}
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="rounded-2xl glass p-4">
+                  <Skeleton className="h-4 w-3/4 rounded-lg" />
+                </div>
+              ))
+            ) : (
+              faqs.map((faq, i) => (
+                <FAQItem
+                  key={faq.id}
+                  q={faq.question}
+                  a={faq.answer}
+                  isOpen={openFaq === i}
+                  toggle={() => setOpenFaq(openFaq === i ? null : i)}
+                />
+              ))
+            )}
           </div>
         </div>
 
