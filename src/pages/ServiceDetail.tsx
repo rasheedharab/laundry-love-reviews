@@ -169,10 +169,10 @@ export default function ServiceDetail() {
               {service.price_express && (
                 <button
                   onClick={() => setTier("express")}
-                  className={`relative rounded-2xl border-2 p-5 text-left transition-all ${
+                  className={`relative rounded-2xl p-5 text-left transition-all ${
                     tier === "express"
-                      ? "border-accent bg-accent/5 shadow-md"
-                      : "border-border bg-card"
+                      ? "glass border-2 border-accent/50 shadow-md"
+                      : "glass"
                   }`}
                 >
                   {tier === "express" && (
