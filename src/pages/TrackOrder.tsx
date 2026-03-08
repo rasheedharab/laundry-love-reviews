@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Bell, Phone, User } from "lucide-react";
+import MapPlaceholder from "@/components/MapPlaceholder";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -88,20 +89,12 @@ export default function TrackOrder() {
       </div>
 
       {/* Map Placeholder */}
-      <div className="mx-5 mb-5 relative h-44 rounded-2xl bg-secondary overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <div className="h-12 w-12 mx-auto mb-2 rounded-full bg-foreground/10 flex items-center justify-center">
-              <span className="text-2xl">📍</span>
-            </div>
-            <p className="text-xs text-muted-foreground">Live tracking</p>
-          </div>
-        </div>
-        <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground border-0 text-[9px] uppercase tracking-wider">
+      <div className="mx-5 mb-5 relative">
+        <MapPlaceholder height="h-44" label="Live tracking" />
+        <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground border-0 text-[9px] uppercase tracking-wider z-10">
           {order.status === "in-progress" ? "In Process" : order.status.replace("-", " ")}
         </Badge>
-        {/* Realtime indicator */}
-      <div className="absolute top-3 left-3 flex items-center gap-1.5">
+        <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
           <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
           <span className="text-[9px] text-muted-foreground font-medium">LIVE</span>
         </div>

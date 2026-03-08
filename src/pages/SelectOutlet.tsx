@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Search, MapPin, Clock, Navigation } from "lucide-react";
+import MapPlaceholder from "@/components/MapPlaceholder";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -46,11 +47,8 @@ export default function SelectOutlet() {
       </div>
 
       {/* Map Placeholder */}
-      <div className="mx-5 mb-5 h-40 rounded-2xl bg-secondary flex items-center justify-center">
-        <div className="text-center">
-          <MapPin className="h-8 w-8 mx-auto text-muted-foreground/30 mb-1" />
-          <p className="text-xs text-muted-foreground">Map view</p>
-        </div>
+      <div className="mx-5 mb-5">
+        <MapPlaceholder height="h-40" label="Find nearby outlets" />
       </div>
 
       {/* Boutiques List */}
