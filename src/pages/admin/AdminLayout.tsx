@@ -22,9 +22,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 const navItems = [
   { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true },
   { to: "/admin/orders", icon: ShoppingBag, label: "Orders" },
+  { to: "/admin/customers", icon: Users, label: "Customers" },
   { to: "/admin/categories", icon: LayoutDashboard, label: "Categories" },
   { to: "/admin/services", icon: Sparkles, label: "Services" },
+  { to: "/admin/outlets", icon: MapPin, label: "Outlets" },
+  { to: "/admin/complaints", icon: MessageSquare, label: "Complaints" },
+  { to: "/admin/blog", icon: FileText, label: "Blog" },
   { to: "/admin/promos", icon: Tag, label: "Promo Codes" },
+  { to: "/admin/users", icon: Shield, label: "Users & Roles" },
 ];
 
 export default function AdminLayout() {
