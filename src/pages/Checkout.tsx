@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Zap, Tag, X, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
