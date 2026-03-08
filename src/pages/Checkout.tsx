@@ -11,15 +11,17 @@ import { toast } from "sonner";
 import { addDays, format, isToday, parse, isBefore } from "date-fns";
 import AnimatedPage from "@/components/AnimatedPage";
 
-const SLOT_CAPACITY = 10;
-const timeSlots = ["08:00 AM — 10:00 AM", "10:00 AM — 12:00 PM", "01:00 PM — 03:00 PM", "04:00 PM — 06:00 PM"];
+const DEFAULT_SLOTS = ["08:00 AM — 10:00 AM", "10:00 AM — 12:00 PM", "01:00 PM — 03:00 PM", "04:00 PM — 06:00 PM"];
+const DEFAULT_CAPACITY = 10;
 
 export default function Checkout() {
   const navigate = useNavigate();
   const { items, total, clearCart } = useCart();
   const { user } = useAuth();
   const [address, setAddress] = useState("");
-  const [selectedSlot, setSelectedSlot] = useState(timeSlots[1]);
+  const [timeSlots, setTimeSlots] = useState<string[]>(DEFAULT_SLOTS);
+  const [slotCapacity, setSlotCapacity] = useState(DEFAULT_CAPACITY);
+  const [selectedSlot, setSelectedSlot] = useState(DEFAULT_SLOTS[1]);
   const [selectedDate, setSelectedDate] = useState(0);
   const [serviceLevel, setServiceLevel] = useState<"regular" | "express">("regular");
   const [loading, setLoading] = useState(false);
