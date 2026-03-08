@@ -13,6 +13,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/home";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
