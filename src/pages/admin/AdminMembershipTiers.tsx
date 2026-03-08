@@ -83,10 +83,11 @@ export default function AdminMembershipTiers() {
     fetchData();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this membership tier?")) return;
-    await supabase.from("membership_tiers").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await supabase.from("membership_tiers").delete().eq("id", deleteId);
     toast.success("Tier deleted");
+    setDeleteId(null);
     fetchData();
   };
 
