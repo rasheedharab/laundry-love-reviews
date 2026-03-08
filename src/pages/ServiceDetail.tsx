@@ -12,6 +12,7 @@ import AnimatedPage from "@/components/AnimatedPage";
 import ServiceReviews from "@/components/ServiceReviews";
 import { addRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import type { Tables } from "@/integrations/supabase/types";
+import { serviceImages } from "@/lib/serviceImages";
 
 import serviceHeroDefault from "@/assets/service-hero-default.jpg";
 import catPartyWear from "@/assets/cat-party-wear.jpg";
