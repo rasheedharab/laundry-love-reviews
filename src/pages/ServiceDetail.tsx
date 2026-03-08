@@ -5,6 +5,7 @@ import { ArrowLeft, Check, Clock, Zap, Star, Sparkles, ShoppingBag } from "lucid
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import ServiceDetailSkeleton from "@/components/skeletons/ServiceDetailSkeleton";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
@@ -66,17 +67,7 @@ export default function ServiceDetail() {
   }, [slug]);
 
   if (!service) {
-    return (
-      <div className="pb-24">
-        <div className="relative min-h-[380px] bg-foreground">
-          <Skeleton className="absolute inset-0" />
-        </div>
-        <div className="px-5 -mt-8 space-y-4">
-          <Skeleton className="h-32 rounded-2xl" />
-          <Skeleton className="h-24 rounded-2xl" />
-        </div>
-      </div>
-    );
+    return <ServiceDetailSkeleton />;
   }
 
   const price = tier === "express" && service.price_express ? service.price_express : service.price_standard;

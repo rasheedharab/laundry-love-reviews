@@ -7,6 +7,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import CardGridSkeleton from "@/components/skeletons/CardGridSkeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -280,9 +281,7 @@ export default function HomePage() {
               </div>
 
               {loading ? (
-                <div className="grid grid-cols-2 gap-3">
-                  {[1, 2, 3, 4, 5, 6].map((i) => <Skeleton key={i} className="h-44 rounded-2xl" />)}
-                </div>
+                <CardGridSkeleton count={6} columns={2} />
               ) : (
                 <motion.div
                   className="grid grid-cols-2 gap-3"

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, Wind, Briefcase, Layers, Armchair, Shirt, ChevronRight } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import CardGridSkeleton from "@/components/skeletons/CardGridSkeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import ServiceSearch from "@/components/ServiceSearch";
 import { motion } from "framer-motion";
@@ -50,9 +50,7 @@ export default function ServicesHub() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-2 gap-3">
-            {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-48 rounded-2xl" />)}
-          </div>
+          <CardGridSkeleton count={4} columns={2} height="h-48" />
         ) : (
           <motion.div
             className="grid grid-cols-2 gap-3"

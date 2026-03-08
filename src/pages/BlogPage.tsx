@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ArrowLeft, Calendar, Clock, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import BlogCardSkeleton from "@/components/skeletons/BlogCardSkeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import ReactMarkdown from "react-markdown";
 import type { Tables } from "@/integrations/supabase/types";
@@ -113,18 +113,7 @@ export default function BlogPage() {
             </div>
 
             {loading ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="rounded-2xl overflow-hidden">
-                    <Skeleton className="aspect-[2/1] w-full" />
-                    <div className="p-5 space-y-2">
-                      <Skeleton className="h-5 w-3/4" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-3 w-1/3" />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <BlogCardSkeleton count={3} />
             ) : posts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <p className="text-muted-foreground mb-2">No posts yet</p>
