@@ -1,23 +1,51 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Search, MapPin, Clock, Navigation } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import MapPlaceholder from "@/components/MapPlaceholder";
+import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
 
-const boutiques = [
-  { id: "1", name: "Via Della Spiga Boutique", address: "14th Road, Bandra West, Mumbai 400050", distance: "0.8 km", hours: "Open until 20:00" },
-  { id: "2", name: "Brera Atelier", address: "Juhu Tara Road, Juhu, Mumbai 400049", distance: "2.4 km", hours: "Open until 20:00" },
-  { id: "3", name: "Navigli Studio", address: "Hiranandani Gardens, Powai, Mumbai 400076", distance: "4.1 km", hours: "Open until 19:00" },
-];
+interface Outlet {
+  id: string;
+  name: string;
+  address_line: string;
+  city: string | null;
+  postal_code: string | null;
+  operating_hours: any;
+}
 
 export default function SelectOutlet() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [outlets, setOutlets] = useState<Outlet[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = boutiques.filter(b =>
-    b.name.toLowerCase().includes(search.toLowerCase()) || b.address.toLowerCase().includes(search.toLowerCase())
+  useEffect(() => {
+    supabase
+      .from("outlets")
+      .select("id, name, address_line, city, postal_code, operating_hours")
+      .eq("is_active", true)
+      .then(({ data }) => {
+        setOutlets(data || []);
+        setLoading(false);
+      });
+  }, []);
+
+  const filtered = outlets.filter(b =>
+    b.name.toLowerCase().includes(search.toLowerCase()) || b.address_line.toLowerCase().includes(search.toLowerCase())
   );
+
+  const formatAddress = (o: Outlet) => {
+    const parts = [o.address_line, o.city, o.postal_code].filter(Boolean);
+    return parts.join(", ");
+  };
+
+  const formatHours = (hours: any) => {
+    if (!hours?.closing) return "Hours not available";
+    return `Open until ${hours.closing}`;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -55,33 +83,42 @@ export default function SelectOutlet() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Available Boutiques</p>
-            <p className="text-xs text-muted-foreground">{filtered.length} locations nearby</p>
+            <p className="text-xs text-muted-foreground">{loading ? "Loading..." : `${filtered.length} locations nearby`}</p>
           </div>
           <button className="text-[10px] uppercase tracking-wider font-semibold text-foreground">Filter</button>
         </div>
 
         <div className="space-y-3">
-          {filtered.map((b) => (
-            <div key={b.id} className="rounded-2xl border border-border bg-card p-5">
-              <div className="flex items-start justify-between mb-2">
-                <p className="text-sm font-bold uppercase tracking-wider text-foreground">{b.name}</p>
-                <span className="text-xs font-semibold text-accent">{b.distance}</span>
+          {loading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="rounded-2xl border border-border bg-card p-5 space-y-3">
+                <Skeleton className="h-4 w-3/4 rounded-lg" />
+                <Skeleton className="h-3 w-full rounded-lg" />
+                <Skeleton className="h-9 w-24 rounded-xl ml-auto" />
               </div>
-              <p className="text-xs text-muted-foreground mb-4">{b.address}</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-foreground">{b.hours}</span>
+            ))
+          ) : (
+            filtered.map((b) => (
+              <div key={b.id} className="rounded-2xl border border-border bg-card p-5">
+                <div className="flex items-start justify-between mb-2">
+                  <p className="text-sm font-bold uppercase tracking-wider text-foreground">{b.name}</p>
                 </div>
-                <Button
-                  className="h-9 px-6 rounded-xl bg-foreground text-primary-foreground text-xs font-bold uppercase tracking-wider hover:bg-foreground/90"
-                  onClick={() => navigate(-1)}
-                >
-                  Select
-                </Button>
+                <p className="text-xs text-muted-foreground mb-4">{formatAddress(b)}</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-2 w-2 rounded-full bg-green-500" />
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-foreground">{formatHours(b.operating_hours)}</span>
+                  </div>
+                  <Button
+                    className="h-9 px-6 rounded-xl bg-foreground text-primary-foreground text-xs font-bold uppercase tracking-wider hover:bg-foreground/90"
+                    onClick={() => navigate(-1)}
+                  >
+                    Select
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
