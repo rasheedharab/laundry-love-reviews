@@ -107,8 +107,13 @@ export default function HomePage() {
           </div>
 
           {/* Hero Section */}
-          <div className="relative mx-5 mb-5 overflow-hidden rounded-2xl min-h-[340px] flex flex-col justify-end">
-            <img src={heroBg} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <div ref={heroRef} className="relative mx-5 mb-5 overflow-hidden rounded-2xl min-h-[340px] flex flex-col justify-end">
+            <motion.img
+              src={heroBg}
+              alt=""
+              className="absolute inset-0 h-[130%] w-full object-cover"
+              style={{ y: heroY, scale: heroScale }}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
             <div className="relative z-10 p-6 pb-7">
               <h1 className="mb-2 text-3xl font-display font-bold leading-tight text-foreground">
