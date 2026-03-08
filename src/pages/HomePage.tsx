@@ -187,13 +187,13 @@ export default function HomePage() {
               className="absolute inset-0 h-[130%] w-full object-cover"
               style={{ y: heroY, scale: heroScale }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-            <div className="relative z-10 p-6 pb-7 mx-3 mb-3 rounded-2xl glass-dark">
-              <h1 className="mb-2 text-3xl font-display font-bold leading-tight text-foreground">
+            <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/30 to-transparent" />
+            <div className="relative z-10 p-6 pb-7">
+              <h1 className="mb-2 text-3xl font-display font-bold leading-tight text-primary-foreground">
                 Expert care for<br />
-                <span className="text-foreground">your wardrobe.</span>
+                <span className="text-primary-foreground">your wardrobe.</span>
               </h1>
-              <p className="mb-5 text-sm text-muted-foreground leading-relaxed">
+              <p className="mb-5 text-sm text-primary-foreground/70 leading-relaxed">
                 High-end dry cleaning & laundry services<br />
                 crafted for modern luxury.
               </p>
