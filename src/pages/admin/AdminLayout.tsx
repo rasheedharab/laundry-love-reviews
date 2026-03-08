@@ -10,6 +10,11 @@ import {
   LogOut,
   Menu,
   X,
+  Users,
+  MapPin,
+  MessageSquare,
+  FileText,
+  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
