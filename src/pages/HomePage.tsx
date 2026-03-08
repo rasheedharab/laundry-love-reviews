@@ -520,7 +520,7 @@ export default function HomePage() {
 
           {/* Brand Footer */}
           <div className="mt-10 mb-6 flex justify-center">
-            <img src={logoImg} alt="White Rabbit" className="h-12 opacity-15" />
+            <img src={logoImg} alt="White Rabbit" className="h-16 opacity-15" />
           </div>
 
           {/* Chat FAB */}

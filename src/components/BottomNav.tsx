@@ -39,7 +39,7 @@ export default function BottomNav() {
                 isActive ? "text-primary" : "text-muted-foreground"
               )}
             >
-              <Icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 1.5} />
+              <Icon className="h-5 w-5" strokeWidth={isActive ? 2.2 : 1.5} />
               <span className="text-[10px] font-medium">{label}</span>
               {label === "Services" && itemCount > 0 && (
                 <span
