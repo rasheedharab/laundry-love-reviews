@@ -267,6 +267,7 @@ export default function HomePage() {
           </div>
 
           {/* Garment Care Tips */}
+          <ScrollReveal delay={0.1}>
           <div className="mt-8 px-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-display font-bold text-foreground">Care Tips</h2>
@@ -292,6 +293,8 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
+          </div>
+          </ScrollReveal>
           </div>
 
           {/* Referral CTA */}
