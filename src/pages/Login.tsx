@@ -59,6 +59,10 @@ export default function Login() {
         Don't have an account?{" "}
         <Link to="/signup" className="text-primary font-medium hover:underline">Sign Up</Link>
       </p>
+
+      <button onClick={() => navigate("/home")} className="mt-6 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        Continue as Guest →
+      </button>
     </div>
   );
 }
