@@ -85,7 +85,7 @@ export default function ProfilePage() {
     { icon: CreditCard, label: "Payment Methods", action: () => toast.info("Payment methods coming soon! Currently we accept Cash, UPI & Cards at pickup.") },
     { icon: ClipboardList, label: "Order History", action: () => navigate("/orders") },
     { icon: Gift, label: "Refer a Friend", action: () => navigate("/referral") },
-    { icon: Headphones, label: "Support & Concierge", action: () => {} },
+    { icon: Headphones, label: "Support & Concierge", action: () => window.open("mailto:support@whiterabbit.in?subject=Support%20Request", "_blank") },
     { icon: FileWarning, label: "My Complaints", action: () => navigate("/my-complaints") },
   ];
 
