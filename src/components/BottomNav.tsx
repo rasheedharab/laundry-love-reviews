@@ -32,15 +32,22 @@ export default function BottomNav() {
         {tabs.map(({ path, icon: Icon, label }) => {
           const isActive = location.pathname.startsWith(path);
           return (
-            <button
+            <motion.button
               key={path}
               onClick={() => navigate(path)}
+              whileTap={{ scale: 0.85 }}
+              transition={{ type: "spring", stiffness: 500, damping: 20 }}
               className={cn(
                 "flex flex-col items-center gap-0.5 py-2 px-3 transition-colors relative",
                 isActive ? "text-primary" : "text-muted-foreground"
               )}
             >
-              <Icon className="h-5 w-5" strokeWidth={isActive ? 2.2 : 1.5} />
+              <motion.div
+                animate={isActive ? { y: -2, scale: 1.1 } : { y: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
+                <Icon className="h-5 w-5" strokeWidth={isActive ? 2.2 : 1.5} />
+              </motion.div>
               <span className="text-[10px] font-medium">{label}</span>
               {label === "Services" && itemCount > 0 && (
                 <span
