@@ -2,9 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
+import { motion, AnimatePresence } from "framer-motion";
 import AnimatedPage from "@/components/AnimatedPage";
 import EmptyState from "@/components/EmptyState";
-import { StaggerContainer, StaggerItem } from "@/components/StaggerAnimation";
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -31,19 +31,38 @@ export default function Cart() {
             </div>
           </div>
         ) : (
-          <StaggerContainer className="px-5 space-y-3">
-            {items.map((item) => (
-              <StaggerItem key={`${item.serviceId}-${item.tier}`}>
-                <div className="rounded-xl glass p-4">
+          <div className="px-5 space-y-3">
+            <AnimatePresence mode="popLayout">
+              {items.map((item) => (
+                <motion.div
+                  key={`${item.serviceId}-${item.tier}`}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: -200, transition: { duration: 0.3 } }}
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={{ left: 0.5, right: 0 }}
+                  onDragEnd={(_, info) => {
+                    if (info.offset.x < -120) {
+                      removeItem(item.serviceId, item.tier);
+                    }
+                  }}
+                  className="rounded-xl glass p-4 cursor-grab active:cursor-grabbing touch-pan-y"
+                >
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <p className="text-sm font-semibold text-foreground">{item.serviceName}</p>
                       <p className="text-[11px] text-muted-foreground">{item.categoryName} · {item.tier === "express" ? "Express" : "Standard"}</p>
                       <p className="text-[10px] text-muted-foreground">{item.turnaround}</p>
                     </div>
-                    <button onClick={() => removeItem(item.serviceId, item.tier)} className="text-muted-foreground hover:text-destructive">
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => removeItem(item.serviceId, item.tier)}
+                      className="text-muted-foreground hover:text-destructive"
+                    >
                       <Trash2 className="h-4 w-4" />
-                    </button>
+                    </motion.button>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 rounded-lg border border-border">
@@ -57,10 +76,11 @@ export default function Cart() {
                     </div>
                     <p className="text-sm font-bold text-foreground">₹{(item.price * item.quantity).toLocaleString()}</p>
                   </div>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
+                  <p className="text-[9px] text-muted-foreground/50 mt-2 text-center">← Swipe to remove</p>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
         )}
 
         {items.length > 0 && (
@@ -70,9 +90,11 @@ export default function Cart() {
                 <p className="text-xs text-muted-foreground">Total</p>
                 <p className="text-xl font-bold text-foreground">₹{total.toLocaleString()}</p>
               </div>
-              <Button onClick={() => navigate("/checkout")} className="h-11 rounded-xl px-8 text-sm font-semibold">
-                Proceed to Checkout
-              </Button>
+              <motion.div whileTap={{ scale: 0.97 }}>
+                <Button onClick={() => navigate("/checkout")} className="h-11 rounded-xl px-8 text-sm font-semibold">
+                  Proceed to Checkout
+                </Button>
+              </motion.div>
             </div>
           </div>
         )}

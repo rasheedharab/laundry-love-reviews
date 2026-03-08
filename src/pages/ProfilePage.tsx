@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Star, Sun, Moon, Monitor, User, MessageSquareWarning, FileWarning } from "lucide-react";
+import { MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Star, Sun, Moon, Monitor, User, MessageSquareWarning, FileWarning, ShoppingBag, Calendar } from "lucide-react";
+import { motion } from "framer-motion";
 import ComplaintDialog from "@/components/ComplaintDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -16,12 +17,35 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
+  const [stats, setStats] = useState({ totalOrders: 0, totalSpent: 0, loyaltyPoints: 0 });
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("*").eq("user_id", user.id).single().then(({ data }) => {
-      if (data) setProfile(data);
-    });
+
+    const fetchAll = async () => {
+      const [profileRes, ordersRes, pointsRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("user_id", user.id).single(),
+        supabase.from("orders").select("total, status").eq("user_id", user.id),
+        supabase.from("loyalty_points").select("points, type").eq("user_id", user.id),
+      ]);
+
+      if (profileRes.data) setProfile(profileRes.data);
+
+      const completedOrders = ordersRes.data?.filter((o) => o.status === "completed") || [];
+      const totalSpent = completedOrders.reduce((sum, o) => sum + Number(o.total), 0);
+      const totalPoints = (pointsRes.data || []).reduce(
+        (sum, p) => sum + (p.type === "earn" ? p.points : -p.points),
+        0
+      );
+
+      setStats({
+        totalOrders: ordersRes.data?.length ?? 0,
+        totalSpent,
+        loyaltyPoints: Math.max(0, totalPoints),
+      });
+    };
+
+    fetchAll();
   }, [user]);
 
   const handleSignOut = async () => {
@@ -57,6 +81,10 @@ export default function ProfilePage() {
     { icon: FileWarning, label: "My Complaints", action: () => navigate("/my-complaints") },
   ];
 
+  const memberSince = profile?.created_at
+    ? new Date(profile.created_at).toLocaleDateString("en-IN", { month: "short", year: "numeric" })
+    : "";
+
   return (
     <AnimatedPage>
       <div className="px-5 pt-6 pb-4">
@@ -68,17 +96,44 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        {/* Avatar + Name */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-secondary/80 border-4 border-background shadow-lg mb-4">
+        {/* Avatar + Name with gradient mesh background */}
+        <div className="relative flex flex-col items-center mb-6 overflow-hidden rounded-2xl py-8">
+          <div className="absolute inset-0 opacity-20" style={{
+            background: "radial-gradient(ellipse at 30% 20%, hsl(var(--accent) / 0.4) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, hsl(var(--gold) / 0.3) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, hsl(var(--primary) / 0.2) 0%, transparent 70%)"
+          }} />
+          <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-secondary/80 border-4 border-background shadow-lg mb-4">
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
             ) : (
               <User className="h-12 w-12 text-muted-foreground/50" />
             )}
           </div>
-          <p className="text-xl font-display font-bold text-foreground">{profile?.full_name || "User"}</p>
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mt-1">Mumbai, India</p>
+          <p className="relative text-xl font-display font-bold text-foreground">{profile?.full_name || "User"}</p>
+          {memberSince && (
+            <p className="relative text-xs text-muted-foreground mt-1 flex items-center gap-1">
+              <Calendar className="h-3 w-3" /> Member since {memberSince}
+            </p>
+          )}
+        </div>
+
+        {/* Stats Row */}
+        <div className="mb-6 grid grid-cols-3 gap-2">
+          {[
+            { label: "Orders", value: stats.totalOrders, icon: ShoppingBag },
+            { label: "Spent", value: `₹${stats.totalSpent.toLocaleString()}`, icon: CreditCard },
+            { label: "Points", value: stats.loyaltyPoints, icon: Star },
+          ].map(({ label, value, icon: Icon }) => (
+            <motion.div
+              key={label}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center rounded-2xl glass p-4"
+            >
+              <Icon className="h-4 w-4 text-accent mb-1.5" />
+              <p className="text-lg font-display font-bold text-foreground">{value}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
+            </motion.div>
+          ))}
         </div>
 
         {/* Premium Club Card */}
@@ -97,22 +152,23 @@ export default function ProfilePage() {
         {/* Menu Items */}
         <div className="space-y-2 mb-6">
           {menuItems.map(({ icon: Icon, label, action }) => (
-            <button
+            <motion.button
               key={label}
               onClick={action}
+              whileTap={{ scale: 0.98 }}
               className="flex w-full items-center gap-4 rounded-2xl glass p-4 text-left transition-colors hover:bg-secondary/50"
             >
               <Icon className="h-5 w-5 text-foreground" />
               <span className="flex-1 text-sm font-medium text-foreground">{label}</span>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </button>
+            </motion.button>
           ))}
           <ComplaintDialog>
-            <button className="flex w-full items-center gap-4 rounded-2xl glass p-4 text-left transition-colors hover:bg-secondary/50">
+            <motion.button whileTap={{ scale: 0.98 }} className="flex w-full items-center gap-4 rounded-2xl glass p-4 text-left transition-colors hover:bg-secondary/50">
               <MessageSquareWarning className="h-5 w-5 text-foreground" />
               <span className="flex-1 text-sm font-medium text-foreground">File a Complaint</span>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </button>
+            </motion.button>
           </ComplaintDialog>
         </div>
 

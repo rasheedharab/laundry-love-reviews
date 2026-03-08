@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Check, Clock, Zap, Star, Sparkles } from "lucide-react";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import AnimatedPage from "@/components/AnimatedPage";
 import ServiceReviews from "@/components/ServiceReviews";
 import type { Tables } from "@/integrations/supabase/types";
@@ -35,6 +36,11 @@ export default function ServiceDetail() {
   const [service, setService] = useState<Tables<"services"> | null>(null);
   const [category, setCategory] = useState<Tables<"service_categories"> | null>(null);
   const [tier, setTier] = useState<"standard" | "express">("standard");
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
+  const headerOpacity = useTransform(scrollYProgress, [0.6, 1], [0, 1]);
 
   useEffect(() => {
     if (!slug) return;
@@ -52,7 +58,7 @@ export default function ServiceDetail() {
     return (
       <div className="pb-24">
         <div className="relative min-h-[380px] bg-foreground">
-          <Skeleton className="absolute inset-0 bg-primary-foreground/5" />
+          <Skeleton className="absolute inset-0" />
         </div>
         <div className="px-5 -mt-8 space-y-4">
           <Skeleton className="h-32 rounded-2xl" />
@@ -82,18 +88,33 @@ export default function ServiceDetail() {
   return (
     <AnimatedPage>
       <div className="pb-28">
-        {/* Full-bleed Hero Image */}
-        <div className="relative min-h-[400px] overflow-hidden">
-          <img
+        {/* Sticky header that reveals on scroll */}
+        <motion.div
+          style={{ opacity: headerOpacity }}
+          className="fixed top-0 left-0 right-0 z-50 glass px-5 py-3"
+        >
+          <div className="mx-auto max-w-lg flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button onClick={() => navigate(-1)} className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary">
+                <ArrowLeft className="h-4 w-4 text-foreground" />
+              </button>
+              <p className="text-sm font-display font-bold text-foreground truncate">{service.name}</p>
+            </div>
+            <p className="text-sm font-bold text-accent">₹{price.toLocaleString()}</p>
+          </div>
+        </motion.div>
+
+        {/* Full-bleed Hero Image with Parallax */}
+        <div ref={heroRef} className="relative min-h-[400px] overflow-hidden">
+          <motion.img
             src={service.image_url || heroImage}
             alt={service.name}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-[130%] w-full object-cover"
+            style={{ y: heroY, scale: heroScale }}
           />
-          {/* Multi-layer gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-b from-foreground/40 via-transparent to-transparent" />
 
-          {/* Back button */}
           <button
             onClick={() => navigate(-1)}
             className="absolute top-5 left-5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-background/20 backdrop-blur-md border border-primary-foreground/10"
@@ -101,7 +122,6 @@ export default function ServiceDetail() {
             <ArrowLeft className="h-4 w-4 text-primary-foreground" />
           </button>
 
-          {/* Badge overlay */}
           {service.badge && (
             <div className="absolute top-5 right-5 z-10">
               <Badge className="bg-accent/90 text-accent-foreground border-0 backdrop-blur-sm text-[10px] tracking-wider uppercase px-3 py-1">
@@ -110,7 +130,6 @@ export default function ServiceDetail() {
             </div>
           )}
 
-          {/* Hero text at bottom */}
           <div className="absolute bottom-0 left-0 right-0 px-5 pb-8">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent mb-2">
               {category?.name || "Premium Care"}
@@ -139,23 +158,29 @@ export default function ServiceDetail() {
             <p className="text-sm text-foreground leading-relaxed">{service.description}</p>
           </div>
 
-          {/* Tier Selection */}
+          {/* Tier Selection with glow */}
           <div className="mb-5">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Select Service Tier</h3>
             <div className="grid grid-cols-2 gap-3">
-              <button
+              <motion.button
                 onClick={() => setTier("standard")}
-                className={`relative rounded-2xl p-5 text-left transition-all ${
-                  tier === "standard"
-                    ? "glass border-2 border-primary/50 shadow-md"
-                    : "glass"
+                whileTap={{ scale: 0.97 }}
+                className={`relative rounded-2xl p-5 text-left transition-all glass ${
+                  tier === "standard" ? "border-2 border-primary/50 tier-glow" : ""
                 }`}
               >
-                {tier === "standard" && (
-                  <div className="absolute top-3 right-3 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
-                    <Check className="h-3 w-3 text-primary-foreground" />
-                  </div>
-                )}
+                <AnimatePresence>
+                  {tier === "standard" && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      className="absolute top-3 right-3 h-5 w-5 rounded-full bg-primary flex items-center justify-center"
+                    >
+                      <Check className="h-3 w-3 text-primary-foreground" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="h-8 w-8 rounded-xl bg-muted flex items-center justify-center">
                     <Clock className="h-4 w-4 text-muted-foreground" />
@@ -164,22 +189,28 @@ export default function ServiceDetail() {
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Standard</p>
                 <p className="text-xl font-display font-bold text-foreground">₹{service.price_standard.toLocaleString()}</p>
                 <p className="text-[10px] text-muted-foreground mt-1">{service.turnaround_standard}</p>
-              </button>
+              </motion.button>
 
               {service.price_express && (
-                <button
+                <motion.button
                   onClick={() => setTier("express")}
-                  className={`relative rounded-2xl p-5 text-left transition-all ${
-                    tier === "express"
-                      ? "glass border-2 border-accent/50 shadow-md"
-                      : "glass"
+                  whileTap={{ scale: 0.97 }}
+                  className={`relative rounded-2xl p-5 text-left transition-all glass ${
+                    tier === "express" ? "border-2 border-accent/50 tier-glow-express" : ""
                   }`}
                 >
-                  {tier === "express" && (
-                    <div className="absolute top-3 right-3 h-5 w-5 rounded-full bg-accent flex items-center justify-center">
-                      <Check className="h-3 w-3 text-accent-foreground" />
-                    </div>
-                  )}
+                  <AnimatePresence>
+                    {tier === "express" && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        className="absolute top-3 right-3 h-5 w-5 rounded-full bg-accent flex items-center justify-center"
+                      >
+                        <Check className="h-3 w-3 text-accent-foreground" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                   <div className="flex items-center gap-2 mb-3">
                     <div className="h-8 w-8 rounded-xl bg-accent/10 flex items-center justify-center">
                       <Zap className="h-4 w-4 text-accent" />
@@ -188,7 +219,7 @@ export default function ServiceDetail() {
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Express</p>
                   <p className="text-xl font-display font-bold text-foreground">₹{service.price_express.toLocaleString()}</p>
                   <p className="text-[10px] text-muted-foreground mt-1">{service.turnaround_express}</p>
-                </button>
+                </motion.button>
               )}
             </div>
           </div>
@@ -236,9 +267,11 @@ export default function ServiceDetail() {
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Total</p>
               <p className="text-2xl font-display font-bold text-foreground">₹{price.toLocaleString()}</p>
             </div>
-            <Button onClick={handleAdd} className="h-12 rounded-xl px-8 text-sm font-semibold shadow-lg">
-              Add to Bag
-            </Button>
+            <motion.div whileTap={{ scale: 0.97 }}>
+              <Button onClick={handleAdd} className="h-12 rounded-xl px-8 text-sm font-semibold shadow-lg">
+                Add to Bag
+              </Button>
+            </motion.div>
           </div>
         </div>
       </div>

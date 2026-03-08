@@ -2,8 +2,8 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { MapPin, ChevronDown, ArrowRight, User, Truck, MessageCircle, Crown, Gift, ChevronRight, Sparkles, Copy, BookOpen } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { MapPin, ChevronDown, ArrowRight, User, Truck, MessageCircle, Crown, Gift, ChevronRight, Sparkles, Copy, BookOpen, Bell } from "lucide-react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -46,12 +46,21 @@ const careTips = [
   { title: "Wool Refresh", desc: "Steam instead of washing to preserve wool fibers and shape.", icon: "🧶" },
 ];
 
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+}
+
 export default function HomePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [categories, setCategories] = useState<Tables<"service_categories">[]>([]);
   const [activeOrder, setActiveOrder] = useState<Tables<"orders"> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<{ full_name: string | null } | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
@@ -63,14 +72,14 @@ export default function HomePage() {
     if (cats) setCategories(cats);
 
     if (user) {
-      const { data: orders } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("user_id", user.id)
-        .not("status", "in", '("completed","cancelled")')
-        .order("created_at", { ascending: false })
-        .limit(1);
-      setActiveOrder(orders?.[0] ?? null);
+      const [ordersRes, profileRes, notifRes] = await Promise.all([
+        supabase.from("orders").select("*").eq("user_id", user.id).not("status", "in", '("completed","cancelled")').order("created_at", { ascending: false }).limit(1),
+        supabase.from("profiles").select("full_name").eq("user_id", user.id).single(),
+        supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("is_read", false),
+      ]);
+      setActiveOrder(ordersRes.data?.[0] ?? null);
+      setProfile(profileRes.data);
+      setUnreadCount(notifRes.count ?? 0);
     }
     setLoading(false);
   }, [user]);
@@ -82,19 +91,44 @@ export default function HomePage() {
       <PullToRefresh onRefresh={fetchData}>
         <div className="min-h-screen bg-background">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 pt-6 pb-4">
-            <button
-              onClick={() => navigate("/select-outlet")}
-              className="flex items-center gap-2 rounded-full glass-sm px-4 py-2.5"
-            >
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Your Location</span>
-            </button>
-            <button
-              onClick={() => navigate("/profile")}
-              className="flex h-11 w-11 items-center justify-center rounded-full glass-sm"
-            >
-              <User className="h-5 w-5 text-foreground" />
-            </button>
+          <div className="flex items-center justify-between px-5 pt-6 pb-2">
+            <div>
+              {user && profile?.full_name ? (
+                <p className="text-sm text-muted-foreground">{getGreeting()},</p>
+              ) : (
+                <p className="text-sm text-muted-foreground">{getGreeting()}</p>
+              )}
+              <p className="text-lg font-display font-bold text-foreground">
+                {user && profile?.full_name ? profile.full_name.split(" ")[0] : "Welcome"}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate("/notifications")}
+                className="relative flex h-11 w-11 items-center justify-center rounded-full glass-sm"
+              >
+                <Bell className="h-5 w-5 text-foreground" />
+                <AnimatePresence>
+                  {unreadCount > 0 && (
+                    <motion.span
+                      key="badge"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-accent-foreground"
+                    >
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </button>
+              <button
+                onClick={() => navigate("/profile")}
+                className="flex h-11 w-11 items-center justify-center rounded-full glass-sm"
+              >
+                <User className="h-5 w-5 text-foreground" />
+              </button>
+            </div>
           </div>
 
           {/* Location selector */}
