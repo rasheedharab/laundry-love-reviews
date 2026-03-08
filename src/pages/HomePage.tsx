@@ -148,6 +148,7 @@ export default function HomePage() {
           )}
 
           {/* Our Services — Image Cards */}
+          <ScrollReveal>
           <div className="px-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-display font-bold text-foreground">Our Services</h2>
@@ -188,6 +189,7 @@ export default function HomePage() {
               </div>
             )}
           </div>
+          </ScrollReveal>
 
           {/* Promotional Banner */}
           <div className="px-5 mt-6">
