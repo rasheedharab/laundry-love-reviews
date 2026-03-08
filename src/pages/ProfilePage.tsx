@@ -60,8 +60,15 @@ export default function ProfilePage() {
       <AnimatedPage>
         <div className="flex min-h-[80vh] flex-col items-center justify-center px-6 text-center">
           <img src={logoImg} alt="White Rabbit" className="mb-6 h-16 opacity-30" />
-          <p className="mb-4 text-muted-foreground">Sign in to view your profile</p>
-          <Button onClick={() => navigate("/login")} className="rounded-2xl">Sign In</Button>
+          <p className="mb-6 text-muted-foreground">Sign in to view your profile</p>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => navigate("/signup")} className="rounded-2xl px-6">
+              Sign Up
+            </Button>
+            <Button onClick={() => navigate("/login")} className="rounded-2xl px-6">
+              Sign In
+            </Button>
+          </div>
         </div>
       </AnimatedPage>
     );
