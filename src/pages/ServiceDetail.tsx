@@ -281,9 +281,36 @@ export default function ServiceDetail() {
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Total</p>
               <p className="text-2xl font-display font-bold text-foreground">₹{price.toLocaleString()}</p>
             </div>
-            <motion.div whileTap={{ scale: 0.97 }}>
-              <Button onClick={handleAdd} className="h-12 rounded-xl px-8 text-sm font-semibold shadow-lg">
-                Add to Bag
+            <motion.div whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={handleAdd}
+                className={`h-12 rounded-xl px-8 text-sm font-semibold shadow-lg transition-all duration-300 ${
+                  justAdded ? "bg-accent text-accent-foreground" : ""
+                }`}
+              >
+                <AnimatePresence mode="wait">
+                  {justAdded ? (
+                    <motion.span
+                      key="added"
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.5 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Check className="h-4 w-4" /> Added!
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="add"
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.5 }}
+                      className="flex items-center gap-2"
+                    >
+                      <ShoppingBag className="h-4 w-4" /> Add to Bag
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </Button>
             </motion.div>
           </div>
