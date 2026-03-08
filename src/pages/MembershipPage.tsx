@@ -135,14 +135,14 @@ export default function MembershipPage() {
       <div className="px-5 mb-8">
         <h2 className="text-lg font-display font-bold text-foreground text-center mb-5">The Club Ritual</h2>
         <div className="space-y-4">
-          {ritualSteps.map((step) => (
-            <div key={step.title} className="flex gap-4">
+          {clubSteps.map((step) => (
+            <div key={step.id} className="flex gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent/10">
-                <span className="text-xl">{step.icon}</span>
+                <span className="text-xl">{step.icon || "✨"}</span>
               </div>
               <div className="flex-1">
                 <p className="text-sm font-bold text-foreground mb-1">{step.title}</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">{step.desc}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{step.description}</p>
               </div>
             </div>
           ))}
