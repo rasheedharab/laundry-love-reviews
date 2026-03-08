@@ -122,7 +122,7 @@ export default function Cart() {
                   <p className="text-xl font-bold text-foreground">₹{total.toLocaleString()}</p>
                 </div>
                 <motion.div whileTap={{ scale: 0.97 }}>
-                  <Button onClick={() => navigate("/checkout")} className="h-11 rounded-xl px-8 text-sm font-semibold">
+                <Button onClick={() => navigate(user ? "/checkout" : "/login")} className="h-11 rounded-xl px-8 text-sm font-semibold">
                     Proceed to Checkout
                   </Button>
                 </motion.div>
