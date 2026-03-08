@@ -142,13 +142,21 @@ export default function HomePage() {
               className="mx-5 mb-3 flex items-center justify-between rounded-2xl glass-accent px-4 py-3"
             >
               <p className="text-sm font-medium text-accent-foreground">Sign in for orders & rewards</p>
-              <Button
-                size="sm"
-                onClick={() => navigate("/login")}
-                className="h-8 rounded-xl bg-accent-foreground text-accent hover:bg-accent-foreground/90 text-xs font-semibold gap-1.5"
-              >
-                <LogIn className="h-3.5 w-3.5" /> Sign In
-              </Button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => navigate("/signup")}
+                  className="text-xs font-semibold text-accent-foreground/80 hover:text-accent-foreground underline underline-offset-2"
+                >
+                  Sign Up
+                </button>
+                <Button
+                  size="sm"
+                  onClick={() => navigate("/login")}
+                  className="h-8 rounded-xl bg-accent-foreground text-accent hover:bg-accent-foreground/90 text-xs font-semibold gap-1.5"
+                >
+                  <LogIn className="h-3.5 w-3.5" /> Sign In
+                </Button>
+              </div>
             </motion.div>
           )}
 
