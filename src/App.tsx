@@ -40,6 +40,7 @@ function RootRedirect() {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <ThemeProvider>
     <AuthProvider>
       <CartProvider>
         <TooltipProvider>
