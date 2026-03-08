@@ -76,12 +76,13 @@ export default function AdminOutlets() {
     }
     setOpen(false); fetch();
   };
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this outlet?")) return;
-    const { error } = await (supabase as any).from("outlets").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await (supabase as any).from("outlets").delete().eq("id", deleteId);
     if (error) { toast.error(error.message); return; }
-    toast.success("Deleted"); fetch();
+    toast.success("Deleted"); setDeleteId(null); fetch();
   };
 
   return (
