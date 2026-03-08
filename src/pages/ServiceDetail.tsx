@@ -49,7 +49,15 @@ export default function ServiceDetail() {
       if (data) {
         setService(data);
         supabase.from("service_categories").select("*").eq("id", data.category_id).single().then(({ data: cat }) => {
-          if (cat) setCategory(cat);
+          if (cat) {
+            setCategory(cat);
+            addRecentlyViewed({
+              serviceId: data.id,
+              serviceName: data.name,
+              categorySlug: cat.slug,
+              serviceSlug: data.slug,
+            });
+          }
         });
       }
     });
