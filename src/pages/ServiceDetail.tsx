@@ -145,10 +145,10 @@ export default function ServiceDetail() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setTier("standard")}
-                className={`relative rounded-2xl border-2 p-5 text-left transition-all ${
+                className={`relative rounded-2xl p-5 text-left transition-all ${
                   tier === "standard"
-                    ? "border-primary bg-primary/5 shadow-md"
-                    : "border-border bg-card"
+                    ? "glass border-2 border-primary/50 shadow-md"
+                    : "glass"
                 }`}
               >
                 {tier === "standard" && (
