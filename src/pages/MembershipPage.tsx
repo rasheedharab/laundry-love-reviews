@@ -27,6 +27,7 @@ interface ClubStep { id: string; title: string; description: string | null; icon
 export default function MembershipPage() {
   const navigate = useNavigate();
   const [tiers, setTiers] = useState<Tier[]>([]);
+  const [clubSteps, setClubSteps] = useState<ClubStep[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
