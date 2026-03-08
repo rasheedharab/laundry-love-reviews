@@ -137,7 +137,7 @@ export default function HomePage() {
           {activeOrder && (
             <button
               onClick={() => navigate(`/track-order/${activeOrder.id}`)}
-              className="mx-5 mb-5 flex w-[calc(100%-2.5rem)] items-center gap-3 rounded-2xl bg-foreground p-4"
+              className="mx-5 mb-5 flex w-[calc(100%-2.5rem)] items-center gap-3 rounded-2xl glass-dark p-4"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/20">
                 <Truck className="h-6 w-6 text-accent" />
