@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, Wind, Briefcase, Layers, Armchair, Shirt, ChevronRight } from "lucide-react";
 import CardGridSkeleton from "@/components/skeletons/CardGridSkeleton";
 import AnimatedPage from "@/components/AnimatedPage";
+import PullToRefresh from "@/components/PullToRefresh";
 import ServiceSearch from "@/components/ServiceSearch";
 import { motion } from "framer-motion";
 import TiltCard from "@/components/TiltCard";
