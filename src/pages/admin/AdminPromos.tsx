@@ -46,12 +46,14 @@ export default function AdminPromos() {
     await supabase.from("promo_codes").update({ is_active: !current }).eq("id", id);
     fetch();
   };
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this promo code?")) return;
-    const { error } = await supabase.from("promo_codes").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await supabase.from("promo_codes").delete().eq("id", deleteId);
     if (error) { toast.error(error.message); return; }
     toast.success("Deleted");
+    setDeleteId(null);
     fetch();
   };
 
