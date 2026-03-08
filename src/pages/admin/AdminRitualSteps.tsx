@@ -186,6 +186,14 @@ export default function AdminRitualSteps() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete ritual step?"
+        description="This will permanently remove this step from the ritual."
+      />
     </div>
   );
 }

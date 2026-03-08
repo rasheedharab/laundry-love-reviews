@@ -168,6 +168,14 @@ export default function AdminCareTips() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete care tip?"
+        description="This will permanently remove this care tip from the homepage."
+      />
     </div>
   );
 }
