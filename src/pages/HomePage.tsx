@@ -293,31 +293,30 @@ export default function HomePage() {
                   {categories.map((cat) => {
                     const img = heroImages[cat.slug] || catDryCleaning;
                     return (
-                      <motion.button
+                      <motion.div
                         key={cat.id}
-                        onClick={() => navigate(`/services/${cat.slug}`)}
-                        className="relative overflow-hidden rounded-2xl text-left group glass-hover"
                         variants={{
                           hidden: { opacity: 0, y: 24, scale: 0.97 },
                           visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
                         }}
-                        whileHover={{ y: -4, boxShadow: "0 12px 28px -8px hsl(18 82% 40% / 0.18)" }}
-                        whileTap={{ scale: 0.97 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       >
-                        <img
-                          src={img}
-                          alt={cat.name}
-                          className="h-44 w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-3.5">
-                          <p className="text-sm font-semibold text-primary-foreground leading-tight">{cat.name}</p>
-                          <p className="text-[10px] text-primary-foreground/60 uppercase tracking-wider mt-0.5">
-                            {cat.description || "Premium Care"}
-                          </p>
-                        </div>
-                      </motion.button>
+                        <TiltCard className="relative overflow-hidden rounded-2xl text-left group cursor-pointer" tiltMax={6} scale={1.03}>
+                          <button onClick={() => navigate(`/services/${cat.slug}`)} className="w-full text-left">
+                            <img
+                              src={img}
+                              alt={cat.name}
+                              className="h-44 w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
+                            <div className="absolute bottom-0 left-0 right-0 p-3.5">
+                              <p className="text-sm font-semibold text-primary-foreground leading-tight">{cat.name}</p>
+                              <p className="text-[10px] text-primary-foreground/60 uppercase tracking-wider mt-0.5">
+                                {cat.description || "Premium Care"}
+                              </p>
+                            </div>
+                          </button>
+                        </TiltCard>
+                      </motion.div>
                     );
                   })}
                 </motion.div>
