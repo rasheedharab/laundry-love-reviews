@@ -227,7 +227,7 @@ export default function Checkout() {
           {/* Promo Code */}
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent mb-3">Promo Code</p>
-            <div className="rounded-2xl border border-border bg-card p-4">
+            <div className="rounded-2xl glass p-4">
               {promoApplied ? (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
