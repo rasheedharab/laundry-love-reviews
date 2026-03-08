@@ -107,16 +107,26 @@ export default function Cart() {
 
         {items.length > 0 && (
           <div className="fixed bottom-16 left-0 right-0 z-40 glass px-5 py-3">
-            <div className="mx-auto max-w-lg flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">Total</p>
-                <p className="text-xl font-bold text-foreground">₹{total.toLocaleString()}</p>
+            <div className="mx-auto max-w-lg">
+              {!user && (
+                <button
+                  onClick={() => navigate("/login")}
+                  className="mb-2 flex w-full items-center justify-center gap-1.5 rounded-xl bg-secondary/80 py-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <LogIn className="h-3 w-3" /> Sign in for a faster checkout
+                </button>
+              )}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Total</p>
+                  <p className="text-xl font-bold text-foreground">₹{total.toLocaleString()}</p>
+                </div>
+                <motion.div whileTap={{ scale: 0.97 }}>
+                  <Button onClick={() => navigate("/checkout")} className="h-11 rounded-xl px-8 text-sm font-semibold">
+                    Proceed to Checkout
+                  </Button>
+                </motion.div>
               </div>
-              <motion.div whileTap={{ scale: 0.97 }}>
-                <Button onClick={() => navigate("/checkout")} className="h-11 rounded-xl px-8 text-sm font-semibold">
-                  Proceed to Checkout
-                </Button>
-              </motion.div>
             </div>
           </div>
         )}
