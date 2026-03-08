@@ -133,3 +133,14 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Uppercase section labels */
+.section-label {
+  @apply text-[10px] font-body font-semibold uppercase tracking-[0.15em] text-muted-foreground;
+}
+
+/* Dark payment theme */
+.dark-surface {
+  background: hsl(25 20% 10%);
+  color: hsl(35 20% 92%);
+}
