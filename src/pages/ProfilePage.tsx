@@ -110,7 +110,7 @@ export default function ProfilePage() {
         {/* Theme Toggle */}
         <div className="mb-6">
           <p className="section-label mb-3">APPEARANCE</p>
-          <div className="flex gap-2 rounded-2xl border border-border bg-card p-1.5">
+          <div className="flex gap-2 rounded-2xl glass p-1.5">
             {themeOptions.map(({ value, icon: Icon, label }) => (
               <button
                 key={value}

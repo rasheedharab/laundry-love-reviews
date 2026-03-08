@@ -230,7 +230,7 @@ export default function ServiceDetail() {
         </div>
 
         {/* Fixed Bottom CTA */}
-        <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-md px-5 py-3">
+        <div className="fixed bottom-16 left-0 right-0 z-40 glass px-5 py-3">
           <div className="mx-auto max-w-lg flex items-center justify-between">
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Total</p>

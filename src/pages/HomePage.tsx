@@ -345,7 +345,7 @@ export default function HomePage() {
           {/* Trust / Social Proof Strip */}
           <ScrollReveal delay={0.1}>
             <div className="px-5 mt-8">
-              <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-5">
+              <div className="flex items-center justify-between rounded-2xl glass p-5">
                 {[
                   { value: "10,000+", label: "Garments Cared" },
                   { value: "4.9★", label: "Avg Rating" },

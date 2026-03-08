@@ -278,7 +278,7 @@ export default function Checkout() {
         </div>
 
         {/* Fixed CTA */}
-        <div className="fixed bottom-16 left-0 right-0 z-40 bg-background px-5 py-3">
+        <div className="fixed bottom-16 left-0 right-0 z-40 glass px-5 py-3">
           <div className="mx-auto max-w-lg">
             <Button
               onClick={handlePlaceOrder}
