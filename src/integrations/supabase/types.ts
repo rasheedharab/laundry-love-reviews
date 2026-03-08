@@ -139,6 +139,33 @@ export type Database = {
           },
         ]
       }
+      faqs: {
+        Row: {
+          answer: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          question: string
+          sort_order: number | null
+        }
+        Insert: {
+          answer: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          question: string
+          sort_order?: number | null
+        }
+        Update: {
+          answer?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          question?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       loyalty_points: {
         Row: {
           created_at: string
@@ -176,6 +203,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      membership_tiers: {
+        Row: {
+          created_at: string | null
+          features: Json | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          is_popular: boolean | null
+          name: string
+          period: string | null
+          price: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          features?: Json | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          name: string
+          period?: string | null
+          price: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          features?: Json | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          name?: string
+          period?: string | null
+          price?: string
+          sort_order?: number | null
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
