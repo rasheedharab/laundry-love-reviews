@@ -3,11 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { supabase } from "@/integrations/supabase/client";
-import { User, MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Trophy, Sun, Moon, Monitor } from "lucide-react";
+import { MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Star, Sun, Moon, Monitor, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { StaggerContainer, StaggerItem } from "@/components/StaggerAnimation";
 import AnimatedPage from "@/components/AnimatedPage";
 import logoImg from "@/assets/logo.png";
 import type { Tables } from "@/integrations/supabase/types";
@@ -17,19 +15,11 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
-  const [orderCount, setOrderCount] = useState(0);
-  const [totalPoints, setTotalPoints] = useState(0);
 
   useEffect(() => {
     if (!user) return;
     supabase.from("profiles").select("*").eq("user_id", user.id).single().then(({ data }) => {
       if (data) setProfile(data);
-    });
-    supabase.from("orders").select("id", { count: "exact", head: true }).eq("user_id", user.id).then(({ count }) => {
-      setOrderCount(count || 0);
-    });
-    supabase.from("loyalty_points").select("points").eq("user_id", user.id).then(({ data }) => {
-      setTotalPoints((data || []).reduce((s, p: any) => s + (p.points || 0), 0));
     });
   }, [user]);
 
@@ -60,7 +50,7 @@ export default function ProfilePage() {
   const menuItems = [
     { icon: MapPin, label: "Saved Addresses", action: () => navigate("/saved-addresses") },
     { icon: CreditCard, label: "Payment Methods", action: () => {} },
-    { icon: ClipboardList, label: `Order History${orderCount > 0 ? ` (${orderCount})` : ""}`, action: () => navigate("/orders") },
+    { icon: ClipboardList, label: "Order History", action: () => navigate("/orders") },
     { icon: Gift, label: "Refer a Friend", action: () => navigate("/referral") },
     { icon: Headphones, label: "Support & Concierge", action: () => {} },
   ];
@@ -69,57 +59,58 @@ export default function ProfilePage() {
     <AnimatedPage>
       <div className="px-5 pt-6 pb-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-display font-bold text-foreground">Profile</h1>
-          <button className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary">
+          <button onClick={() => navigate("/edit-profile")} className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
             <Settings className="h-4 w-4 text-muted-foreground" />
           </button>
         </div>
 
         {/* Avatar + Name */}
-        <button onClick={() => navigate("/edit-profile")} className="mb-5 flex flex-col items-center w-full">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-secondary mb-3">
-            <User className="h-10 w-10 text-muted-foreground" />
+        <div className="flex flex-col items-center mb-6">
+          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-secondary/80 border-4 border-background shadow-lg mb-4">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
+            ) : (
+              <User className="h-12 w-12 text-muted-foreground/50" />
+            )}
           </div>
-          <p className="text-lg font-display font-bold text-foreground">{profile?.full_name || "User"}</p>
-          <p className="text-xs text-muted-foreground">{user.email}</p>
-          <p className="text-[10px] text-accent mt-1 font-medium">Tap to edit profile</p>
-        </button>
-
-        {/* Premium Club Card */}
-        <div className="mb-4 rounded-2xl bg-gradient-to-br from-accent to-primary p-5 text-accent-foreground">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[0.2em] opacity-80">WHITE RABBIT</p>
-              <p className="text-sm font-display font-bold">PREMIUM CLUB</p>
-            </div>
-            <Badge className="bg-accent-foreground/20 text-accent-foreground border-0 text-[9px] uppercase tracking-wider">
-              Active
-            </Badge>
-          </div>
-          <p className="text-xs font-mono opacity-70">•••• •••• •••• {user.id.slice(-4).toUpperCase()}</p>
+          <p className="text-xl font-display font-bold text-foreground">{profile?.full_name || "User"}</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mt-1">Mumbai, India</p>
         </div>
 
-        {/* Loyalty Points Card */}
-        <div className="mb-6 rounded-2xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
-                <Trophy className="h-5 w-5 text-accent" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Loyalty Points</p>
-                <p className="text-lg font-bold text-foreground">{totalPoints.toLocaleString()}</p>
-              </div>
-            </div>
-            <p className="text-[10px] text-muted-foreground">Earn 1pt / ₹10</p>
+        {/* Premium Club Card */}
+        <div className="mb-6 rounded-2xl bg-gradient-to-br from-accent via-accent to-primary p-5 text-accent-foreground relative overflow-hidden">
+          <div className="absolute top-4 right-4">
+            <Star className="h-8 w-8 text-accent-foreground/20" />
           </div>
+          <p className="text-sm font-bold tracking-wider">WHITE RABBIT</p>
+          <p className="text-xs opacity-80 mb-4">PREMIUM CLUB</p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-mono opacity-70">•••• •••• •••• {user.id.slice(-4).toUpperCase()}</p>
+            <span className="text-[10px] font-bold uppercase tracking-wider bg-accent-foreground/20 px-2 py-0.5 rounded-full">Active</span>
+          </div>
+        </div>
+
+        {/* Menu Items */}
+        <div className="space-y-2 mb-6">
+          {menuItems.map(({ icon: Icon, label, action }) => (
+            <button
+              key={label}
+              onClick={action}
+              className="flex w-full items-center gap-4 rounded-2xl bg-card p-4 text-left transition-colors hover:bg-secondary/50"
+            >
+              <Icon className="h-5 w-5 text-foreground" />
+              <span className="flex-1 text-sm font-medium text-foreground">{label}</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </button>
+          ))}
         </div>
 
         {/* Theme Toggle */}
         <div className="mb-6">
           <p className="section-label mb-3">APPEARANCE</p>
-          <div className="flex gap-2 rounded-2xl border border-border bg-card p-2">
+          <div className="flex gap-2 rounded-2xl border border-border bg-card p-1.5">
             {themeOptions.map(({ value, icon: Icon, label }) => (
               <button
                 key={value}
@@ -137,43 +128,9 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Menu Items */}
-        <StaggerContainer className="space-y-2 mb-6">
-          {menuItems.map(({ icon: Icon, label, action }) => (
-            <StaggerItem key={label}>
-              <button
-                onClick={action}
-                className="flex w-full items-center gap-3.5 rounded-2xl border border-border bg-card p-4 text-left transition-shadow hover:shadow-sm"
-              >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <span className="flex-1 text-sm font-medium text-foreground">{label}</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-
-        {/* Membership */}
-        <button
-          onClick={() => navigate("/membership")}
-          className="mb-4 flex w-full items-center gap-3.5 rounded-2xl border border-accent/20 bg-accent/5 p-4 text-left"
-        >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent/10">
-            <Gift className="h-4 w-4 text-accent" />
-          </div>
-          <span className="flex-1 text-sm font-medium text-accent">White Rabbit Club</span>
-          <ChevronRight className="h-4 w-4 text-accent" />
-        </button>
-
         <Button variant="outline" onClick={handleSignOut} className="w-full h-11 rounded-2xl text-destructive border-destructive/20 hover:bg-destructive/5">
           <LogOut className="h-4 w-4 mr-2" /> Sign Out
         </Button>
-
-        <div className="mt-8 flex justify-center">
-          <img src={logoImg} alt="White Rabbit" className="h-10 opacity-15" />
-        </div>
       </div>
     </AnimatedPage>
   );

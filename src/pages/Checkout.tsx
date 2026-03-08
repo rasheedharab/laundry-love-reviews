@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
+import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Zap, Tag, X } from "lucide-react";
+import { ArrowLeft, MapPin, Zap, Tag, X, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
@@ -10,14 +11,14 @@ import { toast } from "sonner";
 import { addDays, format } from "date-fns";
 import AnimatedPage from "@/components/AnimatedPage";
 
-const timeSlots = ["08:00 AM – 10:00 AM", "10:00 AM – 12:00 PM", "02:00 PM – 04:00 PM", "04:00 PM – 06:00 PM"];
+const timeSlots = ["08:00 AM — 10:00 AM", "10:00 AM — 12:00 PM", "01:00 PM — 03:00 PM", "04:00 PM — 06:00 PM"];
 
 export default function Checkout() {
   const navigate = useNavigate();
   const { items, total, clearCart } = useCart();
   const { user } = useAuth();
   const [address, setAddress] = useState("");
-  const [selectedSlot, setSelectedSlot] = useState(timeSlots[0]);
+  const [selectedSlot, setSelectedSlot] = useState(timeSlots[1]);
   const [selectedDate, setSelectedDate] = useState(0);
   const [serviceLevel, setServiceLevel] = useState<"regular" | "express">("regular");
   const [loading, setLoading] = useState(false);
@@ -29,7 +30,7 @@ export default function Checkout() {
     const today = new Date();
     return Array.from({ length: 7 }, (_, i) => {
       const d = addDays(today, i + 1);
-      return { day: format(d, "EEE").toUpperCase(), date: format(d, "d"), full: d };
+      return { day: format(d, "EEE").toUpperCase(), date: format(d, "d"), full: d, month: format(d, "MMMM yyyy") };
     });
   }, []);
 
@@ -37,7 +38,7 @@ export default function Checkout() {
     ? promoApplied.discount_percent ? total * promoApplied.discount_percent / 100 : (promoApplied.discount_amount || 0)
     : 0;
   const finalTotal = Math.max(0, total - discount);
-  const estReturn = format(addDays(dates[selectedDate].full, serviceLevel === "express" ? 2 : 5), "dd MMM yyyy");
+  const estReturn = format(addDays(dates[selectedDate].full, serviceLevel === "express" ? 2 : 5), "EEE, MMM d");
 
   const handlePlaceOrder = async () => {
     if (!user) { toast.error("Please sign in first"); return; }
@@ -111,55 +112,61 @@ export default function Checkout() {
   return (
     <AnimatedPage>
       <div className="pb-28">
-        <div className="px-5 pt-6 pb-4">
-          <button onClick={() => navigate(-1)} className="mb-4 flex items-center gap-1 text-muted-foreground text-sm">
-            <ArrowLeft className="h-4 w-4" /> Back
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-border">
+          <button onClick={() => navigate(-1)} className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
+            <ArrowLeft className="h-4 w-4 text-foreground" />
           </button>
-          <h1 className="text-xl font-display font-bold text-foreground uppercase tracking-wider">Schedule Pickup</h1>
+          <h1 className="text-xs font-bold uppercase tracking-[0.2em] text-foreground">Schedule Pickup</h1>
+          <div className="w-10" />
         </div>
 
-        <div className="px-5 space-y-5">
+        <div className="px-5 pt-5 space-y-6">
           {/* Service Level Toggle */}
           <div>
-            <p className="section-label mb-3">SERVICE LEVEL</p>
-            <div className="flex gap-2">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent mb-3">Service Level</p>
+            <div className="flex rounded-2xl border border-border bg-card p-1.5">
               <button
                 onClick={() => setServiceLevel("regular")}
-                className={`flex-1 rounded-2xl border-2 p-3.5 text-center text-sm font-semibold transition-all ${
-                  serviceLevel === "regular" ? "border-foreground bg-foreground text-primary-foreground" : "border-border text-foreground"
+                className={`flex-1 rounded-xl py-3 text-sm font-semibold transition-all ${
+                  serviceLevel === "regular" ? "bg-foreground text-primary-foreground" : "text-foreground"
                 }`}
               >
                 Regular
               </button>
               <button
                 onClick={() => setServiceLevel("express")}
-                className={`flex-1 rounded-2xl border-2 p-3.5 text-center text-sm font-semibold transition-all relative ${
-                  serviceLevel === "express" ? "border-accent bg-accent text-accent-foreground" : "border-border text-foreground"
+                className={`flex-1 rounded-xl py-3 text-sm font-semibold transition-all relative ${
+                  serviceLevel === "express" ? "bg-foreground text-primary-foreground" : "text-foreground"
                 }`}
               >
-                <Zap className="inline h-3.5 w-3.5 mr-1" />
                 Express
-                <span className="absolute -top-2 right-3 bg-accent text-accent-foreground text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-bold">
+                <Badge className="absolute -top-1.5 right-2 bg-accent text-accent-foreground border-0 text-[7px] uppercase tracking-wider px-1.5 py-0">
                   Priority
-                </span>
+                </Badge>
               </button>
             </div>
           </div>
 
           {/* Date Picker */}
           <div>
-            <p className="section-label mb-3">SELECT DATE</p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Pickup Date</p>
+              <p className="text-xs text-muted-foreground">{dates[selectedDate].month}</p>
+            </div>
             <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-              {dates.map((d, i) => (
+              {dates.slice(0, 5).map((d, i) => (
                 <button
                   key={i}
                   onClick={() => setSelectedDate(i)}
-                  className={`flex flex-col items-center rounded-2xl border-2 px-4 py-3 min-w-[60px] transition-all ${
-                    selectedDate === i ? "border-foreground bg-foreground text-primary-foreground" : "border-border text-foreground"
+                  className={`flex flex-col items-center rounded-2xl px-4 py-3 min-w-[64px] transition-all ${
+                    selectedDate === i
+                      ? "bg-foreground text-primary-foreground"
+                      : "bg-card border border-border text-foreground"
                   }`}
                 >
                   <span className="text-[10px] font-medium uppercase tracking-wider opacity-70">{d.day}</span>
-                  <span className="text-lg font-bold">{d.date}</span>
+                  <span className="text-xl font-bold">{d.date}</span>
                 </button>
               ))}
             </div>
@@ -167,49 +174,59 @@ export default function Checkout() {
 
           {/* Time Slots */}
           <div>
-            <p className="section-label mb-3">TIME WINDOW</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent mb-3">Time Window</p>
             <div className="space-y-2">
               {timeSlots.map((slot) => (
                 <button
                   key={slot}
                   onClick={() => setSelectedSlot(slot)}
-                  className={`w-full rounded-2xl border-2 p-3.5 text-left text-sm font-medium transition-all ${
-                    selectedSlot === slot ? "border-foreground bg-foreground/5" : "border-border"
+                  className={`w-full flex items-center justify-between rounded-2xl border-2 p-4 text-sm font-medium transition-all ${
+                    selectedSlot === slot ? "border-foreground" : "border-border"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${
-                      selectedSlot === slot ? "border-foreground" : "border-muted-foreground"
-                    }`}>
-                      {selectedSlot === slot && <div className="h-2 w-2 rounded-full bg-foreground" />}
-                    </div>
-                    <span className="text-foreground">{slot}</span>
+                  <span className="text-foreground">{slot}</span>
+                  <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
+                    selectedSlot === slot ? "border-foreground bg-foreground" : "border-muted-foreground/40"
+                  }`}>
+                    {selectedSlot === slot && <div className="h-2 w-2 rounded-full bg-primary-foreground" />}
                   </div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Pickup Address */}
+          {/* Location */}
           <div>
-            <p className="section-label mb-3">PICKUP LOCATION</p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Location</p>
+              <button className="text-[10px] font-semibold text-accent uppercase tracking-wider">Edit</button>
+            </div>
             <div className="rounded-2xl border border-border bg-card p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <MapPin className="h-4 w-4 text-accent" />
-                <span className="text-xs font-semibold text-foreground">Enter Address</span>
+              <div className="flex items-center gap-3 mb-3">
+                <MapPin className="h-5 w-5 text-foreground" />
+                <Input
+                  placeholder="Enter pickup address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="border-0 p-0 h-auto text-sm font-medium text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
+                />
               </div>
-              <Input
-                placeholder="Full pickup address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="rounded-xl border-border"
-              />
+              <div className="h-px bg-border mb-3" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Est. Return</p>
+                    <p className="text-xs font-semibold text-foreground">{estReturn}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Promo Code */}
           <div>
-            <p className="section-label mb-3">PROMO CODE</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent mb-3">Promo Code</p>
             <div className="rounded-2xl border border-border bg-card p-4">
               {promoApplied ? (
                 <div className="flex items-center justify-between">
@@ -225,55 +242,50 @@ export default function Checkout() {
                   </button>
                 </div>
               ) : (
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <Input
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value)}
                     placeholder="Enter code"
-                    className="flex-1 rounded-xl border-border uppercase"
+                    className="flex-1 border-0 p-0 h-auto text-sm placeholder:text-muted-foreground focus-visible:ring-0 uppercase"
                   />
-                  <Button
+                  <button
                     onClick={handleApplyPromo}
                     disabled={promoLoading || !promoCode.trim()}
-                    variant="outline"
-                    className="rounded-xl text-xs font-semibold"
+                    className="text-xs font-bold uppercase tracking-wider text-foreground disabled:opacity-40"
                   >
                     {promoLoading ? "..." : "Apply"}
-                  </Button>
+                  </button>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Processing Info */}
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Processing Atelier</p>
-            <p className="text-sm font-semibold text-foreground">White Rabbit — Central Studio</p>
-            <p className="text-xs text-muted-foreground mt-1">Est. return by {estReturn}</p>
+          {/* Summary */}
+          <div className="pt-2">
+            <div className="h-px bg-border mb-4" />
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Subtotal</span>
+              <span className="text-base font-bold text-foreground">₹{finalTotal.toLocaleString()}.00</span>
+            </div>
             {discount > 0 && (
-              <div className="mt-2 pt-2 border-t border-border">
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="text-foreground">₹{total.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-xs mt-1">
-                  <span className="text-accent">Discount</span>
-                  <span className="text-accent">-₹{discount.toLocaleString()}</span>
-                </div>
+              <div className="flex justify-between items-center mt-1">
+                <span className="text-xs text-accent">Discount</span>
+                <span className="text-xs text-accent">-₹{discount.toLocaleString()}</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Fixed CTA */}
-        <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-md px-5 py-3">
+        <div className="fixed bottom-16 left-0 right-0 z-40 bg-background px-5 py-3">
           <div className="mx-auto max-w-lg">
             <Button
               onClick={handlePlaceOrder}
               disabled={loading}
-              className="w-full h-12 rounded-2xl bg-foreground text-primary-foreground text-sm font-semibold uppercase tracking-wider hover:bg-foreground/90"
+              className="w-full h-13 rounded-2xl bg-foreground text-primary-foreground text-sm font-bold uppercase tracking-wider hover:bg-foreground/90"
             >
-              {loading ? "Processing..." : `Confirm Pickup → ₹${finalTotal.toLocaleString()}`}
+              {loading ? "Processing..." : "Pay"}
             </Button>
           </div>
         </div>

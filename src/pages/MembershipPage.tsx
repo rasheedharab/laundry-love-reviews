@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, Star } from "lucide-react";
+import { ArrowLeft, Check, Star, Crown, Diamond } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -7,31 +7,40 @@ const tiers = [
   {
     name: "Silver",
     price: "₹499",
-    period: "/month",
-    features: ["5% off all services", "Priority scheduling", "Free garment bags", "Email support"],
+    period: "/mo",
+    icon: Star,
+    features: ["Priority Pickup", "Standard Care"],
     popular: false,
   },
   {
     name: "Gold",
     price: "₹999",
-    period: "/month",
-    features: ["15% off all services", "Same-day express", "Free pickup & delivery", "Dedicated concierge", "Seasonal wardrobe check"],
+    period: "/mo",
+    icon: Crown,
+    features: ["Priority Pickup", "Complimentary Eco-Bags", "Standard Care"],
     popular: true,
   },
   {
     name: "Platinum",
     price: "₹1,999",
-    period: "/month",
-    features: ["25% off all services", "Priority express (6hr)", "Unlimited free delivery", "Personal valet", "Wardrobe consultation", "VIP event access"],
+    period: "/mo",
+    icon: Diamond,
+    features: ["Priority Pickup", "Complimentary Eco-Bags", "Artisan-only Care"],
     popular: false,
   },
 ];
 
-const clubBenefits = [
-  "Exclusive member pricing on premium treatments",
-  "Early access to seasonal care programs",
-  "Complimentary garment storage during travel",
-  "Birthday month: one free premium service",
+const ritualSteps = [
+  {
+    icon: "👔",
+    title: "White-Glove Collection",
+    desc: "Scheduled precisely to your calendar. Handled with utmost discretion in our signature garment carriers.",
+  },
+  {
+    icon: "✨",
+    title: "Bespoke Treatment",
+    desc: "Each piece is inspected by our master artisans and treated with eco-conscious, fabric-specific formulations.",
+  },
 ];
 
 export default function MembershipPage() {
@@ -40,73 +49,91 @@ export default function MembershipPage() {
   return (
     <div className="pb-8">
       {/* Header */}
-      <div className="px-5 pt-6 pb-4">
-        <button onClick={() => navigate(-1)} className="mb-4 flex items-center gap-1 text-muted-foreground text-sm">
-          <ArrowLeft className="h-4 w-4" /> Back
+      <div className="flex items-center justify-between px-5 pt-5 pb-3">
+        <button onClick={() => navigate(-1)} className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
+          <ArrowLeft className="h-4 w-4 text-foreground" />
         </button>
+        <h1 className="text-sm font-semibold text-foreground">White Rabbit Club</h1>
+        <div className="w-10" />
       </div>
 
-      {/* Premium Card */}
-      <div className="mx-5 mb-6 rounded-2xl bg-gradient-to-br from-accent to-primary p-6 text-accent-foreground">
-        <p className="text-[9px] font-semibold uppercase tracking-[0.2em] opacity-80 mb-1">WHITE RABBIT</p>
-        <h1 className="text-xl font-display font-bold mb-2">Premium Club</h1>
-        <p className="text-xs opacity-70 leading-relaxed">Elevate your garment care with exclusive benefits, priority service, and dedicated concierge support.</p>
+      {/* Premium Hero Card */}
+      <div className="mx-5 mb-6 rounded-2xl bg-gradient-to-br from-amber-600 via-amber-500 to-amber-700 p-6 text-white relative overflow-hidden">
+        <div className="absolute top-4 left-4">
+          <span className="text-2xl">🐇</span>
+        </div>
+        <div className="absolute top-4 right-4">
+          <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Premium</span>
+        </div>
+        <div className="pt-10">
+          <p className="text-xs opacity-80 mb-1">Exclusive Member</p>
+          <p className="text-lg font-display font-bold">White Rabbit Club</p>
+        </div>
       </div>
 
-      {/* Tiers */}
-      <div className="px-5 space-y-4 mb-8">
-        <p className="section-label">SELECT YOUR TIER</p>
-        {tiers.map((tier) => (
-          <div
-            key={tier.name}
-            className={`rounded-2xl border-2 p-5 transition-all ${
-              tier.popular ? "border-accent bg-accent/5" : "border-border bg-card"
-            }`}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Star className={`h-4 w-4 ${tier.popular ? "text-accent" : "text-muted-foreground"}`} />
-                <span className="text-base font-display font-bold text-foreground">{tier.name}</span>
-              </div>
+      {/* Membership Tiers */}
+      <div className="px-5 mb-8">
+        <h2 className="text-lg font-display font-bold text-foreground mb-4">Membership Tiers</h2>
+        <div className="space-y-4">
+          {tiers.map((tier) => (
+            <div
+              key={tier.name}
+              className={`rounded-2xl border-2 p-5 relative ${
+                tier.popular ? "border-accent bg-accent/5" : "border-border bg-card"
+              }`}
+            >
               {tier.popular && (
-                <Badge className="bg-accent text-accent-foreground border-0 text-[8px] uppercase tracking-wider">
+                <Badge className="absolute -top-2.5 right-4 bg-accent text-accent-foreground border-0 text-[9px] uppercase tracking-wider font-bold px-2.5">
                   Most Popular
                 </Badge>
               )}
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-base font-display font-bold text-foreground">{tier.name}</p>
+                <tier.icon className={`h-5 w-5 ${tier.popular ? "text-accent" : "text-muted-foreground"}`} />
+              </div>
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-foreground">{tier.price}</span>
+                <span className="text-sm text-muted-foreground">{tier.period}</span>
+              </div>
+              <div className="space-y-2.5 mb-5">
+                {tier.features.map((f) => (
+                  <div key={f} className="flex items-center gap-2.5">
+                    <div className={`h-5 w-5 rounded-full flex items-center justify-center ${
+                      tier.popular ? "bg-accent/20" : "bg-secondary"
+                    }`}>
+                      <Check className={`h-3 w-3 ${tier.popular ? "text-accent" : "text-primary"}`} />
+                    </div>
+                    <span className="text-sm text-foreground">{f}</span>
+                  </div>
+                ))}
+              </div>
+              <Button
+                className={`w-full h-11 rounded-xl text-xs font-bold uppercase tracking-wider ${
+                  tier.popular
+                    ? "bg-accent text-accent-foreground hover:bg-accent/90"
+                    : "bg-foreground text-primary-foreground hover:bg-foreground/90"
+                }`}
+              >
+                Select {tier.name}
+              </Button>
             </div>
-            <div className="mb-4">
-              <span className="text-2xl font-bold text-foreground">{tier.price}</span>
-              <span className="text-xs text-muted-foreground">{tier.period}</span>
-            </div>
-            <div className="space-y-2 mb-4">
-              {tier.features.map((f) => (
-                <div key={f} className="flex items-center gap-2">
-                  <Check className={`h-3.5 w-3.5 ${tier.popular ? "text-accent" : "text-primary"}`} />
-                  <span className="text-xs text-foreground">{f}</span>
-                </div>
-              ))}
-            </div>
-            <Button
-              className={`w-full h-10 rounded-xl text-xs font-semibold uppercase tracking-wider ${
-                tier.popular
-                  ? "bg-accent text-accent-foreground hover:bg-accent/90"
-                  : "bg-foreground text-primary-foreground hover:bg-foreground/90"
-              }`}
-            >
-              Select {tier.name}
-            </Button>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* Club Ritual Benefits */}
-      <div className="px-5 mb-6">
-        <p className="section-label mb-3">THE CLUB RITUAL</p>
-        <div className="space-y-3">
-          {clubBenefits.map((b) => (
-            <div key={b} className="flex items-start gap-2">
-              <div className="mt-1 h-1.5 w-1.5 rounded-full bg-accent shrink-0" />
-              <p className="text-xs text-foreground leading-relaxed">{b}</p>
+      {/* The Club Ritual */}
+      <div className="px-5 mb-8">
+        <h2 className="text-lg font-display font-bold text-foreground text-center mb-5">The Club Ritual</h2>
+        <div className="space-y-4">
+          {ritualSteps.map((step) => (
+            <div key={step.title} className="flex gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent/10">
+                <span className="text-xl">{step.icon}</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-foreground mb-1">{step.title}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{step.desc}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -114,7 +141,7 @@ export default function MembershipPage() {
 
       {/* CTA */}
       <div className="px-5">
-        <Button className="w-full h-12 rounded-2xl bg-accent text-accent-foreground text-sm font-semibold uppercase tracking-wider hover:bg-accent/90">
+        <Button className="w-full h-13 rounded-2xl bg-accent text-accent-foreground text-sm font-bold uppercase tracking-wider hover:bg-accent/90">
           Join the Club
         </Button>
       </div>
