@@ -50,6 +50,9 @@ import AdminOutlets from "@/pages/admin/AdminOutlets";
 import AdminComplaints from "@/pages/admin/AdminComplaints";
 import AdminBlog from "@/pages/admin/AdminBlog";
 import AdminUsers from "@/pages/admin/AdminUsers";
+import AdminRitualSteps from "@/pages/admin/AdminRitualSteps";
+import AdminCareTips from "@/pages/admin/AdminCareTips";
+import AdminSiteSettings from "@/pages/admin/AdminSiteSettings";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
