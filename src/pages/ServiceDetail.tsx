@@ -37,6 +37,7 @@ export default function ServiceDetail() {
   const [service, setService] = useState<Tables<"services"> | null>(null);
   const [category, setCategory] = useState<Tables<"service_categories"> | null>(null);
   const [tier, setTier] = useState<"standard" | "express">("standard");
+  const [justAdded, setJustAdded] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
