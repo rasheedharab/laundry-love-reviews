@@ -208,7 +208,8 @@ export default function HomePage() {
 
           {/* Active Order Card */}
           {activeOrder && (
-            <button
+            <RippleTouch
+              as="button"
               onClick={() => navigate(`/track-order/${activeOrder.id}`)}
               className="mx-5 mb-5 flex w-[calc(100%-2.5rem)] items-center gap-3 rounded-2xl glass-dark p-4"
             >
@@ -228,7 +229,7 @@ export default function HomePage() {
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-card">
                 <ArrowRight className="h-4 w-4 text-foreground" />
               </div>
-            </button>
+            </RippleTouch>
           )}
 
           {/* Recently Viewed */}
