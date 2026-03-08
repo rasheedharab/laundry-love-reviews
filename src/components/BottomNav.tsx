@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 
 const tabs = [
   { path: "/home", icon: Home, label: "Home" },
