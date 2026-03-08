@@ -12,6 +12,7 @@ import AnimatedPage from "@/components/AnimatedPage";
 import ServiceReviews from "@/components/ServiceReviews";
 import { addRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import type { Tables } from "@/integrations/supabase/types";
+import { serviceImages } from "@/lib/serviceImages";
 
 import serviceHeroDefault from "@/assets/service-hero-default.jpg";
 import catPartyWear from "@/assets/cat-party-wear.jpg";
@@ -81,7 +82,7 @@ export default function ServiceDetail() {
   const price = tier === "express" && service.price_express ? service.price_express : service.price_standard;
   const turnaround = tier === "express" ? service.turnaround_express : service.turnaround_standard;
   const categorySlug = category?.slug || "";
-  const heroImage = heroImageMap[categorySlug] || serviceHeroDefault;
+  const heroImage = serviceImages[service.slug] || heroImageMap[categorySlug] || serviceHeroDefault;
 
   const handleAdd = () => {
     if (justAdded) return;
