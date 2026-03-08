@@ -37,6 +37,11 @@ import AdminOrders from "@/pages/admin/AdminOrders";
 import AdminServices from "@/pages/admin/AdminServices";
 import AdminCategories from "@/pages/admin/AdminCategories";
 import AdminPromos from "@/pages/admin/AdminPromos";
+import AdminCustomers from "@/pages/admin/AdminCustomers";
+import AdminOutlets from "@/pages/admin/AdminOutlets";
+import AdminComplaints from "@/pages/admin/AdminComplaints";
+import AdminBlog from "@/pages/admin/AdminBlog";
+import AdminUsers from "@/pages/admin/AdminUsers";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
