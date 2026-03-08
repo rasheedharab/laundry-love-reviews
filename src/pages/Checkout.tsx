@@ -74,7 +74,7 @@ export default function Checkout() {
     fetchAvailability();
   }, [selectedDate, dates, timeSlots]);
 
-  const isSlotFull = (slot: string) => (slotCounts[slot] || 0) >= SLOT_CAPACITY;
+  const isSlotFull = (slot: string) => (slotCounts[slot] || 0) >= slotCapacity;
 
   const isSlotPast = (slot: string) => {
     const pickupDate = dates[selectedDate].full;
