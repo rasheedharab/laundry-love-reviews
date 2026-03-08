@@ -173,14 +173,23 @@ export default function HomePage() {
                   {[1, 2, 3, 4, 5, 6].map((i) => <Skeleton key={i} className="h-44 rounded-2xl" />)}
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
+                <motion.div
+                  className="grid grid-cols-2 gap-3"
+                  initial="hidden"
+                  animate="visible"
+                  variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+                >
                   {categories.map((cat) => {
                     const img = heroImages[cat.slug] || catDryCleaning;
                     return (
-                      <button
+                      <motion.button
                         key={cat.id}
                         onClick={() => navigate(`/services/${cat.slug}`)}
-                        className="relative overflow-hidden rounded-2xl text-left transition-shadow hover:shadow-lg group"
+                        className="relative overflow-hidden rounded-2xl text-left transition-shadow hover:shadow-lg group glass-hover"
+                        variants={{
+                          hidden: { opacity: 0, y: 24, scale: 0.97 },
+                          visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
+                        }}
                       >
                         <img
                           src={img}
@@ -194,10 +203,10 @@ export default function HomePage() {
                             {cat.description || "Premium Care"}
                           </p>
                         </div>
-                      </button>
+                      </motion.button>
                     );
                   })}
-                </div>
+                </motion.div>
               )}
             </div>
           </ScrollReveal>
