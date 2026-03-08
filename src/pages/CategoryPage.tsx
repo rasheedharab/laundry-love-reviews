@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 import type { Tables } from "@/integrations/supabase/types";
+import { serviceImages } from "@/lib/serviceImages";
 
 import catPartyWear from "@/assets/cat-party-wear.jpg";
 import catDryCleaning from "@/assets/cat-dry-cleaning.jpg";
@@ -56,6 +58,26 @@ const heroTaglines: Record<string, { badge: string; title: string; subtitle: str
     badge: "Daily Essentials",
     title: "Pristine\nWash & Fold",
     subtitle: "Premium laundering with meticulous attention to fabric care.",
+  },
+};
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.15,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
   },
 };
 
@@ -167,23 +189,29 @@ export default function CategoryPage() {
             </button>
           </div>
 
-          {/* Services List — card style with images */}
+          {/* Services List — staggered card animations */}
           {loading ? (
             <div className="space-y-3">
-              {[1, 2, 3].map((i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)}
+              {[1, 2, 3].map((i) => <Skeleton key={i} className="h-[140px] w-full rounded-2xl" />)}
             </div>
           ) : (
-            <div className="space-y-4">
+            <motion.div
+              className="space-y-4"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {services.map((svc, index) => (
-                <button
+                <motion.button
                   key={svc.id}
+                  variants={cardVariants}
                   onClick={() => navigate(`/service/${svc.slug}`)}
-                  className="relative w-full overflow-hidden rounded-2xl text-left transition-shadow hover:shadow-lg group"
+                  className="relative w-full overflow-hidden rounded-2xl text-left group glass-hover"
                   style={{ minHeight: "140px" }}
                 >
                   {/* Background image */}
                   <img
-                    src={svc.image_url || heroImg}
+                    src={svc.image_url || serviceImages[svc.slug] || heroImg}
                     alt={svc.name}
                     className="absolute inset-0 h-full w-full object-cover scale-110 group-hover:scale-105 transition-transform duration-700"
                   />
@@ -237,9 +265,9 @@ export default function CategoryPage() {
                       </div>
                     </div>
                   </div>
-                </button>
+                </motion.button>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
