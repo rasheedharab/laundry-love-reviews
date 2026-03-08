@@ -57,7 +57,7 @@ export default function BottomNav() {
                   {itemCount}
                 </span>
               )}
-            </button>
+            </motion.button>
           );
         })}
       </div>

@@ -540,12 +540,15 @@ export default function HomePage() {
           </div>
 
           {/* Chat FAB */}
-          <button
+          <motion.button
             onClick={() => navigate("/garment-advisor")}
-            className="fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-accent shadow-lg shadow-accent/30 transition-transform hover:scale-105"
+            className="fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-accent shadow-lg shadow-accent/30"
+            whileHover={{ scale: 1.12, boxShadow: "0 8px 32px -4px hsl(18 82% 40% / 0.45)" }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 400, damping: 15 }}
           >
             <MessageCircle className="h-6 w-6 text-accent-foreground" />
-          </button>
+          </motion.button>
         </div>
       </PullToRefresh>
     </AnimatedPage>
