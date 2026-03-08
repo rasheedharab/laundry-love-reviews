@@ -43,9 +43,7 @@ export default function AdminLogin() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-6">
-        <Shield className="h-8 w-8 text-primary" />
-      </div>
+      <img src={logoImg} alt="White Rabbit" className="mb-6 h-20 w-auto" />
       <h1 className="mb-1 text-2xl font-display font-bold text-foreground">Admin Portal</h1>
       <p className="mb-8 text-sm text-muted-foreground">White Rabbit Management</p>
 
