@@ -106,6 +106,9 @@ function AnimatedRoutes() {
           <Route path="complaints" element={<AdminComplaints />} />
           <Route path="blog" element={<AdminBlog />} />
           <Route path="promos" element={<AdminPromos />} />
+          <Route path="ritual-steps" element={<AdminRitualSteps />} />
+          <Route path="care-tips" element={<AdminCareTips />} />
+          <Route path="site-settings" element={<AdminSiteSettings />} />
           <Route path="users" element={<AdminUsers />} />
         </Route>
         <Route path="/garment-advisor" element={<GarmentAdvisor />} />
