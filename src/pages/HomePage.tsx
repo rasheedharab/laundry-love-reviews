@@ -59,6 +59,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<{ full_name: string | null } | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [ritualSteps, setRitualSteps] = useState<RitualStepDB[]>([]);
+  const [careTips, setCareTips] = useState<CareTipDB[]>([]);
   const heroRef = useRef<HTMLDivElement>(null);
   const recentlyViewed = useRecentlyViewed();
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
