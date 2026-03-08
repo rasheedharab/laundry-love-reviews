@@ -131,7 +131,7 @@ export default function ServiceDetail() {
 
         <div className="px-5 -mt-2 relative z-10">
           {/* Description */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm mb-5">
+          <div className="rounded-2xl glass p-5 mb-5">
             <div className="flex items-center gap-2 mb-3">
               <Sparkles className="h-4 w-4 text-accent" />
               <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Artisan Care</h3>
