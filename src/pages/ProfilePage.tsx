@@ -56,13 +56,14 @@ export default function ProfilePage() {
       </div>
 
       {/* Avatar + Name */}
-      <div className="mb-5 flex flex-col items-center">
+      <button onClick={() => navigate("/edit-profile")} className="mb-5 flex flex-col items-center w-full">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-secondary mb-3">
           <User className="h-10 w-10 text-muted-foreground" />
         </div>
         <p className="text-lg font-display font-bold text-foreground">{profile?.full_name || "User"}</p>
         <p className="text-xs text-muted-foreground">{user.email}</p>
-      </div>
+        <p className="text-[10px] text-accent mt-1 font-medium">Tap to edit profile</p>
+      </button>
 
       {/* Premium Club Card */}
       <div className="mb-6 rounded-2xl bg-gradient-to-br from-accent to-primary p-5 text-accent-foreground">
