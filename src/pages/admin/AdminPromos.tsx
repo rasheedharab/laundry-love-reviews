@@ -135,6 +135,14 @@ export default function AdminPromos() {
           </table>
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete promo code?"
+        description="This will permanently remove this promo code."
+      />
     </div>
   );
 }

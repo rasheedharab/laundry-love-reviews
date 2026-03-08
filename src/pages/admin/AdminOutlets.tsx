@@ -159,6 +159,14 @@ export default function AdminOutlets() {
           </table>
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete outlet?"
+        description="This will permanently remove this outlet location."
+      />
     </div>
   );
 }

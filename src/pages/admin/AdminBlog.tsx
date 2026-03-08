@@ -179,6 +179,14 @@ export default function AdminBlog() {
           </table>
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete blog post?"
+        description="This will permanently remove this post and it cannot be recovered."
+      />
     </div>
   );
 }

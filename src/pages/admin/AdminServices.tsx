@@ -267,6 +267,14 @@ export default function AdminServices() {
           </table>
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete service?"
+        description="This will permanently remove this service. Existing orders referencing it won't be affected."
+      />
     </div>
   );
 }

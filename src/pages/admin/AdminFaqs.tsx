@@ -157,6 +157,14 @@ export default function AdminFaqs() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete FAQ?"
+        description="This will permanently remove this FAQ from the support page."
+      />
     </div>
   );
 }
