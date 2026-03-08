@@ -22,7 +22,6 @@ interface Outlet { id: string; name: string; }
 interface OrderRow extends Tables<"orders"> {
   profile?: Tables<"profiles"> | null;
   items?: Tables<"order_items">[];
-  outlet_id?: string | null;
 }
 
 export default function AdminOrders() {
