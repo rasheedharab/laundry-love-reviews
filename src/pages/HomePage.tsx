@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { MapPin, ChevronDown, Sparkles, Wind, Briefcase, Layers, Armchair, Shirt, ArrowRight, User, Truck, MessageCircle } from "lucide-react";
+import { MapPin, ChevronDown, ArrowRight, User, Truck, MessageCircle, Crown, Gift, Star, ChevronRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedPage from "@/components/AnimatedPage";
@@ -11,9 +11,37 @@ import logoImg from "@/assets/logo.png";
 import heroBg from "@/assets/hero-bg.jpg";
 import type { Tables } from "@/integrations/supabase/types";
 
-const iconMap: Record<string, React.ElementType> = {
-  sparkles: Sparkles, wind: Wind, briefcase: Briefcase, layers: Layers, armchair: Armchair, shirt: Shirt,
+import catPartyWear from "@/assets/cat-party-wear.jpg";
+import catDryCleaning from "@/assets/cat-dry-cleaning.jpg";
+import catLeatherCare from "@/assets/cat-leather-care.jpg";
+import catCarpets from "@/assets/cat-carpets.jpg";
+import catSofaCare from "@/assets/cat-sofa-care.jpg";
+import catLaundry from "@/assets/cat-laundry.jpg";
+
+const heroImages: Record<string, string> = {
+  "party-occasion-wear": catPartyWear,
+  "dry-cleaning": catDryCleaning,
+  "leather-care": catLeatherCare,
+  "carpets-rugs": catCarpets,
+  "sofa-care": catSofaCare,
+  "laundry": catLaundry,
 };
+
+const ritualSteps = [
+  { num: 1, title: "Inspection", icon: "🔍" },
+  { num: 2, title: "Spotting", icon: "✨" },
+  { num: 3, title: "Eco-Wash", icon: "🌿" },
+  { num: 4, title: "Drying", icon: "☁️" },
+  { num: 5, title: "Finishing", icon: "👔" },
+  { num: 6, title: "QC Check", icon: "✓" },
+  { num: 7, title: "Packaging", icon: "🎁" },
+];
+
+const careTips = [
+  { title: "Storing Silk", desc: "Keep silk garments in breathable cotton bags away from direct sunlight.", icon: "🧵" },
+  { title: "Leather Care 101", desc: "Condition leather every 3 months to maintain its supple texture.", icon: "👜" },
+  { title: "Wool Refresh", desc: "Steam instead of washing to preserve wool fibers and shape.", icon: "🧶" },
+];
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -52,9 +80,7 @@ export default function HomePage() {
               onClick={() => navigate("/select-outlet")}
               className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5"
             >
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Your Location</span>
-              </div>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Your Location</span>
             </button>
             <button
               onClick={() => navigate("/profile")}
@@ -64,19 +90,16 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* Location selector below */}
+          {/* Location selector */}
           <div className="px-5 -mt-2 mb-4">
-            <button
-              onClick={() => navigate("/select-outlet")}
-              className="flex items-center gap-1.5"
-            >
+            <button onClick={() => navigate("/select-outlet")} className="flex items-center gap-1.5">
               <MapPin className="h-4 w-4 text-accent" />
               <span className="text-sm font-medium text-foreground">Select Outlet/City</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </button>
           </div>
 
-          {/* Hero Section with background image */}
+          {/* Hero Section */}
           <div className="relative mx-5 mb-5 overflow-hidden rounded-2xl min-h-[340px] flex flex-col justify-end">
             <img src={heroBg} alt="" className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
@@ -123,7 +146,7 @@ export default function HomePage() {
             </button>
           )}
 
-          {/* Our Services */}
+          {/* Our Services — Image Cards */}
           <div className="px-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-display font-bold text-foreground">Our Services</h2>
@@ -134,25 +157,28 @@ export default function HomePage() {
 
             {loading ? (
               <div className="grid grid-cols-2 gap-3">
-                {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}
+                {[1, 2, 3, 4, 5, 6].map((i) => <Skeleton key={i} className="h-44 rounded-2xl" />)}
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
-                {categories.slice(0, 4).map((cat) => {
-                  const Icon = iconMap[cat.icon || "sparkles"] || Sparkles;
+                {categories.map((cat) => {
+                  const img = heroImages[cat.slug] || catDryCleaning;
                   return (
                     <button
                       key={cat.id}
                       onClick={() => navigate(`/services/${cat.slug}`)}
-                      className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-5 pt-6 pb-5 transition-shadow hover:shadow-md"
+                      className="relative overflow-hidden rounded-2xl text-left transition-shadow hover:shadow-lg group"
                     >
-                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-secondary">
-                        <Icon className="h-6 w-6 text-muted-foreground" />
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm font-semibold text-foreground leading-tight">{cat.name}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">
-                          {cat.description?.split(" ").slice(0, 2).join(" ") || "Premium Care"}
+                      <img
+                        src={img}
+                        alt={cat.name}
+                        className="h-44 w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-3.5">
+                        <p className="text-sm font-semibold text-primary-foreground leading-tight">{cat.name}</p>
+                        <p className="text-[10px] text-primary-foreground/60 uppercase tracking-wider mt-0.5">
+                          {cat.description || "Premium Care"}
                         </p>
                       </div>
                     </button>
@@ -160,6 +186,145 @@ export default function HomePage() {
                 })}
               </div>
             )}
+          </div>
+
+          {/* Promotional Banner */}
+          <div className="px-5 mt-6">
+            <button
+              onClick={() => navigate("/services")}
+              className="w-full overflow-hidden rounded-2xl bg-gradient-to-r from-accent to-accent/80 p-5 text-left relative"
+            >
+              <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-accent-foreground/20">
+                <Sparkles className="h-4 w-4 text-accent-foreground" />
+              </div>
+              <p className="text-[10px] text-accent-foreground/70 uppercase tracking-widest font-medium mb-1">Limited Offer</p>
+              <p className="text-xl font-display font-bold text-accent-foreground leading-tight">First Order<br />20% Off</p>
+              <p className="text-xs text-accent-foreground/70 mt-2">Use code WELCOME20 at checkout</p>
+              <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-accent-foreground uppercase tracking-wider">
+                Shop Now <ArrowRight className="h-3 w-3" />
+              </div>
+            </button>
+          </div>
+
+          {/* 7-Step Ritual Preview */}
+          <div className="mt-8 px-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-display font-bold text-foreground">Our 7-Step Ritual</h2>
+              <button onClick={() => navigate("/ritual")} className="text-xs font-semibold text-accent uppercase tracking-wider">
+                Learn More
+              </button>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
+              {ritualSteps.map((step) => (
+                <button
+                  key={step.num}
+                  onClick={() => navigate("/ritual")}
+                  className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-4 transition-shadow hover:shadow-md"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-base">
+                    {step.icon}
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] text-accent font-bold">Step {step.num}</p>
+                    <p className="text-xs font-semibold text-foreground mt-0.5">{step.title}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Membership / Premium Club Teaser */}
+          <div className="px-5 mt-8">
+            <button
+              onClick={() => navigate("/membership")}
+              className="w-full overflow-hidden rounded-2xl bg-foreground p-5 text-left relative"
+            >
+              <div className="absolute top-4 right-4">
+                <Crown className="h-8 w-8 text-accent/40" />
+              </div>
+              <p className="text-[10px] text-primary-foreground/50 uppercase tracking-widest font-medium mb-1">Exclusive Access</p>
+              <p className="text-xl font-display font-bold text-primary-foreground leading-tight">Premium Club</p>
+              <p className="text-xs text-primary-foreground/60 mt-2 leading-relaxed max-w-[240px]">
+                Unlock priority pickup, exclusive discounts, and complimentary garment care with our membership tiers.
+              </p>
+              <div className="mt-4 flex items-center gap-3">
+                {["Silver", "Gold", "Platinum"].map((tier) => (
+                  <span key={tier} className="text-[10px] font-semibold text-accent/80 uppercase tracking-wider bg-accent/10 px-2.5 py-1 rounded-full">
+                    {tier}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-accent uppercase tracking-wider">
+                Explore Membership <ChevronRight className="h-3 w-3" />
+              </div>
+            </button>
+          </div>
+
+          {/* Garment Care Tips */}
+          <div className="mt-8 px-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-display font-bold text-foreground">Care Tips</h2>
+              <button onClick={() => navigate("/garment-advisor")} className="text-xs font-semibold text-accent uppercase tracking-wider">
+                Ask Advisor
+              </button>
+            </div>
+            <div className="space-y-3">
+              {careTips.map((tip) => (
+                <button
+                  key={tip.title}
+                  onClick={() => navigate("/garment-advisor")}
+                  className="w-full flex items-start gap-3.5 rounded-2xl border border-border bg-card p-4 text-left transition-shadow hover:shadow-md"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-base">
+                    {tip.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{tip.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.desc}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Referral CTA */}
+          <div className="px-5 mt-8">
+            <button
+              onClick={() => navigate("/referral")}
+              className="w-full overflow-hidden rounded-2xl border border-accent/20 bg-accent/5 p-5 text-left"
+            >
+              <div className="flex items-start gap-3.5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/10">
+                  <Gift className="h-6 w-6 text-accent" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-display font-bold text-foreground">Invite Friends, Earn Rewards</p>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                    Share your referral code and earn 500 loyalty points for every friend who places their first order.
+                  </p>
+                  <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-accent uppercase tracking-wider">
+                    Share Now <ArrowRight className="h-3 w-3" />
+                  </div>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          {/* Trust / Social Proof Strip */}
+          <div className="px-5 mt-8">
+            <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-5">
+              {[
+                { value: "10,000+", label: "Garments Cared" },
+                { value: "4.9★", label: "Avg Rating" },
+                { value: "500+", label: "Happy Clients" },
+              ].map((stat, i) => (
+                <div key={stat.label} className={`text-center flex-1 ${i > 0 ? "border-l border-border" : ""}`}>
+                  <p className="text-lg font-display font-bold text-foreground">{stat.value}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">{stat.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Brand Footer */}
