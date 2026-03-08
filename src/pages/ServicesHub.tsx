@@ -44,7 +44,10 @@ export default function ServicesHub() {
     <AnimatedPage>
       <div className="px-5 pt-6 pb-4">
         <h1 className="mb-1 text-2xl font-display font-bold text-foreground">Services</h1>
-        <p className="mb-6 text-sm text-muted-foreground">Premium care for everything you own</p>
+        <p className="mb-4 text-sm text-muted-foreground">Premium care for everything you own</p>
+        <div className="mb-5">
+          <ServiceSearch />
+        </div>
 
         {loading ? (
           <div className="grid grid-cols-2 gap-3">
