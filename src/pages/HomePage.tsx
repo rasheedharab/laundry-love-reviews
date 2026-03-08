@@ -115,7 +115,7 @@ export default function HomePage() {
               style={{ y: heroY, scale: heroScale }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-            <div className="relative z-10 p-6 pb-7 mx-3 mb-3 rounded-2xl glass-dark"
+            <div className="relative z-10 p-6 pb-7 mx-3 mb-3 rounded-2xl glass-dark">
               <h1 className="mb-2 text-3xl font-display font-bold leading-tight text-foreground">
                 Expert care for<br />
                 <span className="text-foreground">your wardrobe.</span>
