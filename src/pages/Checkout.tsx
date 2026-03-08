@@ -49,7 +49,9 @@ export default function Checkout() {
         pickup_time_slot: selectedSlot,
         address_id: addr?.id,
         subtotal: total,
-        total: total,
+        discount: discount,
+        total: finalTotal,
+        promo_code_id: promoApplied?.id || null,
       }).select().single();
 
       if (orderErr) throw orderErr;
