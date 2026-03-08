@@ -10,6 +10,7 @@ import AnimatedPage from "@/components/AnimatedPage";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import type { Tables } from "@/integrations/supabase/types";
+import { serviceImages } from "@/lib/serviceImages";
 
 import catPartyWear from "@/assets/cat-party-wear.jpg";
 import catDryCleaning from "@/assets/cat-dry-cleaning.jpg";
