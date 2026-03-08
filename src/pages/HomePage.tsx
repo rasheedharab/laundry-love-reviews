@@ -443,11 +443,14 @@ export default function HomePage() {
                   <motion.button
                     key={tip.title}
                     onClick={() => navigate("/garment-advisor")}
-                    className="w-full flex items-start gap-3.5 rounded-2xl glass p-4 text-left transition-shadow hover:shadow-md glass-hover"
+                    className="w-full flex items-start gap-3.5 rounded-2xl glass p-4 text-left glass-hover"
                     variants={{
                       hidden: { opacity: 0, y: 24, scale: 0.97 },
                       visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
                     }}
+                    whileHover={{ x: 4, boxShadow: "0 8px 24px -6px hsl(18 82% 40% / 0.12)" }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10">
                       <tip.Icon className="h-5 w-5 text-accent" strokeWidth={1.5} />
