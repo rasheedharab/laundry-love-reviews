@@ -46,12 +46,21 @@ const careTips = [
   { title: "Wool Refresh", desc: "Steam instead of washing to preserve wool fibers and shape.", icon: "🧶" },
 ];
 
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+}
+
 export default function HomePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [categories, setCategories] = useState<Tables<"service_categories">[]>([]);
   const [activeOrder, setActiveOrder] = useState<Tables<"orders"> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<{ full_name: string | null } | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
@@ -63,14 +72,14 @@ export default function HomePage() {
     if (cats) setCategories(cats);
 
     if (user) {
-      const { data: orders } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("user_id", user.id)
-        .not("status", "in", '("completed","cancelled")')
-        .order("created_at", { ascending: false })
-        .limit(1);
-      setActiveOrder(orders?.[0] ?? null);
+      const [ordersRes, profileRes, notifRes] = await Promise.all([
+        supabase.from("orders").select("*").eq("user_id", user.id).not("status", "in", '("completed","cancelled")').order("created_at", { ascending: false }).limit(1),
+        supabase.from("profiles").select("full_name").eq("user_id", user.id).single(),
+        supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("is_read", false),
+      ]);
+      setActiveOrder(ordersRes.data?.[0] ?? null);
+      setProfile(profileRes.data);
+      setUnreadCount(notifRes.count ?? 0);
     }
     setLoading(false);
   }, [user]);
