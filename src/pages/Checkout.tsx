@@ -20,6 +20,9 @@ export default function Checkout() {
   const [selectedDate, setSelectedDate] = useState(0);
   const [serviceLevel, setServiceLevel] = useState<"regular" | "express">("regular");
   const [loading, setLoading] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState<{ id: string; code: string; discount_percent: number | null; discount_amount: number | null } | null>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
 
   const dates = useMemo(() => {
     const today = new Date();
