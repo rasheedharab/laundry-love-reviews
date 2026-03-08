@@ -238,7 +238,7 @@ export default function HomePage() {
               <div className="px-5 mb-5">
                 <h2 className="text-lg font-display font-bold text-foreground mb-3">Recently Viewed</h2>
                 <motion.div
-                  className="flex gap-3 overflow-x-auto -mx-5 px-5 py-2 no-scrollbar"
+                  className="flex gap-3 overflow-x-auto -mx-5 px-5 py-2 no-scrollbar snap-x snap-mandatory"
                   initial="hidden"
                   animate="visible"
                   variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
@@ -249,7 +249,7 @@ export default function HomePage() {
                       <motion.button
                         key={item.serviceId}
                         onClick={() => navigate(`/service/${item.serviceSlug}`)}
-                        className="flex-shrink-0 w-[140px] overflow-hidden rounded-2xl text-left group glass-hover"
+                        className="flex-shrink-0 w-[140px] overflow-hidden rounded-2xl text-left group glass-hover snap-start"
                         variants={{
                           hidden: { opacity: 0, y: 16, scale: 0.97 },
                           visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] } },
@@ -364,7 +364,7 @@ export default function HomePage() {
                 </button>
               </div>
               <motion.div
-                className="flex gap-3 overflow-x-auto -mx-5 px-5 py-2 no-scrollbar"
+                className="flex gap-3 overflow-x-auto -mx-5 px-5 py-2 no-scrollbar snap-x snap-mandatory"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.3 }}
@@ -374,7 +374,7 @@ export default function HomePage() {
                   <motion.button
                     key={step.num}
                     onClick={() => navigate("/ritual")}
-                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 glass-hover"
+                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 glass-hover snap-start"
                     variants={{
                       hidden: { opacity: 0, y: 24, scale: 0.97 },
                       visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
