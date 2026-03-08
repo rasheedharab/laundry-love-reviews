@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Star, Sun, Moon, Monitor, User, MessageSquareWarning } from "lucide-react";
+import { MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Star, Sun, Moon, Monitor, User, MessageSquareWarning, FileWarning } from "lucide-react";
 import ComplaintDialog from "@/components/ComplaintDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -54,6 +54,7 @@ export default function ProfilePage() {
     { icon: ClipboardList, label: "Order History", action: () => navigate("/orders") },
     { icon: Gift, label: "Refer a Friend", action: () => navigate("/referral") },
     { icon: Headphones, label: "Support & Concierge", action: () => {} },
+    { icon: FileWarning, label: "My Complaints", action: () => navigate("/my-complaints") },
   ];
 
   return (

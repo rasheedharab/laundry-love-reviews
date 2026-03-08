@@ -31,6 +31,7 @@ import EditProfile from "@/pages/EditProfile";
 import NotificationsPage from "@/pages/NotificationsPage";
 import ReferralPage from "@/pages/ReferralPage";
 import BlogPage from "@/pages/BlogPage";
+import MyComplaintsPage from "@/pages/MyComplaintsPage";
 import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminLayout from "@/pages/admin/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -84,6 +85,7 @@ const App = () => (
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/referral" element={<ReferralPage />} />
                 <Route path="/blog" element={<BlogPage />} />
+                <Route path="/my-complaints" element={<MyComplaintsPage />} />
               </Route>
               {/* Admin routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
