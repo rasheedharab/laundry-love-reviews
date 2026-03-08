@@ -3,9 +3,24 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, Wind, Briefcase, Layers, Armchair, Shirt, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { StaggerContainer, StaggerItem } from "@/components/StaggerAnimation";
 import AnimatedPage from "@/components/AnimatedPage";
 import type { Tables } from "@/integrations/supabase/types";
+
+import catPartyWear from "@/assets/cat-party-wear.jpg";
+import catDryCleaning from "@/assets/cat-dry-cleaning.jpg";
+import catLeatherCare from "@/assets/cat-leather-care.jpg";
+import catCarpets from "@/assets/cat-carpets.jpg";
+import catSofaCare from "@/assets/cat-sofa-care.jpg";
+import catLaundry from "@/assets/cat-laundry.jpg";
+
+const heroImages: Record<string, string> = {
+  "party-occasion-wear": catPartyWear,
+  "dry-cleaning": catDryCleaning,
+  "leather-care": catLeatherCare,
+  "carpets-rugs": catCarpets,
+  "sofa-care": catSofaCare,
+  "laundry": catLaundry,
+};
 
 const iconMap: Record<string, React.ElementType> = {
   sparkles: Sparkles, wind: Wind, briefcase: Briefcase, layers: Layers, armchair: Armchair, shirt: Shirt,
@@ -30,32 +45,31 @@ export default function ServicesHub() {
         <p className="mb-6 text-sm text-muted-foreground">Premium care for everything you own</p>
 
         {loading ? (
-          <div className="space-y-3">
-            {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
+          <div className="grid grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-48 rounded-2xl" />)}
           </div>
         ) : (
-          <StaggerContainer className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
             {categories.map((cat) => {
-              const Icon = iconMap[cat.icon || "sparkles"] || Sparkles;
+              const img = heroImages[cat.slug] || catDryCleaning;
               return (
-                <StaggerItem key={cat.id}>
-                  <button
-                    onClick={() => navigate(`/services/${cat.slug}`)}
-                    className="flex w-full items-center gap-4 rounded-xl border border-border bg-card p-4 text-left transition-shadow hover:shadow-md"
-                  >
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                      <Icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground">{cat.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{cat.description}</p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                  </button>
-                </StaggerItem>
+                <button
+                  key={cat.id}
+                  onClick={() => navigate(`/services/${cat.slug}`)}
+                  className="relative overflow-hidden rounded-2xl text-left transition-shadow hover:shadow-lg group"
+                >
+                  <img src={img} alt={cat.name} className="h-44 w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3.5">
+                    <p className="text-sm font-semibold text-primary-foreground leading-tight">{cat.name}</p>
+                    <p className="text-[10px] text-primary-foreground/60 uppercase tracking-wider mt-0.5">
+                      {cat.description || "Premium Care"}
+                    </p>
+                  </div>
+                </button>
               );
             })}
-          </StaggerContainer>
+          </div>
         )}
 
         {/* 7-Step Ritual Link */}
