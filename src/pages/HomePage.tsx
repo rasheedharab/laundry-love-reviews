@@ -13,6 +13,7 @@ import PullToRefresh from "@/components/PullToRefresh";
 import ScrollReveal from "@/components/ScrollReveal";
 import ServiceSearch from "@/components/ServiceSearch";
 import logoImg from "@/assets/logo.png";
+import TiltCard from "@/components/TiltCard";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import type { Tables } from "@/integrations/supabase/types";
