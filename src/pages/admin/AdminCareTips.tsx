@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 interface CareTip {
   id: string;
@@ -25,6 +26,7 @@ export default function AdminCareTips() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchData = async () => {
     const { data } = await supabase.from("care_tips").select("*").order("sort_order");
@@ -70,10 +72,11 @@ export default function AdminCareTips() {
     fetchData();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this care tip?")) return;
-    await supabase.from("care_tips").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await supabase.from("care_tips").delete().eq("id", deleteId);
     toast.success("Tip deleted");
+    setDeleteId(null);
     fetchData();
   };
 
@@ -119,7 +122,7 @@ export default function AdminCareTips() {
                     <Button variant="ghost" size="sm" onClick={() => openEdit(tip)}>
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(tip.id)} className="text-destructive hover:text-destructive">
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteId(tip.id)} className="text-destructive hover:text-destructive">
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
@@ -165,6 +168,14 @@ export default function AdminCareTips() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete care tip?"
+        description="This will permanently remove this care tip from the homepage."
+      />
     </div>
   );
 }

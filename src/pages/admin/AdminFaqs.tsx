@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 interface Faq {
   id: string;
@@ -24,6 +25,7 @@ export default function AdminFaqs() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchData = async () => {
     const { data } = await supabase.from("faqs").select("*").order("sort_order");
@@ -67,10 +69,11 @@ export default function AdminFaqs() {
     fetchData();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this FAQ?")) return;
-    await supabase.from("faqs").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await supabase.from("faqs").delete().eq("id", deleteId);
     toast.success("FAQ deleted");
+    setDeleteId(null);
     fetchData();
   };
 
@@ -114,7 +117,7 @@ export default function AdminFaqs() {
                     <Button variant="ghost" size="sm" onClick={() => openEdit(faq)}>
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(faq.id)} className="text-destructive hover:text-destructive">
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteId(faq.id)} className="text-destructive hover:text-destructive">
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
@@ -154,6 +157,14 @@ export default function AdminFaqs() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete FAQ?"
+        description="This will permanently remove this FAQ from the support page."
+      />
     </div>
   );
 }

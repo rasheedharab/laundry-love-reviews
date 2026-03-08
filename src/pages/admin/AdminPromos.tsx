@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import { Badge } from "@/components/ui/badge";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -45,12 +46,14 @@ export default function AdminPromos() {
     await supabase.from("promo_codes").update({ is_active: !current }).eq("id", id);
     fetch();
   };
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this promo code?")) return;
-    const { error } = await supabase.from("promo_codes").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await supabase.from("promo_codes").delete().eq("id", deleteId);
     if (error) { toast.error(error.message); return; }
     toast.success("Deleted");
+    setDeleteId(null);
     fetch();
   };
 
@@ -117,7 +120,7 @@ export default function AdminPromos() {
                     <Switch checked={p.is_active ?? false} onCheckedChange={() => toggleActive(p.id, p.is_active ?? false)} />
                   </td>
                   <td className="px-4 py-3">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(p.id)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(p.id)}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </td>
@@ -132,6 +135,14 @@ export default function AdminPromos() {
           </table>
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete promo code?"
+        description="This will permanently remove this promo code."
+      />
     </div>
   );
 }

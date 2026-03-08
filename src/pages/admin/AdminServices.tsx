@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Upload, Image as ImageIcon } from "lucide-react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Service = Tables<"services">;
@@ -116,12 +117,14 @@ export default function AdminServices() {
     setOpen(false);
     fetchData();
   };
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this service?")) return;
-    const { error } = await supabase.from("services").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await supabase.from("services").delete().eq("id", deleteId);
     if (error) { toast.error(error.message); return; }
     toast.success("Deleted");
+    setDeleteId(null);
     fetchData();
   };
 
@@ -251,7 +254,7 @@ export default function AdminServices() {
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(s)}>
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(s.id)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(s.id)}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </td>
@@ -264,6 +267,14 @@ export default function AdminServices() {
           </table>
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete service?"
+        description="This will permanently remove this service. Existing orders referencing it won't be affected."
+      />
     </div>
   );
 }

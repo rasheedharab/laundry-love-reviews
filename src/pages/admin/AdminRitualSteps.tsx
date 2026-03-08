@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, GripVertical } from "lucide-react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 interface RitualStep {
   id: string;
@@ -33,6 +34,7 @@ export default function AdminRitualSteps() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchData = async () => {
     const { data } = await supabase.from("ritual_steps").select("*").order("step_number");
@@ -84,10 +86,11 @@ export default function AdminRitualSteps() {
     fetchData();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this ritual step?")) return;
-    await supabase.from("ritual_steps").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await supabase.from("ritual_steps").delete().eq("id", deleteId);
     toast.success("Step deleted");
+    setDeleteId(null);
     fetchData();
   };
 
@@ -133,7 +136,7 @@ export default function AdminRitualSteps() {
                     <Button variant="ghost" size="sm" onClick={() => openEdit(step)}>
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(step.id)} className="text-destructive hover:text-destructive">
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteId(step.id)} className="text-destructive hover:text-destructive">
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
@@ -183,6 +186,14 @@ export default function AdminRitualSteps() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete ritual step?"
+        description="This will permanently remove this step from the ritual."
+      />
     </div>
   );
 }

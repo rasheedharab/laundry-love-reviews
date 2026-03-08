@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 interface Tier {
   id: string;
@@ -28,6 +29,7 @@ export default function AdminMembershipTiers() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchData = async () => {
     const { data } = await supabase.from("membership_tiers").select("*").order("sort_order");
@@ -81,10 +83,11 @@ export default function AdminMembershipTiers() {
     fetchData();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this membership tier?")) return;
-    await supabase.from("membership_tiers").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await supabase.from("membership_tiers").delete().eq("id", deleteId);
     toast.success("Tier deleted");
+    setDeleteId(null);
     fetchData();
   };
 
@@ -134,7 +137,7 @@ export default function AdminMembershipTiers() {
                       <Button variant="ghost" size="sm" onClick={() => openEdit(tier)}>
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(tier.id)} className="text-destructive hover:text-destructive">
+                      <Button variant="ghost" size="sm" onClick={() => setDeleteId(tier.id)} className="text-destructive hover:text-destructive">
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
@@ -197,6 +200,14 @@ export default function AdminMembershipTiers() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete membership tier?"
+        description="This will permanently remove this membership plan."
+      />
     </div>
   );
 }

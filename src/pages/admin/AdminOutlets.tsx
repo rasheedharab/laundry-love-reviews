@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, MapPin } from "lucide-react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 interface Outlet {
   id: string;
@@ -75,12 +76,13 @@ export default function AdminOutlets() {
     }
     setOpen(false); fetch();
   };
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this outlet?")) return;
-    const { error } = await (supabase as any).from("outlets").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await (supabase as any).from("outlets").delete().eq("id", deleteId);
     if (error) { toast.error(error.message); return; }
-    toast.success("Deleted"); fetch();
+    toast.success("Deleted"); setDeleteId(null); fetch();
   };
 
   return (
@@ -148,7 +150,7 @@ export default function AdminOutlets() {
                   </td>
                   <td className="px-4 py-3 flex gap-2">
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(o)}><Pencil className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(o.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(o.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                   </td>
                 </tr>
               ))}
@@ -157,6 +159,14 @@ export default function AdminOutlets() {
           </table>
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete outlet?"
+        description="This will permanently remove this outlet location."
+      />
     </div>
   );
 }

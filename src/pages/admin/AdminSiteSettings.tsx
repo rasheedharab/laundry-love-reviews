@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Settings } from "lucide-react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 interface SiteSetting {
   id: string;
@@ -23,6 +24,7 @@ export default function AdminSiteSettings() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchData = async () => {
     const { data } = await supabase.from("site_settings").select("*").order("key");
@@ -65,10 +67,11 @@ export default function AdminSiteSettings() {
     fetchData();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this setting?")) return;
-    await supabase.from("site_settings").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await supabase.from("site_settings").delete().eq("id", deleteId);
     toast.success("Setting deleted");
+    setDeleteId(null);
     fetchData();
   };
 
@@ -103,7 +106,7 @@ export default function AdminSiteSettings() {
                 <Button variant="ghost" size="sm" onClick={() => openEdit(s)}>
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => handleDelete(s.id)} className="text-destructive hover:text-destructive">
+                <Button variant="ghost" size="sm" onClick={() => setDeleteId(s.id)} className="text-destructive hover:text-destructive">
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </div>
@@ -148,6 +151,14 @@ export default function AdminSiteSettings() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete site setting?"
+        description="This will permanently remove this configuration. Features depending on it may break."
+      />
     </div>
   );
 }

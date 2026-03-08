@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Upload, Eye } from "lucide-react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 interface BlogPost {
   id: string;
@@ -89,12 +90,13 @@ export default function AdminBlog() {
     }
     setOpen(false); fetchPosts();
   };
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this post?")) return;
-    const { error } = await (supabase as any).from("blog_posts").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await (supabase as any).from("blog_posts").delete().eq("id", deleteId);
     if (error) { toast.error(error.message); return; }
-    toast.success("Deleted"); fetchPosts();
+    toast.success("Deleted"); setDeleteId(null); fetchPosts();
   };
 
   const statusColor: Record<string, string> = {
@@ -168,7 +170,7 @@ export default function AdminBlog() {
                   <td className="px-4 py-3 text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</td>
                   <td className="px-4 py-3 flex gap-2">
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(p)}><Pencil className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(p.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(p.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                   </td>
                 </tr>
               ))}
@@ -177,6 +179,14 @@ export default function AdminBlog() {
           </table>
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete blog post?"
+        description="This will permanently remove this post and it cannot be recovered."
+      />
     </div>
   );
 }

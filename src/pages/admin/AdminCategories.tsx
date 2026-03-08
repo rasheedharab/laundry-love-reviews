@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Upload, Image as ImageIcon } from "lucide-react";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Category = Tables<"service_categories">;
@@ -86,12 +87,14 @@ export default function AdminCategories() {
     setOpen(false);
     fetchData();
   };
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this category? Services in it won't be deleted.")) return;
-    const { error } = await supabase.from("service_categories").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await supabase.from("service_categories").delete().eq("id", deleteId);
     if (error) { toast.error(error.message); return; }
     toast.success("Deleted");
+    setDeleteId(null);
     fetchData();
   };
 
@@ -182,7 +185,7 @@ export default function AdminCategories() {
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(c)}>
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(c.id)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(c.id)}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </td>
@@ -195,6 +198,14 @@ export default function AdminCategories() {
           </table>
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete category?"
+        description="This will remove the category. Services within it won't be deleted."
+      />
     </div>
   );
 }
