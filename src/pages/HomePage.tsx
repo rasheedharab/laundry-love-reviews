@@ -35,21 +35,14 @@ const heroImages: Record<string, string> = {
   "laundry": catLaundry,
 };
 
-const ritualSteps = [
-  { num: 1, title: "Inspection", Icon: Search },
-  { num: 2, title: "Spotting", Icon: Sparkles },
-  { num: 3, title: "Eco-Wash", Icon: Leaf },
-  { num: 4, title: "Drying", Icon: CloudSun },
-  { num: 5, title: "Finishing", Icon: Shirt },
-  { num: 6, title: "QC Check", Icon: ShieldCheck },
-  { num: 7, title: "Packaging", Icon: Package },
-];
+const iconMap: Record<string, React.ElementType> = {
+  search: Search, sparkles: Sparkles, leaf: Leaf, "cloud-sun": CloudSun,
+  shirt: Shirt, "shield-check": ShieldCheck, package: Package,
+  scissors: Scissors, briefcase: Briefcase, wind: Wind,
+};
 
-const careTips = [
-  { title: "Storing Silk", desc: "Keep silk garments in breathable cotton bags away from direct sunlight.", Icon: Scissors },
-  { title: "Leather Care 101", desc: "Condition leather every 3 months to maintain its supple texture.", Icon: Briefcase },
-  { title: "Wool Refresh", desc: "Steam instead of washing to preserve wool fibers and shape.", Icon: Wind },
-];
+interface RitualStepDB { id: string; step_number: number; title: string; icon: string | null; }
+interface CareTipDB { id: string; title: string; description: string; icon: string | null; }
 
 function getGreeting(): string {
   const h = new Date().getHours();
