@@ -322,7 +322,7 @@ export default function HomePage() {
             <div className="px-5 mt-8">
               <button
                 onClick={() => navigate("/referral")}
-                className="w-full overflow-hidden rounded-2xl border border-accent/20 bg-accent/5 p-5 text-left"
+                className="w-full overflow-hidden rounded-2xl glass p-5 text-left"
               >
                 <div className="flex items-start gap-3.5">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/10">
