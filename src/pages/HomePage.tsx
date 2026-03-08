@@ -249,7 +249,7 @@ export default function HomePage() {
                       <motion.button
                         key={item.serviceId}
                         onClick={() => navigate(`/service/${item.serviceSlug}`)}
-                        className="flex-shrink-0 w-[140px] overflow-hidden rounded-2xl text-left group glass-hover"
+                        className="flex-shrink-0 w-[140px] overflow-hidden rounded-2xl text-left group glass-hover snap-start"
                         variants={{
                           hidden: { opacity: 0, y: 16, scale: 0.97 },
                           visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] } },
