@@ -80,7 +80,29 @@ export default function Checkout() {
     return null;
   }
 
+  const discount = promoApplied
+    ? promoApplied.discount_percent ? total * promoApplied.discount_percent / 100 : (promoApplied.discount_amount || 0)
+    : 0;
+  const finalTotal = Math.max(0, total - discount);
   const estReturn = format(addDays(dates[selectedDate].full, serviceLevel === "express" ? 2 : 5), "dd MMM yyyy");
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoLoading(true);
+    const { data, error } = await supabase
+      .from("promo_codes")
+      .select("*")
+      .eq("code", promoCode.trim().toUpperCase())
+      .eq("is_active", true)
+      .single();
+    if (error || !data) {
+      toast.error("Invalid or expired promo code");
+    } else {
+      setPromoApplied({ id: data.id, code: data.code, discount_percent: data.discount_percent, discount_amount: data.discount_amount });
+      toast.success(`Promo "${data.code}" applied!`);
+    }
+    setPromoLoading(false);
+  };
 
   return (
     <div className="pb-28">
