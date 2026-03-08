@@ -35,21 +35,14 @@ const heroImages: Record<string, string> = {
   "laundry": catLaundry,
 };
 
-const ritualSteps = [
-  { num: 1, title: "Inspection", Icon: Search },
-  { num: 2, title: "Spotting", Icon: Sparkles },
-  { num: 3, title: "Eco-Wash", Icon: Leaf },
-  { num: 4, title: "Drying", Icon: CloudSun },
-  { num: 5, title: "Finishing", Icon: Shirt },
-  { num: 6, title: "QC Check", Icon: ShieldCheck },
-  { num: 7, title: "Packaging", Icon: Package },
-];
+const iconMap: Record<string, React.ElementType> = {
+  search: Search, sparkles: Sparkles, leaf: Leaf, "cloud-sun": CloudSun,
+  shirt: Shirt, "shield-check": ShieldCheck, package: Package,
+  scissors: Scissors, briefcase: Briefcase, wind: Wind,
+};
 
-const careTips = [
-  { title: "Storing Silk", desc: "Keep silk garments in breathable cotton bags away from direct sunlight.", Icon: Scissors },
-  { title: "Leather Care 101", desc: "Condition leather every 3 months to maintain its supple texture.", Icon: Briefcase },
-  { title: "Wool Refresh", desc: "Steam instead of washing to preserve wool fibers and shape.", Icon: Wind },
-];
+interface RitualStepDB { id: string; step_number: number; title: string; icon: string | null; }
+interface CareTipDB { id: string; title: string; description: string; icon: string | null; }
 
 function getGreeting(): string {
   const h = new Date().getHours();
@@ -66,6 +59,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<{ full_name: string | null } | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [ritualSteps, setRitualSteps] = useState<RitualStepDB[]>([]);
+  const [careTips, setCareTips] = useState<CareTipDB[]>([]);
   const heroRef = useRef<HTMLDivElement>(null);
   const recentlyViewed = useRecentlyViewed();
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -74,8 +69,14 @@ export default function HomePage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data: cats } = await supabase.from("service_categories").select("*").order("sort_order");
-    if (cats) setCategories(cats);
+    const [catsRes, ritualRes, tipsRes] = await Promise.all([
+      supabase.from("service_categories").select("*").order("sort_order"),
+      supabase.from("ritual_steps").select("id, step_number, title, icon").eq("is_active", true).order("step_number"),
+      supabase.from("care_tips").select("id, title, description, icon").eq("is_active", true).order("sort_order"),
+    ]);
+    if (catsRes.data) setCategories(catsRes.data);
+    setRitualSteps((ritualRes.data as RitualStepDB[]) || []);
+    setCareTips((tipsRes.data as CareTipDB[]) || []);
 
     if (user) {
       const [ordersRes, profileRes, notifRes] = await Promise.all([
@@ -370,9 +371,11 @@ export default function HomePage() {
                 viewport={{ once: true, amount: 0.3 }}
                 variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
               >
-                {ritualSteps.map((step) => (
+                {ritualSteps.map((step) => {
+                  const StepIcon = iconMap[step.icon || "sparkles"] || Sparkles;
+                  return (
                   <motion.button
-                    key={step.num}
+                    key={step.id}
                     onClick={() => navigate("/ritual")}
                     className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 glass-hover snap-start"
                     variants={{
@@ -384,14 +387,15 @@ export default function HomePage() {
                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
-                      <step.Icon className="h-5 w-5 text-accent" strokeWidth={1.5} />
+                      <StepIcon className="h-5 w-5 text-accent" strokeWidth={1.5} />
                     </div>
                     <div className="text-center">
-                      <p className="text-[10px] text-accent font-bold">Step {step.num}</p>
+                      <p className="text-[10px] text-accent font-bold">Step {step.step_number}</p>
                       <p className="text-xs font-semibold text-foreground mt-0.5">{step.title}</p>
                     </div>
                   </motion.button>
-                ))}
+                  );
+                })}
               </motion.div>
             </div>
           </ScrollReveal>
@@ -442,9 +446,11 @@ export default function HomePage() {
                 viewport={{ once: true, amount: 0.2 }}
                 variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
               >
-                {careTips.map((tip) => (
+                {careTips.map((tip) => {
+                  const TipIcon = iconMap[tip.icon || "scissors"] || Scissors;
+                  return (
                   <motion.button
-                    key={tip.title}
+                    key={tip.id}
                     onClick={() => navigate("/garment-advisor")}
                     className="w-full flex items-start gap-3.5 rounded-2xl glass p-4 text-left glass-hover"
                     variants={{
@@ -456,15 +462,16 @@ export default function HomePage() {
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10">
-                      <tip.Icon className="h-5 w-5 text-accent" strokeWidth={1.5} />
+                      <TipIcon className="h-5 w-5 text-accent" strokeWidth={1.5} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-foreground">{tip.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.desc}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.description}</p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                   </motion.button>
-                ))}
+                  );
+                })}
               </motion.div>
             </div>
           </ScrollReveal>

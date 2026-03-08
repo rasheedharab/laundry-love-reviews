@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MessageCircle, Mail, Phone, MapPin, ChevronDown, ExternalLink, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -55,46 +55,54 @@ export default function SupportPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
+  const [contactData, setContactData] = useState<any[]>([]);
 
   useEffect(() => {
-    supabase
-      .from("faqs")
-      .select("id, question, answer")
-      .eq("is_active", true)
-      .order("sort_order")
-      .then(({ data }) => {
-        setFaqs(data || []);
-        setLoading(false);
-      });
+    Promise.all([
+      supabase.from("faqs").select("id, question, answer").eq("is_active", true).order("sort_order"),
+      supabase.from("site_settings").select("key, value").eq("key", "contact_options"),
+    ]).then(([faqsRes, settingsRes]) => {
+      setFaqs(faqsRes.data || []);
+      const contactSetting = settingsRes.data?.[0];
+      if (contactSetting && Array.isArray(contactSetting.value)) {
+        setContactData(contactSetting.value);
+      }
+      setLoading(false);
+    });
   }, []);
 
-  const contactOptions = [
-    {
-      icon: MessageCircle,
-      label: "Live Chat with Advisor",
-      description: "Get instant help from our AI garment care advisor",
-      action: () => navigate("/garment-advisor"),
-      accent: true,
-    },
-    {
-      icon: Mail,
-      label: "Email Support",
-      description: "support@whiterabbit.in",
-      action: () => window.open("mailto:support@whiterabbit.in?subject=Support%20Request", "_blank"),
-    },
-    {
-      icon: Phone,
-      label: "Call Us",
-      description: "+91 98765 43210",
-      action: () => window.open("tel:+919876543210"),
-    },
-    {
+  const contactIconMap: Record<string, React.ElementType> = {
+    "message-circle": MessageCircle, mail: Mail, phone: Phone, "map-pin": MapPin,
+  };
+
+  const contactOptions = useMemo(() => {
+    // Always include Live Chat and Visit Outlet as app navigation items
+    const options: { icon: React.ElementType; label: string; description: string; action: () => void }[] = [
+      {
+        icon: MessageCircle,
+        label: "Live Chat with Advisor",
+        description: "Get instant help from our AI garment care advisor",
+        action: () => navigate("/garment-advisor"),
+      },
+    ];
+    // Add dynamic contacts from DB
+    contactData.forEach((c: any) => {
+      const Icon = contactIconMap[c.icon] || Mail;
+      if (c.type === "email") {
+        options.push({ icon: Icon, label: c.label, description: c.detail, action: () => window.open(`mailto:${c.detail}?subject=Support%20Request`, "_blank") });
+      } else if (c.type === "phone" || c.type === "whatsapp") {
+        options.push({ icon: Icon, label: c.label, description: c.detail, action: () => window.open(`tel:${c.detail.replace(/\s/g, "")}`) });
+      }
+    });
+    // Always include outlet link
+    options.push({
       icon: MapPin,
       label: "Visit an Outlet",
       description: "Find the nearest White Rabbit outlet",
       action: () => navigate("/select-outlet"),
-    },
-  ];
+    });
+    return options;
+  }, [contactData, navigate]);
 
   return (
     <AnimatedPage>

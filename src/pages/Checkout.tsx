@@ -11,15 +11,17 @@ import { toast } from "sonner";
 import { addDays, format, isToday, parse, isBefore } from "date-fns";
 import AnimatedPage from "@/components/AnimatedPage";
 
-const SLOT_CAPACITY = 10;
-const timeSlots = ["08:00 AM — 10:00 AM", "10:00 AM — 12:00 PM", "01:00 PM — 03:00 PM", "04:00 PM — 06:00 PM"];
+const DEFAULT_SLOTS = ["08:00 AM — 10:00 AM", "10:00 AM — 12:00 PM", "01:00 PM — 03:00 PM", "04:00 PM — 06:00 PM"];
+const DEFAULT_CAPACITY = 10;
 
 export default function Checkout() {
   const navigate = useNavigate();
   const { items, total, clearCart } = useCart();
   const { user } = useAuth();
   const [address, setAddress] = useState("");
-  const [selectedSlot, setSelectedSlot] = useState(timeSlots[1]);
+  const [timeSlots, setTimeSlots] = useState<string[]>(DEFAULT_SLOTS);
+  const [slotCapacity, setSlotCapacity] = useState(DEFAULT_CAPACITY);
+  const [selectedSlot, setSelectedSlot] = useState(DEFAULT_SLOTS[1]);
   const [selectedDate, setSelectedDate] = useState(0);
   const [serviceLevel, setServiceLevel] = useState<"regular" | "express">("regular");
   const [loading, setLoading] = useState(false);
@@ -34,6 +36,23 @@ export default function Checkout() {
       const d = addDays(today, i + 1);
       return { day: format(d, "EEE").toUpperCase(), date: format(d, "d"), full: d, month: format(d, "MMMM yyyy") };
     });
+  }, []);
+
+  // Fetch settings (time slots + capacity)
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const { data } = await supabase.from("site_settings").select("key, value").in("key", ["time_slots", "slot_capacity"]);
+      if (data) {
+        data.forEach((s: any) => {
+          if (s.key === "time_slots" && Array.isArray(s.value)) {
+            setTimeSlots(s.value);
+            setSelectedSlot(s.value[1] || s.value[0]);
+          }
+          if (s.key === "slot_capacity" && typeof s.value === "string") setSlotCapacity(parseInt(s.value) || DEFAULT_CAPACITY);
+        });
+      }
+    };
+    fetchSettings();
   }, []);
 
   // Fetch slot availability when selected date changes
@@ -53,9 +72,9 @@ export default function Checkout() {
       }
     };
     fetchAvailability();
-  }, [selectedDate, dates]);
+  }, [selectedDate, dates, timeSlots]);
 
-  const isSlotFull = (slot: string) => (slotCounts[slot] || 0) >= SLOT_CAPACITY;
+  const isSlotFull = (slot: string) => (slotCounts[slot] || 0) >= slotCapacity;
 
   const isSlotPast = (slot: string) => {
     const pickupDate = dates[selectedDate].full;
@@ -72,7 +91,7 @@ export default function Checkout() {
   const getSlotLabel = (slot: string) => {
     if (isSlotFull(slot)) return "Full";
     if (isSlotPast(slot)) return "Past";
-    return `${SLOT_CAPACITY - (slotCounts[slot] || 0)} left`;
+    return `${slotCapacity - (slotCounts[slot] || 0)} left`;
   };
 
   const discount = promoApplied

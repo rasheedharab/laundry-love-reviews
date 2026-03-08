@@ -22,34 +22,23 @@ interface Tier {
   is_popular: boolean;
 }
 
-const ritualSteps = [
-  {
-    icon: "👔",
-    title: "White-Glove Collection",
-    desc: "Scheduled precisely to your calendar. Handled with utmost discretion in our signature garment carriers.",
-  },
-  {
-    icon: "✨",
-    title: "Bespoke Treatment",
-    desc: "Each piece is inspected by our master artisans and treated with eco-conscious, fabric-specific formulations.",
-  },
-];
+interface ClubStep { id: string; title: string; description: string | null; icon: string | null; step_number: number; }
 
 export default function MembershipPage() {
   const navigate = useNavigate();
   const [tiers, setTiers] = useState<Tier[]>([]);
+  const [clubSteps, setClubSteps] = useState<ClubStep[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase
-      .from("membership_tiers")
-      .select("id, name, price, period, icon, features, is_popular")
-      .eq("is_active", true)
-      .order("sort_order")
-      .then(({ data }) => {
-        setTiers((data as any) || []);
-        setLoading(false);
-      });
+    Promise.all([
+      supabase.from("membership_tiers").select("id, name, price, period, icon, features, is_popular").eq("is_active", true).order("sort_order"),
+      supabase.from("ritual_steps").select("id, step_number, title, description, icon").eq("is_active", true).order("step_number").limit(2),
+    ]).then(([tiersRes, stepsRes]) => {
+      setTiers((tiersRes.data as any) || []);
+      setClubSteps((stepsRes.data as ClubStep[]) || []);
+      setLoading(false);
+    });
   }, []);
 
   return (
@@ -146,14 +135,14 @@ export default function MembershipPage() {
       <div className="px-5 mb-8">
         <h2 className="text-lg font-display font-bold text-foreground text-center mb-5">The Club Ritual</h2>
         <div className="space-y-4">
-          {ritualSteps.map((step) => (
-            <div key={step.title} className="flex gap-4">
+          {clubSteps.map((step) => (
+            <div key={step.id} className="flex gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent/10">
-                <span className="text-xl">{step.icon}</span>
+                <span className="text-xl">{step.icon || "✨"}</span>
               </div>
               <div className="flex-1">
                 <p className="text-sm font-bold text-foreground mb-1">{step.title}</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">{step.desc}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{step.description}</p>
               </div>
             </div>
           ))}

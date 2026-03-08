@@ -89,6 +89,36 @@ export type Database = {
         }
         Relationships: []
       }
+      care_tips: {
+        Row: {
+          created_at: string | null
+          description: string
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
       complaints: {
         Row: {
           admin_notes: string | null
@@ -589,6 +619,39 @@ export type Database = {
           },
         ]
       }
+      ritual_steps: {
+        Row: {
+          color_class: string | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          step_number: number
+          title: string
+        }
+        Insert: {
+          color_class?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          step_number: number
+          title: string
+        }
+        Update: {
+          color_class?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          step_number?: number
+          title?: string
+        }
+        Relationships: []
+      }
       service_categories: {
         Row: {
           created_at: string
@@ -599,6 +662,9 @@ export type Database = {
           name: string
           slug: string
           sort_order: number | null
+          tagline_badge: string | null
+          tagline_subtitle: string | null
+          tagline_title: string | null
         }
         Insert: {
           created_at?: string
@@ -609,6 +675,9 @@ export type Database = {
           name: string
           slug: string
           sort_order?: number | null
+          tagline_badge?: string | null
+          tagline_subtitle?: string | null
+          tagline_title?: string | null
         }
         Update: {
           created_at?: string
@@ -619,6 +688,9 @@ export type Database = {
           name?: string
           slug?: string
           sort_order?: number | null
+          tagline_badge?: string | null
+          tagline_subtitle?: string | null
+          tagline_title?: string | null
         }
         Relationships: []
       }
@@ -680,6 +752,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      site_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          value: Json
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          value?: Json
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          value?: Json
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

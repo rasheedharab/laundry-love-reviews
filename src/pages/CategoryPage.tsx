@@ -29,38 +29,7 @@ const heroImages: Record<string, string> = {
   "laundry": catLaundry,
 };
 
-const heroTaglines: Record<string, { badge: string; title: string; subtitle: string }> = {
-  "party-occasion-wear": {
-    badge: "Premium Care",
-    title: "Artisanal Cleaning\nfor Your Finest Silks",
-    subtitle: "White Rabbit's signature eco-sensitive process for couture items.",
-  },
-  "dry-cleaning": {
-    badge: "Artisan Standards",
-    title: "Tailored\nTextile Care",
-    subtitle: "The precision of expert craftsmanship applied to your wardrobe essentials.",
-  },
-  "leather-care": {
-    badge: "Exquisite Care",
-    title: "Leather\nRevitalization Ritual",
-    subtitle: "A multi-stage artisanal process to restore natural oils, pigment, and structural integrity.",
-  },
-  "carpets-rugs": {
-    badge: "Deep Restoration",
-    title: "Heritage Carpet\nRevival",
-    subtitle: "Specialist cleaning that respects the artistry of your finest rugs.",
-  },
-  "sofa-care": {
-    badge: "Fabric Revival",
-    title: "Premium\nUpholstery Care",
-    subtitle: "Professional deep cleaning to restore the beauty of your furniture.",
-  },
-  "laundry": {
-    badge: "Daily Essentials",
-    title: "Pristine\nWash & Fold",
-    subtitle: "Premium laundering with meticulous attention to fabric care.",
-  },
-};
+const defaultTagline = { badge: "Premium Care", title: "Expert\nGarment Care", subtitle: "Professional cleaning services for your finest garments." };
 
 const containerVariants = {
   hidden: {},
@@ -116,7 +85,11 @@ export default function CategoryPage() {
   };
 
   const heroImg = category?.image_url || heroImages[slug || ""] || catDryCleaning;
-  const tagline = heroTaglines[slug || ""] || heroTaglines["dry-cleaning"];
+  const tagline = {
+    badge: category?.tagline_badge || defaultTagline.badge,
+    title: category?.tagline_title || defaultTagline.title,
+    subtitle: category?.tagline_subtitle || defaultTagline.subtitle,
+  };
 
   if (!category && loading) {
     return (
