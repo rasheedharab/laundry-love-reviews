@@ -110,7 +110,7 @@ export default function Cart() {
             <div className="mx-auto max-w-lg">
               {!user && (
                 <button
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate("/login?redirect=/cart")}
                   className="mb-2 flex w-full items-center justify-center gap-1.5 rounded-xl bg-secondary/80 py-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <LogIn className="h-3 w-3" /> Sign in for a faster checkout
