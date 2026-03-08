@@ -122,8 +122,8 @@ export default function CategoryPage() {
     return (
       <div className="px-5 pt-6 space-y-4">
         <Skeleton className="h-80 w-full rounded-2xl" />
-        <Skeleton className="h-4 w-32" />
-        {[1, 2, 3].map((i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)}
+        <Skeleton className="h-4 w-32 rounded-lg" />
+        <ListSkeleton count={3} height="h-24" showAvatar />
       </div>
     );
   }
