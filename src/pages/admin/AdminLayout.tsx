@@ -15,6 +15,9 @@ import {
   MessageSquare,
   FileText,
   Shield,
+  ListOrdered,
+  Lightbulb,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
