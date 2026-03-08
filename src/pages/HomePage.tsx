@@ -106,8 +106,11 @@ export default function HomePage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <button
+              <motion.button
                 onClick={() => navigate("/notifications")}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 className="relative flex h-11 w-11 items-center justify-center rounded-full glass-sm"
               >
                 <Bell className="h-5 w-5 text-foreground" />
@@ -124,13 +127,16 @@ export default function HomePage() {
                     </motion.span>
                   )}
                 </AnimatePresence>
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={() => navigate("/profile")}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 className="flex h-11 w-11 items-center justify-center rounded-full glass-sm"
               >
                 <User className="h-5 w-5 text-foreground" />
-              </button>
+              </motion.button>
             </div>
           </div>
 
@@ -244,7 +250,8 @@ export default function HomePage() {
                           hidden: { opacity: 0, y: 16, scale: 0.97 },
                           visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] } },
                         }}
-                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ scale: 1.03, y: -2 }}
+                        whileTap={{ scale: 0.96 }}
                       >
                         <img
                           src={img}
@@ -289,11 +296,14 @@ export default function HomePage() {
                       <motion.button
                         key={cat.id}
                         onClick={() => navigate(`/services/${cat.slug}`)}
-                        className="relative overflow-hidden rounded-2xl text-left transition-shadow hover:shadow-lg group glass-hover"
+                        className="relative overflow-hidden rounded-2xl text-left group glass-hover"
                         variants={{
                           hidden: { opacity: 0, y: 24, scale: 0.97 },
                           visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
                         }}
+                        whileHover={{ y: -4, boxShadow: "0 12px 28px -8px hsl(18 82% 40% / 0.18)" }}
+                        whileTap={{ scale: 0.97 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       >
                         <img
                           src={img}
@@ -362,11 +372,14 @@ export default function HomePage() {
                   <motion.button
                     key={step.num}
                     onClick={() => navigate("/ritual")}
-                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 transition-shadow hover:shadow-md glass-hover"
+                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 glass-hover"
                     variants={{
                       hidden: { opacity: 0, y: 24, scale: 0.97 },
                       visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
                     }}
+                    whileHover={{ y: -3, scale: 1.04 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
                       <step.Icon className="h-5 w-5 text-accent" strokeWidth={1.5} />
@@ -430,11 +443,14 @@ export default function HomePage() {
                   <motion.button
                     key={tip.title}
                     onClick={() => navigate("/garment-advisor")}
-                    className="w-full flex items-start gap-3.5 rounded-2xl glass p-4 text-left transition-shadow hover:shadow-md glass-hover"
+                    className="w-full flex items-start gap-3.5 rounded-2xl glass p-4 text-left glass-hover"
                     variants={{
                       hidden: { opacity: 0, y: 24, scale: 0.97 },
                       visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
                     }}
+                    whileHover={{ x: 4, boxShadow: "0 8px 24px -6px hsl(18 82% 40% / 0.12)" }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10">
                       <tip.Icon className="h-5 w-5 text-accent" strokeWidth={1.5} />
@@ -524,12 +540,15 @@ export default function HomePage() {
           </div>
 
           {/* Chat FAB */}
-          <button
+          <motion.button
             onClick={() => navigate("/garment-advisor")}
-            className="fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-accent shadow-lg shadow-accent/30 transition-transform hover:scale-105"
+            className="fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-accent shadow-lg shadow-accent/30"
+            whileHover={{ scale: 1.12, boxShadow: "0 8px 32px -4px hsl(18 82% 40% / 0.45)" }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 400, damping: 15 }}
           >
             <MessageCircle className="h-6 w-6 text-accent-foreground" />
-          </button>
+          </motion.button>
         </div>
       </PullToRefresh>
     </AnimatedPage>
