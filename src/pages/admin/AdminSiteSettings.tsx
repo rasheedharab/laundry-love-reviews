@@ -106,7 +106,7 @@ export default function AdminSiteSettings() {
                 <Button variant="ghost" size="sm" onClick={() => openEdit(s)}>
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => handleDelete(s.id)} className="text-destructive hover:text-destructive">
+                <Button variant="ghost" size="sm" onClick={() => setDeleteId(s.id)} className="text-destructive hover:text-destructive">
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </div>

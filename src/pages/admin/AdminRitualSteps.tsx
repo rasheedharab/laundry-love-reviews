@@ -136,7 +136,7 @@ export default function AdminRitualSteps() {
                     <Button variant="ghost" size="sm" onClick={() => openEdit(step)}>
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(step.id)} className="text-destructive hover:text-destructive">
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteId(step.id)} className="text-destructive hover:text-destructive">
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>

@@ -254,7 +254,7 @@ export default function AdminServices() {
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(s)}>
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(s.id)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(s.id)}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </td>

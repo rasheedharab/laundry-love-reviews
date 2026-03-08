@@ -120,7 +120,7 @@ export default function AdminPromos() {
                     <Switch checked={p.is_active ?? false} onCheckedChange={() => toggleActive(p.id, p.is_active ?? false)} />
                   </td>
                   <td className="px-4 py-3">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(p.id)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(p.id)}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </td>
