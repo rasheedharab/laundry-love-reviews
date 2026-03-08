@@ -105,7 +105,7 @@ export default function ServiceDetail() {
 
         {/* What's Included */}
         {service.whats_included && service.whats_included.length > 0 && (
-          <div className="mb-6">
+          <div className="mb-4">
             <h3 className="mb-3 text-sm font-semibold text-foreground">What's Included</h3>
             <div className="space-y-2">
               {service.whats_included.map((item, i) => (
@@ -119,6 +119,21 @@ export default function ServiceDetail() {
             </div>
           </div>
         )}
+
+        {/* 7-Step Ritual Link */}
+        <button
+          onClick={() => navigate("/ritual")}
+          className="mb-6 flex w-full items-center gap-3 rounded-2xl border border-accent/20 bg-accent/5 p-4 text-left"
+        >
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent/10">
+            <span className="text-sm">✦</span>
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-accent">Our 7-Step Ritual</p>
+            <p className="text-[10px] text-muted-foreground">See how we care for your garments</p>
+          </div>
+          <Check className="h-4 w-4 text-accent" />
+        </button>
       </div>
 
       {/* Fixed Bottom CTA */}
