@@ -21,6 +21,8 @@ export default function Login() {
     setLoading(true);
     try {
       await signIn(email, password);
+      const isRedirect = redirectTo !== "/home";
+      toast.success(isRedirect ? "Welcome back! Continuing where you left off" : "Signed in successfully");
       navigate(redirectTo);
     } catch (err: any) {
       toast.error(err.message || "Login failed");
