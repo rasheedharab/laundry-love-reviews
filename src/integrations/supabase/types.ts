@@ -47,6 +47,98 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_posts: {
+        Row: {
+          author_id: string
+          content: string
+          cover_image_url: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          published_at: string | null
+          slug: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          content?: string
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published_at?: string | null
+          slug: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published_at?: string | null
+          slug?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      complaints: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          description: string
+          id: string
+          order_id: string | null
+          priority: string
+          resolved_at: string | null
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          order_id?: string | null
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          order_id?: string | null
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaints_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loyalty_points: {
         Row: {
           created_at: string
@@ -173,6 +265,7 @@ export type Database = {
           discount: number | null
           id: string
           notes: string | null
+          outlet_id: string | null
           payment_method: string | null
           payment_status: string | null
           pickup_date: string | null
@@ -191,6 +284,7 @@ export type Database = {
           discount?: number | null
           id?: string
           notes?: string | null
+          outlet_id?: string | null
           payment_method?: string | null
           payment_status?: string | null
           pickup_date?: string | null
@@ -209,6 +303,7 @@ export type Database = {
           discount?: number | null
           id?: string
           notes?: string | null
+          outlet_id?: string | null
           payment_method?: string | null
           payment_status?: string | null
           pickup_date?: string | null
@@ -230,6 +325,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "orders_outlet_id_fkey"
+            columns: ["outlet_id"]
+            isOneToOne: false
+            referencedRelation: "outlets"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "orders_promo_code_id_fkey"
             columns: ["promo_code_id"]
             isOneToOne: false
@@ -237,6 +339,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      outlets: {
+        Row: {
+          address_line: string
+          city: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          lat: number | null
+          lng: number | null
+          name: string
+          operating_hours: Json | null
+          phone: string | null
+          postal_code: string | null
+          slug: string
+        }
+        Insert: {
+          address_line: string
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          lat?: number | null
+          lng?: number | null
+          name: string
+          operating_hours?: Json | null
+          phone?: string | null
+          postal_code?: string | null
+          slug: string
+        }
+        Update: {
+          address_line?: string
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          operating_hours?: Json | null
+          phone?: string | null
+          postal_code?: string | null
+          slug?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
