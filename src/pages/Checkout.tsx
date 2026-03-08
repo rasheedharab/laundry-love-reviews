@@ -270,7 +270,7 @@ export default function Checkout() {
             disabled={loading}
             className="w-full h-12 rounded-2xl bg-foreground text-primary-foreground text-sm font-semibold uppercase tracking-wider hover:bg-foreground/90"
           >
-            {loading ? "Processing..." : `Confirm Pickup → ₹${total.toLocaleString()}`}
+            {loading ? "Processing..." : `Confirm Pickup → ₹${finalTotal.toLocaleString()}`}
           </Button>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Bell, Phone, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Tables } from "@/integrations/supabase/types";
 
 const steps = [
@@ -22,15 +23,54 @@ export default function TrackOrder() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [order, setOrder] = useState<Tables<"orders"> | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
+
+    // Initial fetch
     supabase.from("orders").select("*").eq("id", id).single().then(({ data }) => {
       if (data) setOrder(data);
+      setLoading(false);
     });
+
+    // Real-time subscription
+    const channel = supabase
+      .channel(`order-${id}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "orders", filter: `id=eq.${id}` },
+        (payload) => {
+          setOrder(payload.new as Tables<"orders">);
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, [id]);
 
-  if (!order) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="px-5 pt-6 space-y-4">
+        <Skeleton className="h-9 w-9 rounded-full" />
+        <Skeleton className="h-44 w-full rounded-2xl" />
+        <Skeleton className="h-6 w-48" />
+        <div className="space-y-6 mt-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex gap-4">
+              <Skeleton className="h-4 w-4 rounded-full" />
+              <div className="space-y-1">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-48" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!order) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Order not found</div>;
 
   const activeStep = statusToStep[order.status] ?? 0;
 
@@ -60,6 +100,11 @@ export default function TrackOrder() {
         <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground border-0 text-[9px] uppercase tracking-wider">
           {order.status === "in-progress" ? "In Process" : order.status.replace("-", " ")}
         </Badge>
+        {/* Realtime indicator */}
+        <div className="absolute top-3 left-3 flex items-center gap-1.5">
+          <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+          <span className="text-[9px] text-muted-foreground font-medium">LIVE</span>
+        </div>
       </div>
 
       {/* Order Info */}
@@ -80,16 +125,16 @@ export default function TrackOrder() {
             return (
               <div key={step.key} className="flex gap-4">
                 <div className="flex flex-col items-center">
-                  <div className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${
+                  <div className={`h-4 w-4 rounded-full border-2 flex items-center justify-center transition-colors ${
                     isDone ? "border-accent bg-accent" : "border-muted-foreground/30 bg-card"
                   }`}>
                     {isDone && <div className="h-1.5 w-1.5 rounded-full bg-accent-foreground" />}
                   </div>
                   {i < steps.length - 1 && (
-                    <div className={`w-0.5 h-12 ${isDone && i < activeStep ? "bg-accent" : "bg-border"}`} />
+                    <div className={`w-0.5 h-12 transition-colors ${isDone && i < activeStep ? "bg-accent" : "bg-border"}`} />
                   )}
                 </div>
-                <div className={`pb-8 ${isActive ? "" : "opacity-50"}`}>
+                <div className={`pb-8 transition-opacity ${isActive ? "" : "opacity-50"}`}>
                   <p className={`text-sm font-semibold ${isActive ? "text-accent" : "text-foreground"}`}>{step.label}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">{step.desc}</p>
                 </div>
