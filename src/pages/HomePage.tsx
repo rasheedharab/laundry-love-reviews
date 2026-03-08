@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { MapPin, ChevronDown, Sparkles, Wind, Briefcase, Layers, Armchair, Shirt, ArrowRight } from "lucide-react";
+import { MapPin, ChevronDown, Sparkles, Wind, Briefcase, Layers, Armchair, Shirt, ArrowRight, Bell, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StaggerContainer, StaggerItem } from "@/components/StaggerAnimation";
@@ -22,6 +22,8 @@ export default function HomePage() {
   const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
   const [activeOrder, setActiveOrder] = useState<Tables<"orders"> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -29,17 +31,33 @@ export default function HomePage() {
     if (cats) setCategories(cats);
 
     if (user) {
-      const [{ data: prof }, { data: orders }] = await Promise.all([
+      const [{ data: prof }, { data: orders }, { data: points }, { count: unread }] = await Promise.all([
         supabase.from("profiles").select("*").eq("user_id", user.id).single(),
         supabase.from("orders").select("*").eq("user_id", user.id).not("status", "in", '("completed","cancelled")').order("created_at", { ascending: false }).limit(1),
+        supabase.from("loyalty_points").select("points").eq("user_id", user.id),
+        supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("is_read", false),
       ]);
       if (prof) setProfile(prof);
       setActiveOrder(orders?.[0] ?? null);
+      setTotalPoints((points || []).reduce((s: number, p: any) => s + (p.points || 0), 0));
+      setUnreadCount(unread || 0);
     }
     setLoading(false);
   }, [user]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  // Realtime notifications count
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel("home-notif-count")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` }, () => {
+        setUnreadCount((c) => c + 1);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
 
   return (
     <AnimatedPage>
@@ -51,12 +69,42 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">Good day,</p>
               <p className="text-base font-semibold text-foreground">{profile?.full_name || "Guest"}</p>
             </div>
-            <button className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">
-              <MapPin className="h-3 w-3" />
-              Mumbai
-              <ChevronDown className="h-3 w-3" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate("/notifications")}
+                className="relative flex h-9 w-9 items-center justify-center rounded-full bg-secondary"
+              >
+                <Bell className="h-4 w-4 text-foreground" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-accent-foreground">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </button>
+              <button className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">
+                <MapPin className="h-3 w-3" />
+                Mumbai
+                <ChevronDown className="h-3 w-3" />
+              </button>
+            </div>
           </div>
+
+          {/* Loyalty Points Banner */}
+          {user && totalPoints > 0 && (
+            <button
+              onClick={() => navigate("/profile")}
+              className="mb-4 flex w-full items-center gap-3 rounded-xl bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/20 p-3 text-left"
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent/15">
+                <Trophy className="h-4 w-4 text-accent" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-foreground">{totalPoints.toLocaleString()} Points</p>
+                <p className="text-[10px] text-muted-foreground">White Rabbit Rewards</p>
+              </div>
+              <ChevronDown className="h-4 w-4 text-accent rotate-[-90deg]" />
+            </button>
+          )}
 
           {/* Hero */}
           <div className="relative mb-6 overflow-hidden rounded-2xl bg-foreground p-6 text-primary-foreground">
@@ -87,7 +135,7 @@ export default function HomePage() {
             <ChevronDown className="h-4 w-4 text-accent rotate-[-90deg]" />
           </button>
 
-          {/* Active Order Banner — real data */}
+          {/* Active Order Banner */}
           <div className="mb-6 flex items-center gap-3 rounded-xl border border-border bg-card p-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
               <Sparkles className="h-5 w-5 text-accent" />

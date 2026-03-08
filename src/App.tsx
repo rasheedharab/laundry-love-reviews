@@ -26,6 +26,8 @@ import SelectOutlet from "@/pages/SelectOutlet";
 import GarmentAdvisor from "@/pages/GarmentAdvisor";
 import SavedAddresses from "@/pages/SavedAddresses";
 import EditProfile from "@/pages/EditProfile";
+import NotificationsPage from "@/pages/NotificationsPage";
+import ReferralPage from "@/pages/ReferralPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -62,6 +64,8 @@ const App = () => (
                 <Route path="/select-outlet" element={<SelectOutlet />} />
                 <Route path="/saved-addresses" element={<SavedAddresses />} />
                 <Route path="/edit-profile" element={<EditProfile />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/referral" element={<ReferralPage />} />
               </Route>
               <Route path="/garment-advisor" element={<GarmentAdvisor />} />
               <Route path="/payment" element={<PaymentPage />} />

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { User, MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings } from "lucide-react";
+import { User, MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
   const [orderCount, setOrderCount] = useState(0);
+  const [totalPoints, setTotalPoints] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -24,6 +25,9 @@ export default function ProfilePage() {
     });
     supabase.from("orders").select("id", { count: "exact", head: true }).eq("user_id", user.id).then(({ count }) => {
       setOrderCount(count || 0);
+    });
+    supabase.from("loyalty_points").select("points").eq("user_id", user.id).then(({ data }) => {
+      setTotalPoints((data || []).reduce((s, p: any) => s + (p.points || 0), 0));
     });
   }, [user]);
 
@@ -49,7 +53,7 @@ export default function ProfilePage() {
     { icon: MapPin, label: "Saved Addresses", action: () => navigate("/saved-addresses") },
     { icon: CreditCard, label: "Payment Methods", action: () => {} },
     { icon: ClipboardList, label: `Order History${orderCount > 0 ? ` (${orderCount})` : ""}`, action: () => navigate("/orders") },
-    { icon: Gift, label: "Refer a Friend", action: () => {} },
+    { icon: Gift, label: "Refer a Friend", action: () => navigate("/referral") },
     { icon: Headphones, label: "Support & Concierge", action: () => {} },
   ];
 
@@ -75,7 +79,7 @@ export default function ProfilePage() {
         </button>
 
         {/* Premium Club Card */}
-        <div className="mb-6 rounded-2xl bg-gradient-to-br from-accent to-primary p-5 text-accent-foreground">
+        <div className="mb-4 rounded-2xl bg-gradient-to-br from-accent to-primary p-5 text-accent-foreground">
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-[9px] font-semibold uppercase tracking-[0.2em] opacity-80">WHITE RABBIT</p>
@@ -86,6 +90,22 @@ export default function ProfilePage() {
             </Badge>
           </div>
           <p className="text-xs font-mono opacity-70">•••• •••• •••• {user.id.slice(-4).toUpperCase()}</p>
+        </div>
+
+        {/* Loyalty Points Card */}
+        <div className="mb-6 rounded-2xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
+                <Trophy className="h-5 w-5 text-accent" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Loyalty Points</p>
+                <p className="text-lg font-bold text-foreground">{totalPoints.toLocaleString()}</p>
+              </div>
+            </div>
+            <p className="text-[10px] text-muted-foreground">Earn 1pt / ₹10</p>
+          </div>
         </div>
 
         {/* Menu Items */}
