@@ -102,9 +102,12 @@ export type Database = {
           discount: number | null
           id: string
           notes: string | null
+          payment_method: string | null
+          payment_status: string | null
           pickup_date: string | null
           pickup_time_slot: string | null
           promo_code_id: string | null
+          service_level: string | null
           status: string
           subtotal: number
           total: number
@@ -117,9 +120,12 @@ export type Database = {
           discount?: number | null
           id?: string
           notes?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
           pickup_date?: string | null
           pickup_time_slot?: string | null
           promo_code_id?: string | null
+          service_level?: string | null
           status?: string
           subtotal?: number
           total?: number
@@ -132,9 +138,12 @@ export type Database = {
           discount?: number | null
           id?: string
           notes?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
           pickup_date?: string | null
           pickup_time_slot?: string | null
           promo_code_id?: string | null
+          service_level?: string | null
           status?: string
           subtotal?: number
           total?: number
