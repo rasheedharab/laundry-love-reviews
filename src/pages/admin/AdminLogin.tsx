@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Shield } from "lucide-react";
+import logoImg from "@/assets/logo.png";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
