@@ -211,7 +211,7 @@ export default function CategoryPage() {
                 >
                   {/* Background image */}
                   <img
-                    src={svc.image_url || heroImg}
+                    src={svc.image_url || serviceImages[svc.slug] || heroImg}
                     alt={svc.name}
                     className="absolute inset-0 h-full w-full object-cover scale-110 group-hover:scale-105 transition-transform duration-700"
                   />
