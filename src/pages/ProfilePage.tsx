@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { supabase } from "@/integrations/supabase/client";
-import { User, MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Trophy } from "lucide-react";
+import { User, MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Trophy, Sun, Moon, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -14,6 +15,7 @@ import type { Tables } from "@/integrations/supabase/types";
 export default function ProfilePage() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
   const [orderCount, setOrderCount] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
@@ -48,6 +50,12 @@ export default function ProfilePage() {
       </AnimatedPage>
     );
   }
+
+  const themeOptions: { value: "light" | "dark" | "system"; icon: React.ElementType; label: string }[] = [
+    { value: "light", icon: Sun, label: "Light" },
+    { value: "dark", icon: Moon, label: "Dark" },
+    { value: "system", icon: Monitor, label: "Auto" },
+  ];
 
   const menuItems = [
     { icon: MapPin, label: "Saved Addresses", action: () => navigate("/saved-addresses") },
@@ -105,6 +113,27 @@ export default function ProfilePage() {
               </div>
             </div>
             <p className="text-[10px] text-muted-foreground">Earn 1pt / ₹10</p>
+          </div>
+        </div>
+
+        {/* Theme Toggle */}
+        <div className="mb-6">
+          <p className="section-label mb-3">APPEARANCE</p>
+          <div className="flex gap-2 rounded-2xl border border-border bg-card p-2">
+            {themeOptions.map(({ value, icon: Icon, label }) => (
+              <button
+                key={value}
+                onClick={() => setTheme(value)}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all ${
+                  theme === value
+                    ? "bg-foreground text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
