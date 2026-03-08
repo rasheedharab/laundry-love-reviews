@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Check, Clock, Zap, Star, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Clock, Zap, Star, Sparkles, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -37,6 +37,7 @@ export default function ServiceDetail() {
   const [service, setService] = useState<Tables<"services"> | null>(null);
   const [category, setCategory] = useState<Tables<"service_categories"> | null>(null);
   const [tier, setTier] = useState<"standard" | "express">("standard");
+  const [justAdded, setJustAdded] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
@@ -83,6 +84,7 @@ export default function ServiceDetail() {
   const heroImage = heroImageMap[categorySlug] || serviceHeroDefault;
 
   const handleAdd = () => {
+    if (justAdded) return;
     addItem({
       serviceId: service.id,
       serviceName: service.name,
@@ -91,7 +93,9 @@ export default function ServiceDetail() {
       price,
       turnaround: turnaround || "",
     });
+    setJustAdded(true);
     toast.success(`${service.name} added to bag`);
+    setTimeout(() => setJustAdded(false), 1200);
   };
 
   return (
@@ -276,9 +280,36 @@ export default function ServiceDetail() {
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Total</p>
               <p className="text-2xl font-display font-bold text-foreground">₹{price.toLocaleString()}</p>
             </div>
-            <motion.div whileTap={{ scale: 0.97 }}>
-              <Button onClick={handleAdd} className="h-12 rounded-xl px-8 text-sm font-semibold shadow-lg">
-                Add to Bag
+            <motion.div whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={handleAdd}
+                className={`h-12 rounded-xl px-8 text-sm font-semibold shadow-lg transition-all duration-300 ${
+                  justAdded ? "bg-accent text-accent-foreground" : ""
+                }`}
+              >
+                <AnimatePresence mode="wait">
+                  {justAdded ? (
+                    <motion.span
+                      key="added"
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.5 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Check className="h-4 w-4" /> Added!
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="add"
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.5 }}
+                      className="flex items-center gap-2"
+                    >
+                      <ShoppingBag className="h-4 w-4" /> Add to Bag
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </Button>
             </motion.div>
           </div>

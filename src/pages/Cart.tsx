@@ -66,15 +66,35 @@ export default function Cart() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 rounded-lg border border-border">
-                      <button onClick={() => updateQuantity(item.serviceId, item.tier, item.quantity - 1)} className="p-2">
+                      <motion.button whileTap={{ scale: 0.8 }} onClick={() => updateQuantity(item.serviceId, item.tier, item.quantity - 1)} className="p-2">
                         <Minus className="h-3 w-3" />
-                      </button>
-                      <span className="text-sm font-semibold w-4 text-center">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.serviceId, item.tier, item.quantity + 1)} className="p-2">
+                      </motion.button>
+                      <AnimatePresence mode="wait">
+                        <motion.span
+                          key={item.quantity}
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 8 }}
+                          transition={{ duration: 0.15 }}
+                          className="text-sm font-semibold w-4 text-center"
+                        >
+                          {item.quantity}
+                        </motion.span>
+                      </AnimatePresence>
+                      <motion.button whileTap={{ scale: 0.8 }} onClick={() => updateQuantity(item.serviceId, item.tier, item.quantity + 1)} className="p-2">
                         <Plus className="h-3 w-3" />
-                      </button>
+                      </motion.button>
                     </div>
-                    <p className="text-sm font-bold text-foreground">₹{(item.price * item.quantity).toLocaleString()}</p>
+                    <AnimatePresence mode="wait">
+                      <motion.p
+                        key={item.price * item.quantity}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="text-sm font-bold text-foreground"
+                      >
+                        ₹{(item.price * item.quantity).toLocaleString()}
+                      </motion.p>
+                    </AnimatePresence>
                   </div>
                   <p className="text-[9px] text-muted-foreground/50 mt-2 text-center">← Swipe to remove</p>
                 </motion.div>
