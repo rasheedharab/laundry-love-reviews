@@ -1,8 +1,10 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { MapPin, ChevronDown, ArrowRight, User, Truck, MessageCircle, Crown, Gift, ChevronRight, Sparkles } from "lucide-react";
+import { MapPin, ChevronDown, ArrowRight, User, Truck, MessageCircle, Crown, Gift, ChevronRight, Sparkles, Copy } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedPage from "@/components/AnimatedPage";
@@ -50,6 +52,10 @@ export default function HomePage() {
   const [categories, setCategories] = useState<Tables<"service_categories">[]>([]);
   const [activeOrder, setActiveOrder] = useState<Tables<"orders"> | null>(null);
   const [loading, setLoading] = useState(true);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -101,8 +107,13 @@ export default function HomePage() {
           </div>
 
           {/* Hero Section */}
-          <div className="relative mx-5 mb-5 overflow-hidden rounded-2xl min-h-[340px] flex flex-col justify-end">
-            <img src={heroBg} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <div ref={heroRef} className="relative mx-5 mb-5 overflow-hidden rounded-2xl min-h-[340px] flex flex-col justify-end">
+            <motion.img
+              src={heroBg}
+              alt=""
+              className="absolute inset-0 h-[130%] w-full object-cover"
+              style={{ y: heroY, scale: heroScale }}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
             <div className="relative z-10 p-6 pb-7">
               <h1 className="mb-2 text-3xl font-display font-bold leading-tight text-foreground">
@@ -195,7 +206,11 @@ export default function HomePage() {
           <ScrollReveal delay={0.05}>
             <div className="px-5 mt-6">
               <button
-                onClick={() => navigate("/services")}
+                onClick={() => {
+                  navigator.clipboard.writeText("WELCOME20");
+                  toast.success("Code WELCOME20 copied! Apply it at checkout.", { duration: 3000 });
+                  navigate("/services");
+                }}
                 className="w-full overflow-hidden rounded-2xl bg-gradient-to-r from-accent to-accent/80 p-5 text-left relative"
               >
                 <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-accent-foreground/20">
@@ -203,7 +218,10 @@ export default function HomePage() {
                 </div>
                 <p className="text-[10px] text-accent-foreground/70 uppercase tracking-widest font-medium mb-1">Limited Offer</p>
                 <p className="text-xl font-display font-bold text-accent-foreground leading-tight">First Order<br />20% Off</p>
-                <p className="text-xs text-accent-foreground/70 mt-2">Use code WELCOME20 at checkout</p>
+                <p className="text-xs text-accent-foreground/70 mt-2 flex items-center gap-1.5">
+                  Use code <span className="font-bold text-accent-foreground bg-accent-foreground/15 px-2 py-0.5 rounded-md">WELCOME20</span> at checkout
+                  <Copy className="h-3 w-3 text-accent-foreground/60" />
+                </p>
                 <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-accent-foreground uppercase tracking-wider">
                   Shop Now <ArrowRight className="h-3 w-3" />
                 </div>
