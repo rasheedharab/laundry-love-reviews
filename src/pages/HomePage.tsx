@@ -250,7 +250,8 @@ export default function HomePage() {
                           hidden: { opacity: 0, y: 16, scale: 0.97 },
                           visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] } },
                         }}
-                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ scale: 1.03, y: -2 }}
+                        whileTap={{ scale: 0.96 }}
                       >
                         <img
                           src={img}
