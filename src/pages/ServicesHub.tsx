@@ -7,6 +7,7 @@ import AnimatedPage from "@/components/AnimatedPage";
 import ServiceSearch from "@/components/ServiceSearch";
 import { motion } from "framer-motion";
 import TiltCard from "@/components/TiltCard";
+import RippleTouch from "@/components/RippleTouch";
 import type { Tables } from "@/integrations/supabase/types";
 
 import catPartyWear from "@/assets/cat-party-wear.jpg";
@@ -70,7 +71,7 @@ export default function ServicesHub() {
                   }}
                 >
                   <TiltCard className="relative overflow-hidden rounded-2xl text-left group cursor-pointer" tiltMax={6} scale={1.03}>
-                    <button onClick={() => navigate(`/services/${cat.slug}`)} className="w-full text-left">
+                    <RippleTouch as="button" onClick={() => navigate(`/services/${cat.slug}`)} className="w-full text-left rounded-2xl">
                       <img src={img} alt={cat.name} className="h-44 w-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
                       <div className="absolute bottom-0 left-0 right-0 p-3.5">
@@ -79,7 +80,7 @@ export default function ServicesHub() {
                           {cat.description || "Premium Care"}
                         </p>
                       </div>
-                    </button>
+                    </RippleTouch>
                   </TiltCard>
                 </motion.div>
               );

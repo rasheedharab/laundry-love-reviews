@@ -14,6 +14,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import ServiceSearch from "@/components/ServiceSearch";
 import logoImg from "@/assets/logo.png";
 import TiltCard from "@/components/TiltCard";
+import RippleTouch from "@/components/RippleTouch";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import type { Tables } from "@/integrations/supabase/types";
@@ -207,7 +208,8 @@ export default function HomePage() {
 
           {/* Active Order Card */}
           {activeOrder && (
-            <button
+            <RippleTouch
+              as="button"
               onClick={() => navigate(`/track-order/${activeOrder.id}`)}
               className="mx-5 mb-5 flex w-[calc(100%-2.5rem)] items-center gap-3 rounded-2xl glass-dark p-4"
             >
@@ -227,7 +229,7 @@ export default function HomePage() {
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-card">
                 <ArrowRight className="h-4 w-4 text-foreground" />
               </div>
-            </button>
+            </RippleTouch>
           )}
 
           {/* Recently Viewed */}
@@ -301,7 +303,7 @@ export default function HomePage() {
                         }}
                       >
                         <TiltCard className="relative overflow-hidden rounded-2xl text-left group cursor-pointer" tiltMax={6} scale={1.03}>
-                          <button onClick={() => navigate(`/services/${cat.slug}`)} className="w-full text-left">
+                          <RippleTouch as="button" onClick={() => navigate(`/services/${cat.slug}`)} className="w-full text-left rounded-2xl">
                             <img
                               src={img}
                               alt={cat.name}
@@ -314,7 +316,7 @@ export default function HomePage() {
                                 {cat.description || "Premium Care"}
                               </p>
                             </div>
-                          </button>
+                          </RippleTouch>
                         </TiltCard>
                       </motion.div>
                     );
@@ -327,13 +329,14 @@ export default function HomePage() {
           {/* Promotional Banner */}
           <ScrollReveal delay={0.05}>
             <div className="px-5 mt-6">
-              <button
+              <RippleTouch
+                as="button"
                 onClick={() => {
                   navigator.clipboard.writeText("WELCOME20");
                   toast.success("Code WELCOME20 copied! Apply it at checkout.", { duration: 3000 });
                   navigate("/services");
                 }}
-                className="w-full overflow-hidden rounded-2xl glass-accent p-5 text-left relative"
+                className="w-full overflow-hidden rounded-2xl glass-accent p-5 text-left"
               >
                 <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-accent-foreground/20">
                   <Sparkles className="h-4 w-4 text-accent-foreground" />
@@ -347,7 +350,7 @@ export default function HomePage() {
                 <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-accent-foreground uppercase tracking-wider">
                   Shop Now <ArrowRight className="h-3 w-3" />
                 </div>
-              </button>
+              </RippleTouch>
             </div>
           </ScrollReveal>
 
