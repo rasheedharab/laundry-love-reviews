@@ -69,7 +69,7 @@ export default function Checkout() {
       }
 
       clearCart();
-      navigate(`/payment`, { state: { orderId: order?.id, total } });
+      navigate(`/payment`, { state: { orderId: order?.id, total: finalTotal } });
     } catch (err: any) {
       toast.error(err.message || "Failed to place order");
     } finally {

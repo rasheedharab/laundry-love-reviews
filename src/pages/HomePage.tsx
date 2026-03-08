@@ -72,6 +72,21 @@ export default function HomePage() {
         <img src={logoImg} alt="" className="absolute -right-4 -bottom-4 h-28 w-28 opacity-10" />
       </div>
 
+      {/* AI Care Advisor Banner */}
+      <button
+        onClick={() => navigate("/garment-advisor")}
+        className="mb-6 flex w-full items-center gap-3 rounded-xl border border-accent/20 bg-accent/5 p-4 text-left transition-shadow hover:shadow-md"
+      >
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
+          <Sparkles className="h-5 w-5 text-accent" />
+        </div>
+        <div className="flex-1">
+          <p className="text-xs font-semibold text-accent">AI Care Advisor</p>
+          <p className="text-[10px] text-muted-foreground">Get expert fabric care tips instantly</p>
+        </div>
+        <ChevronDown className="h-4 w-4 text-accent rotate-[-90deg]" />
+      </button>
+
       {/* Active Order Banner (mock) */}
       <div className="mb-6 flex items-center gap-3 rounded-xl border border-border bg-card p-4">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
