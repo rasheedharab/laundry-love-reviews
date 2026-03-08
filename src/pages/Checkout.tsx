@@ -201,7 +201,7 @@ export default function Checkout() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Location</p>
               <button className="text-[10px] font-semibold text-accent uppercase tracking-wider">Edit</button>
             </div>
-            <div className="rounded-2xl border border-border bg-card p-4">
+            <div className="rounded-2xl glass p-4">
               <div className="flex items-center gap-3 mb-3">
                 <MapPin className="h-5 w-5 text-foreground" />
                 <Input
