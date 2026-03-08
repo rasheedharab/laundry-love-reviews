@@ -446,9 +446,11 @@ export default function HomePage() {
                 viewport={{ once: true, amount: 0.2 }}
                 variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
               >
-                {careTips.map((tip) => (
+                {careTips.map((tip) => {
+                  const TipIcon = iconMap[tip.icon || "scissors"] || Scissors;
+                  return (
                   <motion.button
-                    key={tip.title}
+                    key={tip.id}
                     onClick={() => navigate("/garment-advisor")}
                     className="w-full flex items-start gap-3.5 rounded-2xl glass p-4 text-left glass-hover"
                     variants={{
@@ -460,11 +462,11 @@ export default function HomePage() {
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10">
-                      <tip.Icon className="h-5 w-5 text-accent" strokeWidth={1.5} />
+                      <TipIcon className="h-5 w-5 text-accent" strokeWidth={1.5} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-foreground">{tip.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.desc}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.description}</p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                   </motion.button>
