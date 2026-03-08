@@ -85,7 +85,11 @@ export default function CategoryPage() {
   };
 
   const heroImg = category?.image_url || heroImages[slug || ""] || catDryCleaning;
-  const tagline = heroTaglines[slug || ""] || heroTaglines["dry-cleaning"];
+  const tagline = {
+    badge: category?.tagline_badge || defaultTagline.badge,
+    title: category?.tagline_title || defaultTagline.title,
+    subtitle: category?.tagline_subtitle || defaultTagline.subtitle,
+  };
 
   if (!category && loading) {
     return (

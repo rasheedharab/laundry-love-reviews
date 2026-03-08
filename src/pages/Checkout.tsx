@@ -91,7 +91,7 @@ export default function Checkout() {
   const getSlotLabel = (slot: string) => {
     if (isSlotFull(slot)) return "Full";
     if (isSlotPast(slot)) return "Past";
-    return `${SLOT_CAPACITY - (slotCounts[slot] || 0)} left`;
+    return `${slotCapacity - (slotCounts[slot] || 0)} left`;
   };
 
   const discount = promoApplied
