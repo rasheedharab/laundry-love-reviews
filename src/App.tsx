@@ -52,6 +52,8 @@ import AdminBlog from "@/pages/admin/AdminBlog";
 import AdminUsers from "@/pages/admin/AdminUsers";
 import AdminRitualSteps from "@/pages/admin/AdminRitualSteps";
 import AdminCareTips from "@/pages/admin/AdminCareTips";
+import AdminFaqs from "@/pages/admin/AdminFaqs";
+import AdminMembershipTiers from "@/pages/admin/AdminMembershipTiers";
 import AdminSiteSettings from "@/pages/admin/AdminSiteSettings";
 import NotFound from "@/pages/NotFound";
 
@@ -108,6 +110,8 @@ function AnimatedRoutes() {
           <Route path="promos" element={<AdminPromos />} />
           <Route path="ritual-steps" element={<AdminRitualSteps />} />
           <Route path="care-tips" element={<AdminCareTips />} />
+          <Route path="faqs" element={<AdminFaqs />} />
+          <Route path="membership" element={<AdminMembershipTiers />} />
           <Route path="site-settings" element={<AdminSiteSettings />} />
           <Route path="users" element={<AdminUsers />} />
         </Route>
