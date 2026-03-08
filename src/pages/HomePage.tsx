@@ -196,6 +196,46 @@ export default function HomePage() {
             </button>
           )}
 
+          {/* Recently Viewed */}
+          {recentlyViewed.length > 0 && (
+            <ScrollReveal>
+              <div className="px-5 mb-5">
+                <h2 className="text-lg font-display font-bold text-foreground mb-3">Recently Viewed</h2>
+                <motion.div
+                  className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide"
+                  initial="hidden"
+                  animate="visible"
+                  variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
+                >
+                  {recentlyViewed.map((item) => {
+                    const img = heroImages[item.categorySlug] || catDryCleaning;
+                    return (
+                      <motion.button
+                        key={item.serviceId}
+                        onClick={() => navigate(`/service/${item.serviceSlug}`)}
+                        className="flex-shrink-0 w-[140px] overflow-hidden rounded-2xl text-left group glass-hover"
+                        variants={{
+                          hidden: { opacity: 0, y: 16, scale: 0.97 },
+                          visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] } },
+                        }}
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        <img
+                          src={img}
+                          alt={item.serviceName}
+                          className="h-24 w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="p-2.5">
+                          <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{item.serviceName}</p>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+                </motion.div>
+              </div>
+            </ScrollReveal>
+          )}
+
           {/* Our Services — Image Cards */}
           <ScrollReveal>
             <div className="px-5">
