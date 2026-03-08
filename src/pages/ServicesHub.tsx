@@ -50,14 +50,23 @@ export default function ServicesHub() {
             {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-48 rounded-2xl" />)}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <motion.div
+            className="grid grid-cols-2 gap-3"
+            initial="hidden"
+            animate="visible"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } } }}
+          >
             {categories.map((cat) => {
               const img = heroImages[cat.slug] || catDryCleaning;
               return (
-                <button
+                <motion.button
                   key={cat.id}
+                  variants={{
+                    hidden: { opacity: 0, y: 24, scale: 0.97 },
+                    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] } },
+                  }}
                   onClick={() => navigate(`/services/${cat.slug}`)}
-                  className="relative overflow-hidden rounded-2xl text-left transition-shadow hover:shadow-lg group"
+                  className="relative overflow-hidden rounded-2xl text-left group glass-hover"
                 >
                   <img src={img} alt={cat.name} className="h-44 w-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
@@ -67,10 +76,10 @@ export default function ServicesHub() {
                       {cat.description || "Premium Care"}
                     </p>
                   </div>
-                </button>
+                </motion.button>
               );
             })}
-          </div>
+          </motion.div>
         )}
 
         {/* 7-Step Ritual Link */}
