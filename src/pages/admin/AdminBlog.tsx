@@ -90,12 +90,13 @@ export default function AdminBlog() {
     }
     setOpen(false); fetchPosts();
   };
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this post?")) return;
-    const { error } = await (supabase as any).from("blog_posts").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await (supabase as any).from("blog_posts").delete().eq("id", deleteId);
     if (error) { toast.error(error.message); return; }
-    toast.success("Deleted"); fetchPosts();
+    toast.success("Deleted"); setDeleteId(null); fetchPosts();
   };
 
   const statusColor: Record<string, string> = {
