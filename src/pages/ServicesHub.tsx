@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, Wind, Briefcase, Layers, Armchair, Shirt, ChevronRight } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import CardGridSkeleton from "@/components/skeletons/CardGridSkeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import ServiceSearch from "@/components/ServiceSearch";
 import { motion } from "framer-motion";
