@@ -217,22 +217,33 @@ export default function Checkout() {
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent mb-3">Time Window</p>
             <div className="space-y-2">
-              {timeSlots.map((slot) => (
-                <button
-                  key={slot}
-                  onClick={() => setSelectedSlot(slot)}
-                  className={`w-full flex items-center justify-between rounded-2xl border-2 p-4 text-sm font-medium transition-all ${
-                    selectedSlot === slot ? "border-foreground" : "border-border"
-                  }`}
-                >
-                  <span className="text-foreground">{slot}</span>
-                  <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
-                    selectedSlot === slot ? "border-foreground bg-foreground" : "border-muted-foreground/40"
-                  }`}>
-                    {selectedSlot === slot && <div className="h-2 w-2 rounded-full bg-primary-foreground" />}
-                  </div>
-                </button>
-              ))}
+              {timeSlots.map((slot) => {
+                const disabled = isSlotDisabled(slot);
+                return (
+                  <button
+                    key={slot}
+                    onClick={() => !disabled && setSelectedSlot(slot)}
+                    disabled={disabled}
+                    className={`w-full flex items-center justify-between rounded-2xl border-2 p-4 text-sm font-medium transition-all ${
+                      disabled
+                        ? "border-border opacity-40 cursor-not-allowed"
+                        : selectedSlot === slot ? "border-foreground" : "border-border"
+                    }`}
+                  >
+                    <span className="text-foreground">{slot}</span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] font-semibold uppercase tracking-wider ${disabled ? "text-destructive" : "text-muted-foreground"}`}>
+                        {getSlotLabel(slot)}
+                      </span>
+                      <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
+                        disabled ? "border-muted-foreground/20" : selectedSlot === slot ? "border-foreground bg-foreground" : "border-muted-foreground/40"
+                      }`}>
+                        {!disabled && selectedSlot === slot && <div className="h-2 w-2 rounded-full bg-primary-foreground" />}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
