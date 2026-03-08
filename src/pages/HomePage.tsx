@@ -315,12 +315,22 @@ export default function HomePage() {
                   Ask Advisor
                 </button>
               </div>
-              <div className="space-y-3">
+              <motion.div
+                className="space-y-3"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+              >
                 {careTips.map((tip) => (
-                  <button
+                  <motion.button
                     key={tip.title}
                     onClick={() => navigate("/garment-advisor")}
-                    className="w-full flex items-start gap-3.5 rounded-2xl glass p-4 text-left transition-shadow hover:shadow-md"
+                    className="w-full flex items-start gap-3.5 rounded-2xl glass p-4 text-left transition-shadow hover:shadow-md glass-hover"
+                    variants={{
+                      hidden: { opacity: 0, y: 24, scale: 0.97 },
+                      visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
+                    }}
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-base">
                       {tip.icon}
@@ -330,9 +340,9 @@ export default function HomePage() {
                       <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tip.desc}</p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                  </button>
+                  </motion.button>
                 ))}
-              </div>
+              </motion.div>
             </div>
           </ScrollReveal>
 

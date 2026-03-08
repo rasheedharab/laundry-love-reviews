@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const navItems = [
   { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true },
   { to: "/admin/orders", icon: ShoppingBag, label: "Orders" },
+  { to: "/admin/categories", icon: LayoutDashboard, label: "Categories" },
   { to: "/admin/services", icon: Sparkles, label: "Services" },
   { to: "/admin/promos", icon: Tag, label: "Promo Codes" },
 ];
