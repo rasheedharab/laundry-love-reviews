@@ -107,6 +107,7 @@ export default function ServicesHub() {
           <ChevronRight className="h-4 w-4 text-accent" />
         </button>
       </div>
+      </PullToRefresh>
     </AnimatedPage>
   );
 }
