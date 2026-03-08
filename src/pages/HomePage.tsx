@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
 import logoImg from "@/assets/logo.png";
+import heroBg from "@/assets/hero-bg.jpg";
 import type { Tables } from "@/integrations/supabase/types";
 
 const iconMap: Record<string, React.ElementType> = {
