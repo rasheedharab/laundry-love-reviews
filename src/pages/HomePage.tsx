@@ -371,9 +371,11 @@ export default function HomePage() {
                 viewport={{ once: true, amount: 0.3 }}
                 variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
               >
-                {ritualSteps.map((step) => (
+                {ritualSteps.map((step) => {
+                  const StepIcon = iconMap[step.icon || "sparkles"] || Sparkles;
+                  return (
                   <motion.button
-                    key={step.num}
+                    key={step.id}
                     onClick={() => navigate("/ritual")}
                     className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 glass-hover snap-start"
                     variants={{
@@ -385,14 +387,15 @@ export default function HomePage() {
                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
-                      <step.Icon className="h-5 w-5 text-accent" strokeWidth={1.5} />
+                      <StepIcon className="h-5 w-5 text-accent" strokeWidth={1.5} />
                     </div>
                     <div className="text-center">
-                      <p className="text-[10px] text-accent font-bold">Step {step.num}</p>
+                      <p className="text-[10px] text-accent font-bold">Step {step.step_number}</p>
                       <p className="text-xs font-semibold text-foreground mt-0.5">{step.title}</p>
                     </div>
                   </motion.button>
-                ))}
+                  );
+                })}
               </motion.div>
             </div>
           </ScrollReveal>
