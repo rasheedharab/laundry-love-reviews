@@ -26,6 +26,7 @@ export default function AdminCareTips() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchData = async () => {
     const { data } = await supabase.from("care_tips").select("*").order("sort_order");
