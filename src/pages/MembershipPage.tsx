@@ -31,15 +31,14 @@ export default function MembershipPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase
-      .from("membership_tiers")
-      .select("id, name, price, period, icon, features, is_popular")
-      .eq("is_active", true)
-      .order("sort_order")
-      .then(({ data }) => {
-        setTiers((data as any) || []);
-        setLoading(false);
-      });
+    Promise.all([
+      supabase.from("membership_tiers").select("id, name, price, period, icon, features, is_popular").eq("is_active", true).order("sort_order"),
+      supabase.from("ritual_steps").select("id, step_number, title, description, icon").eq("is_active", true).order("step_number").limit(2),
+    ]).then(([tiersRes, stepsRes]) => {
+      setTiers((tiersRes.data as any) || []);
+      setClubSteps((stepsRes.data as ClubStep[]) || []);
+      setLoading(false);
+    });
   }, []);
 
   return (
