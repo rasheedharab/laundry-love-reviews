@@ -301,7 +301,7 @@ export default function HomePage() {
                   <button
                     key={tip.title}
                     onClick={() => navigate("/garment-advisor")}
-                    className="w-full flex items-start gap-3.5 rounded-2xl border border-border bg-card p-4 text-left transition-shadow hover:shadow-md"
+                    className="w-full flex items-start gap-3.5 rounded-2xl glass p-4 text-left transition-shadow hover:shadow-md"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-base">
                       {tip.icon}
