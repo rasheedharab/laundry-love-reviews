@@ -10,6 +10,7 @@ import EmptyState from "@/components/EmptyState";
 export default function Cart() {
   const navigate = useNavigate();
   const { items, updateQuantity, removeItem, total, itemCount } = useCart();
+  const { user } = useAuth();
 
   return (
     <AnimatedPage>
