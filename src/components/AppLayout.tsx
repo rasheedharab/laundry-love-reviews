@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import BottomNav from "./BottomNav";
+import SwipeBack from "./SwipeBack";
 
 const pageTransition = {
   initial: { opacity: 0, y: 10 },
@@ -8,8 +9,11 @@ const pageTransition = {
   exit: { opacity: 0, y: -8 },
 };
 
+const rootPaths = ["/home", "/services", "/orders", "/profile"];
+
 export default function AppLayout() {
   const location = useLocation();
+  const isRoot = rootPaths.includes(location.pathname);
 
   return (
     <div className="mx-auto min-h-screen max-w-lg bg-background">
@@ -23,7 +27,13 @@ export default function AppLayout() {
             exit="exit"
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           >
-            <Outlet />
+            {isRoot ? (
+              <Outlet />
+            ) : (
+              <SwipeBack>
+                <Outlet />
+              </SwipeBack>
+            )}
           </motion.div>
         </AnimatePresence>
       </main>
