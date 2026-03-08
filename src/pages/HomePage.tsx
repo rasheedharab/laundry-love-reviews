@@ -33,19 +33,19 @@ const heroImages: Record<string, string> = {
 };
 
 const ritualSteps = [
-  { num: 1, title: "Inspection", icon: "🔍" },
-  { num: 2, title: "Spotting", icon: "✨" },
-  { num: 3, title: "Eco-Wash", icon: "🌿" },
-  { num: 4, title: "Drying", icon: "☁️" },
-  { num: 5, title: "Finishing", icon: "👔" },
-  { num: 6, title: "QC Check", icon: "✓" },
-  { num: 7, title: "Packaging", icon: "🎁" },
+  { num: 1, title: "Inspection", Icon: Search },
+  { num: 2, title: "Spotting", Icon: Sparkles },
+  { num: 3, title: "Eco-Wash", Icon: Leaf },
+  { num: 4, title: "Drying", Icon: CloudSun },
+  { num: 5, title: "Finishing", Icon: Shirt },
+  { num: 6, title: "QC Check", Icon: ShieldCheck },
+  { num: 7, title: "Packaging", Icon: Package },
 ];
 
 const careTips = [
-  { title: "Storing Silk", desc: "Keep silk garments in breathable cotton bags away from direct sunlight.", icon: "🧵" },
-  { title: "Leather Care 101", desc: "Condition leather every 3 months to maintain its supple texture.", icon: "👜" },
-  { title: "Wool Refresh", desc: "Steam instead of washing to preserve wool fibers and shape.", icon: "🧶" },
+  { title: "Storing Silk", desc: "Keep silk garments in breathable cotton bags away from direct sunlight.", Icon: Scissors },
+  { title: "Leather Care 101", desc: "Condition leather every 3 months to maintain its supple texture.", Icon: Briefcase },
+  { title: "Wool Refresh", desc: "Steam instead of washing to preserve wool fibers and shape.", Icon: Wind },
 ];
 
 function getGreeting(): string {
