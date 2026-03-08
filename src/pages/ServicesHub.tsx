@@ -36,15 +36,18 @@ export default function ServicesHub() {
   const [categories, setCategories] = useState<Tables<"service_categories">[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    supabase.from("service_categories").select("*").order("sort_order").then(({ data }) => {
-      if (data) setCategories(data);
-      setLoading(false);
-    });
-  }, []);
+  const fetchData = async () => {
+    setLoading(true);
+    const { data } = await supabase.from("service_categories").select("*").order("sort_order");
+    if (data) setCategories(data);
+    setLoading(false);
+  };
+
+  useEffect(() => { fetchData(); }, []);
 
   return (
     <AnimatedPage>
+      <PullToRefresh onRefresh={fetchData}>
       <div className="px-5 pt-6 pb-4">
         <h1 className="mb-1 text-2xl font-display font-bold text-foreground">Services</h1>
         <p className="mb-4 text-sm text-muted-foreground">Premium care for everything you own</p>

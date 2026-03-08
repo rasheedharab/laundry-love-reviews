@@ -55,10 +55,13 @@ export default function PullToRefresh({ onRefresh, children }: PullToRefreshProp
             exit={{ opacity: 0, height: 0 }}
             className="flex items-center justify-center overflow-hidden"
           >
-            <Loader2
-              className={`h-5 w-5 text-muted-foreground ${refreshing ? "animate-spin" : ""}`}
-              style={{ transform: refreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
-            />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10">
+              <Loader2
+                className={`h-4.5 w-4.5 text-accent ${refreshing ? "animate-spin" : ""}`}
+                style={{ transform: refreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
+                strokeWidth={2.5}
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
