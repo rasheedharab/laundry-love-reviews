@@ -85,6 +85,7 @@ const App = () => (
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/referral" element={<ReferralPage />} />
                 <Route path="/blog" element={<BlogPage />} />
+                <Route path="/my-complaints" element={<MyComplaintsPage />} />
               </Route>
               {/* Admin routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
