@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { MapPin, ChevronDown, ArrowRight, User, Truck, MessageCircle, Crown, Gift, ChevronRight, Sparkles, Copy } from "lucide-react";
+import { MapPin, ChevronDown, ArrowRight, User, Truck, MessageCircle, Crown, Gift, ChevronRight, Sparkles, Copy, BookOpen } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -343,6 +343,31 @@ export default function HomePage() {
                   </motion.button>
                 ))}
               </motion.div>
+            </div>
+          </ScrollReveal>
+
+          {/* Blog CTA */}
+          <ScrollReveal delay={0.05}>
+            <div className="px-5 mt-8">
+              <button
+                onClick={() => navigate("/blog")}
+                className="w-full overflow-hidden rounded-2xl glass p-5 text-left"
+              >
+                <div className="flex items-start gap-3.5">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/10">
+                    <BookOpen className="h-6 w-6 text-accent" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-display font-bold text-foreground">From Our Blog</p>
+                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                      Garment care guides, style tips, and behind-the-scenes stories from our experts.
+                    </p>
+                    <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-accent uppercase tracking-wider">
+                      Read Articles <ArrowRight className="h-3 w-3" />
+                    </div>
+                  </div>
+                </div>
+              </button>
             </div>
           </ScrollReveal>
 
