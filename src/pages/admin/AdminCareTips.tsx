@@ -72,10 +72,11 @@ export default function AdminCareTips() {
     fetchData();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this care tip?")) return;
-    await supabase.from("care_tips").delete().eq("id", id);
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await supabase.from("care_tips").delete().eq("id", deleteId);
     toast.success("Tip deleted");
+    setDeleteId(null);
     fetchData();
   };
 
