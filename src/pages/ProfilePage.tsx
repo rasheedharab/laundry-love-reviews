@@ -38,7 +38,7 @@ export default function ProfilePage() {
   }
 
   const menuItems = [
-    { icon: MapPin, label: "Saved Addresses", action: () => {} },
+    { icon: MapPin, label: "Saved Addresses", action: () => navigate("/saved-addresses") },
     { icon: CreditCard, label: "Payment Methods", action: () => {} },
     { icon: ClipboardList, label: "Order History", action: () => navigate("/orders") },
     { icon: Gift, label: "Refer a Friend", action: () => {} },
