@@ -91,7 +91,7 @@ export default function HomePage() {
             </button>
             <button
               onClick={() => navigate("/profile")}
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card"
+              className="flex h-11 w-11 items-center justify-center rounded-full glass-sm"
             >
               <User className="h-5 w-5 text-foreground" />
             </button>
