@@ -91,19 +91,44 @@ export default function HomePage() {
       <PullToRefresh onRefresh={fetchData}>
         <div className="min-h-screen bg-background">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 pt-6 pb-4">
-            <button
-              onClick={() => navigate("/select-outlet")}
-              className="flex items-center gap-2 rounded-full glass-sm px-4 py-2.5"
-            >
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Your Location</span>
-            </button>
-            <button
-              onClick={() => navigate("/profile")}
-              className="flex h-11 w-11 items-center justify-center rounded-full glass-sm"
-            >
-              <User className="h-5 w-5 text-foreground" />
-            </button>
+          <div className="flex items-center justify-between px-5 pt-6 pb-2">
+            <div>
+              {user && profile?.full_name ? (
+                <p className="text-sm text-muted-foreground">{getGreeting()},</p>
+              ) : (
+                <p className="text-sm text-muted-foreground">{getGreeting()}</p>
+              )}
+              <p className="text-lg font-display font-bold text-foreground">
+                {user && profile?.full_name ? profile.full_name.split(" ")[0] : "Welcome"}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate("/notifications")}
+                className="relative flex h-11 w-11 items-center justify-center rounded-full glass-sm"
+              >
+                <Bell className="h-5 w-5 text-foreground" />
+                <AnimatePresence>
+                  {unreadCount > 0 && (
+                    <motion.span
+                      key="badge"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-accent-foreground"
+                    >
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </button>
+              <button
+                onClick={() => navigate("/profile")}
+                className="flex h-11 w-11 items-center justify-center rounded-full glass-sm"
+              >
+                <User className="h-5 w-5 text-foreground" />
+              </button>
+            </div>
           </div>
 
           {/* Location selector */}
