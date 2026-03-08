@@ -26,7 +26,7 @@ export default function BottomNav() {
   }, [itemCount]);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 glass border-t-0" style={{ borderTop: '1px solid hsl(0 0% 100% / 0.1)' }}>
       <div className="mx-auto flex max-w-lg items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
         {tabs.map(({ path, icon: Icon, label }) => {
           const isActive = location.pathname.startsWith(path);

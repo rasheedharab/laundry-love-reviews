@@ -80,7 +80,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Premium Club Card */}
-        <div className="mb-6 rounded-2xl bg-gradient-to-br from-accent via-accent to-primary p-5 text-accent-foreground relative overflow-hidden">
+        <div className="mb-6 rounded-2xl glass-accent p-5 text-accent-foreground relative overflow-hidden">
           <div className="absolute top-4 right-4">
             <Star className="h-8 w-8 text-accent-foreground/20" />
           </div>
@@ -98,7 +98,7 @@ export default function ProfilePage() {
             <button
               key={label}
               onClick={action}
-              className="flex w-full items-center gap-4 rounded-2xl bg-card p-4 text-left transition-colors hover:bg-secondary/50"
+              className="flex w-full items-center gap-4 rounded-2xl glass p-4 text-left transition-colors hover:bg-secondary/50"
             >
               <Icon className="h-5 w-5 text-foreground" />
               <span className="flex-1 text-sm font-medium text-foreground">{label}</span>
@@ -110,7 +110,7 @@ export default function ProfilePage() {
         {/* Theme Toggle */}
         <div className="mb-6">
           <p className="section-label mb-3">APPEARANCE</p>
-          <div className="flex gap-2 rounded-2xl border border-border bg-card p-1.5">
+          <div className="flex gap-2 rounded-2xl glass p-1.5">
             {themeOptions.map(({ value, icon: Icon, label }) => (
               <button
                 key={value}

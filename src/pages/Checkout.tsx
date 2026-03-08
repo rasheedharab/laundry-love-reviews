@@ -125,7 +125,7 @@ export default function Checkout() {
           {/* Service Level Toggle */}
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent mb-3">Service Level</p>
-            <div className="flex rounded-2xl border border-border bg-card p-1.5">
+            <div className="flex rounded-2xl glass p-1.5">
               <button
                 onClick={() => setServiceLevel("regular")}
                 className={`flex-1 rounded-xl py-3 text-sm font-semibold transition-all ${
@@ -201,7 +201,7 @@ export default function Checkout() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Location</p>
               <button className="text-[10px] font-semibold text-accent uppercase tracking-wider">Edit</button>
             </div>
-            <div className="rounded-2xl border border-border bg-card p-4">
+            <div className="rounded-2xl glass p-4">
               <div className="flex items-center gap-3 mb-3">
                 <MapPin className="h-5 w-5 text-foreground" />
                 <Input
@@ -227,7 +227,7 @@ export default function Checkout() {
           {/* Promo Code */}
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent mb-3">Promo Code</p>
-            <div className="rounded-2xl border border-border bg-card p-4">
+            <div className="rounded-2xl glass p-4">
               {promoApplied ? (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -278,7 +278,7 @@ export default function Checkout() {
         </div>
 
         {/* Fixed CTA */}
-        <div className="fixed bottom-16 left-0 right-0 z-40 bg-background px-5 py-3">
+        <div className="fixed bottom-16 left-0 right-0 z-40 glass px-5 py-3">
           <div className="mx-auto max-w-lg">
             <Button
               onClick={handlePlaceOrder}

@@ -131,7 +131,7 @@ export default function ServiceDetail() {
 
         <div className="px-5 -mt-2 relative z-10">
           {/* Description */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm mb-5">
+          <div className="rounded-2xl glass p-5 mb-5">
             <div className="flex items-center gap-2 mb-3">
               <Sparkles className="h-4 w-4 text-accent" />
               <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Artisan Care</h3>
@@ -145,10 +145,10 @@ export default function ServiceDetail() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setTier("standard")}
-                className={`relative rounded-2xl border-2 p-5 text-left transition-all ${
+                className={`relative rounded-2xl p-5 text-left transition-all ${
                   tier === "standard"
-                    ? "border-primary bg-primary/5 shadow-md"
-                    : "border-border bg-card"
+                    ? "glass border-2 border-primary/50 shadow-md"
+                    : "glass"
                 }`}
               >
                 {tier === "standard" && (
@@ -169,10 +169,10 @@ export default function ServiceDetail() {
               {service.price_express && (
                 <button
                   onClick={() => setTier("express")}
-                  className={`relative rounded-2xl border-2 p-5 text-left transition-all ${
+                  className={`relative rounded-2xl p-5 text-left transition-all ${
                     tier === "express"
-                      ? "border-accent bg-accent/5 shadow-md"
-                      : "border-border bg-card"
+                      ? "glass border-2 border-accent/50 shadow-md"
+                      : "glass"
                   }`}
                 >
                   {tier === "express" && (
@@ -197,7 +197,7 @@ export default function ServiceDetail() {
           {service.whats_included && service.whats_included.length > 0 && (
             <div className="mb-5">
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">What's Included</h3>
-              <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+              <div className="rounded-2xl glass p-5 space-y-3">
                 {service.whats_included.map((item, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10">
@@ -230,7 +230,7 @@ export default function ServiceDetail() {
         </div>
 
         {/* Fixed Bottom CTA */}
-        <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-md px-5 py-3">
+        <div className="fixed bottom-16 left-0 right-0 z-40 glass px-5 py-3">
           <div className="mx-auto max-w-lg flex items-center justify-between">
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Total</p>

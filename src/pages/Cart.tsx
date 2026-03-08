@@ -34,7 +34,7 @@ export default function Cart() {
           <StaggerContainer className="px-5 space-y-3">
             {items.map((item) => (
               <StaggerItem key={`${item.serviceId}-${item.tier}`}>
-                <div className="rounded-xl border border-border bg-card p-4">
+                <div className="rounded-xl glass p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <p className="text-sm font-semibold text-foreground">{item.serviceName}</p>
@@ -64,7 +64,7 @@ export default function Cart() {
         )}
 
         {items.length > 0 && (
-          <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-md px-5 py-3">
+          <div className="fixed bottom-16 left-0 right-0 z-40 glass px-5 py-3">
             <div className="mx-auto max-w-lg flex items-center justify-between">
               <div>
                 <p className="text-xs text-muted-foreground">Total</p>

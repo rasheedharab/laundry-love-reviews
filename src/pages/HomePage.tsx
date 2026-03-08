@@ -85,13 +85,13 @@ export default function HomePage() {
           <div className="flex items-center justify-between px-5 pt-6 pb-4">
             <button
               onClick={() => navigate("/select-outlet")}
-              className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5"
+              className="flex items-center gap-2 rounded-full glass-sm px-4 py-2.5"
             >
               <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Your Location</span>
             </button>
             <button
               onClick={() => navigate("/profile")}
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card"
+              className="flex h-11 w-11 items-center justify-center rounded-full glass-sm"
             >
               <User className="h-5 w-5 text-foreground" />
             </button>
@@ -114,8 +114,8 @@ export default function HomePage() {
               className="absolute inset-0 h-[130%] w-full object-cover"
               style={{ y: heroY, scale: heroScale }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-            <div className="relative z-10 p-6 pb-7">
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+            <div className="relative z-10 p-6 pb-7 mx-3 mb-3 rounded-2xl glass-dark">
               <h1 className="mb-2 text-3xl font-display font-bold leading-tight text-foreground">
                 Expert care for<br />
                 <span className="text-foreground">your wardrobe.</span>
@@ -137,7 +137,7 @@ export default function HomePage() {
           {activeOrder && (
             <button
               onClick={() => navigate(`/track-order/${activeOrder.id}`)}
-              className="mx-5 mb-5 flex w-[calc(100%-2.5rem)] items-center gap-3 rounded-2xl bg-foreground p-4"
+              className="mx-5 mb-5 flex w-[calc(100%-2.5rem)] items-center gap-3 rounded-2xl glass-dark p-4"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/20">
                 <Truck className="h-6 w-6 text-accent" />
@@ -211,7 +211,7 @@ export default function HomePage() {
                   toast.success("Code WELCOME20 copied! Apply it at checkout.", { duration: 3000 });
                   navigate("/services");
                 }}
-                className="w-full overflow-hidden rounded-2xl bg-gradient-to-r from-accent to-accent/80 p-5 text-left relative"
+                className="w-full overflow-hidden rounded-2xl glass-accent p-5 text-left relative"
               >
                 <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-accent-foreground/20">
                   <Sparkles className="h-4 w-4 text-accent-foreground" />
@@ -243,7 +243,7 @@ export default function HomePage() {
                   <button
                     key={step.num}
                     onClick={() => navigate("/ritual")}
-                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-4 transition-shadow hover:shadow-md"
+                    className="flex-shrink-0 w-[100px] flex flex-col items-center gap-2 rounded-2xl glass p-4 transition-shadow hover:shadow-md"
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-base">
                       {step.icon}
@@ -263,7 +263,7 @@ export default function HomePage() {
             <div className="px-5 mt-8">
               <button
                 onClick={() => navigate("/membership")}
-                className="w-full overflow-hidden rounded-2xl bg-foreground p-5 text-left relative"
+                className="w-full overflow-hidden rounded-2xl glass-dark p-5 text-left relative"
               >
                 <div className="absolute top-4 right-4">
                   <Crown className="h-8 w-8 text-accent/40" />
@@ -301,7 +301,7 @@ export default function HomePage() {
                   <button
                     key={tip.title}
                     onClick={() => navigate("/garment-advisor")}
-                    className="w-full flex items-start gap-3.5 rounded-2xl border border-border bg-card p-4 text-left transition-shadow hover:shadow-md"
+                    className="w-full flex items-start gap-3.5 rounded-2xl glass p-4 text-left transition-shadow hover:shadow-md"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-base">
                       {tip.icon}
@@ -322,7 +322,7 @@ export default function HomePage() {
             <div className="px-5 mt-8">
               <button
                 onClick={() => navigate("/referral")}
-                className="w-full overflow-hidden rounded-2xl border border-accent/20 bg-accent/5 p-5 text-left"
+                className="w-full overflow-hidden rounded-2xl glass p-5 text-left"
               >
                 <div className="flex items-start gap-3.5">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/10">
@@ -345,7 +345,7 @@ export default function HomePage() {
           {/* Trust / Social Proof Strip */}
           <ScrollReveal delay={0.1}>
             <div className="px-5 mt-8">
-              <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-5">
+              <div className="flex items-center justify-between rounded-2xl glass p-5">
                 {[
                   { value: "10,000+", label: "Garments Cared" },
                   { value: "4.9★", label: "Avg Rating" },
