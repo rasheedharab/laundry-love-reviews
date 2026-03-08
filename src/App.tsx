@@ -31,6 +31,7 @@ import EditProfile from "@/pages/EditProfile";
 import NotificationsPage from "@/pages/NotificationsPage";
 import ReferralPage from "@/pages/ReferralPage";
 import BlogPage from "@/pages/BlogPage";
+import MyComplaintsPage from "@/pages/MyComplaintsPage";
 import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminLayout from "@/pages/admin/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
