@@ -26,6 +26,7 @@ export default function Checkout() {
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState<{ id: string; code: string; discount_percent: number | null; discount_amount: number | null } | null>(null);
   const [promoLoading, setPromoLoading] = useState(false);
+  const [slotCounts, setSlotCounts] = useState<Record<string, number>>({});
 
   const dates = useMemo(() => {
     const today = new Date();
@@ -34,6 +35,45 @@ export default function Checkout() {
       return { day: format(d, "EEE").toUpperCase(), date: format(d, "d"), full: d, month: format(d, "MMMM yyyy") };
     });
   }, []);
+
+  // Fetch slot availability when selected date changes
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      const dateStr = format(dates[selectedDate].full, "yyyy-MM-dd");
+      const { data } = await supabase.rpc("get_slot_availability", {
+        p_date: dateStr,
+        p_slots: timeSlots,
+      });
+      if (data) {
+        const counts: Record<string, number> = {};
+        (data as { time_slot: string; booked_count: number }[]).forEach((r) => {
+          counts[r.time_slot] = r.booked_count;
+        });
+        setSlotCounts(counts);
+      }
+    };
+    fetchAvailability();
+  }, [selectedDate, dates]);
+
+  const isSlotFull = (slot: string) => (slotCounts[slot] || 0) >= SLOT_CAPACITY;
+
+  const isSlotPast = (slot: string) => {
+    const pickupDate = dates[selectedDate].full;
+    if (!isToday(pickupDate)) return false;
+    // Parse end time from slot like "10:00 AM — 12:00 PM"
+    const endTimeStr = slot.split("—")[1]?.trim();
+    if (!endTimeStr) return false;
+    const endTime = parse(endTimeStr, "hh:mm a", new Date());
+    return isBefore(endTime, new Date());
+  };
+
+  const isSlotDisabled = (slot: string) => isSlotFull(slot) || isSlotPast(slot);
+
+  const getSlotLabel = (slot: string) => {
+    if (isSlotFull(slot)) return "Full";
+    if (isSlotPast(slot)) return "Past";
+    return `${SLOT_CAPACITY - (slotCounts[slot] || 0)} left`;
+  };
 
   const discount = promoApplied
     ? promoApplied.discount_percent ? total * promoApplied.discount_percent / 100 : (promoApplied.discount_amount || 0)
