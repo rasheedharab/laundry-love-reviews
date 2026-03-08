@@ -364,7 +364,7 @@ export default function HomePage() {
                 </button>
               </div>
               <motion.div
-                className="flex gap-3 overflow-x-auto -mx-5 px-5 py-2 no-scrollbar"
+                className="flex gap-3 overflow-x-auto -mx-5 px-5 py-2 no-scrollbar snap-x snap-mandatory"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.3 }}
