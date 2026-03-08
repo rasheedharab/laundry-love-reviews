@@ -44,6 +44,21 @@ export default function ServicesHub() {
           );
         })}
       </div>
+
+      {/* 7-Step Ritual Link */}
+      <button
+        onClick={() => navigate("/ritual")}
+        className="mt-5 flex w-full items-center gap-3.5 rounded-2xl border border-accent/20 bg-accent/5 p-4 text-left"
+      >
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10">
+          <span className="text-base">✦</span>
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-accent">Our 7-Step Ritual</p>
+          <p className="text-[10px] text-muted-foreground">Discover how we care for your garments</p>
+        </div>
+        <ChevronRight className="h-4 w-4 text-accent" />
+      </button>
     </div>
   );
 }
