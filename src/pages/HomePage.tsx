@@ -470,7 +470,8 @@ export default function HomePage() {
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                   </motion.button>
-                ))}
+                  );
+                })}
               </motion.div>
             </div>
           </ScrollReveal>
