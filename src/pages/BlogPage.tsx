@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ArrowLeft, Calendar, Clock, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import BlogCardSkeleton from "@/components/skeletons/BlogCardSkeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import ReactMarkdown from "react-markdown";
 import type { Tables } from "@/integrations/supabase/types";
