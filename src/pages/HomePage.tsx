@@ -64,6 +64,7 @@ export default function HomePage() {
   const [profile, setProfile] = useState<{ full_name: string | null } | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
+  const recentlyViewed = useRecentlyViewed();
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
