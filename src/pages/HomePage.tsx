@@ -329,13 +329,14 @@ export default function HomePage() {
           {/* Promotional Banner */}
           <ScrollReveal delay={0.05}>
             <div className="px-5 mt-6">
-              <button
+              <RippleTouch
+                as="button"
                 onClick={() => {
                   navigator.clipboard.writeText("WELCOME20");
                   toast.success("Code WELCOME20 copied! Apply it at checkout.", { duration: 3000 });
                   navigate("/services");
                 }}
-                className="w-full overflow-hidden rounded-2xl glass-accent p-5 text-left relative"
+                className="w-full overflow-hidden rounded-2xl glass-accent p-5 text-left"
               >
                 <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-accent-foreground/20">
                   <Sparkles className="h-4 w-4 text-accent-foreground" />
@@ -349,7 +350,7 @@ export default function HomePage() {
                 <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-accent-foreground uppercase tracking-wider">
                   Shop Now <ArrowRight className="h-3 w-3" />
                 </div>
-              </button>
+              </RippleTouch>
             </div>
           </ScrollReveal>
 
