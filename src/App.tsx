@@ -37,6 +37,7 @@ import NotificationsPage from "@/pages/NotificationsPage";
 import ReferralPage from "@/pages/ReferralPage";
 import BlogPage from "@/pages/BlogPage";
 import MyComplaintsPage from "@/pages/MyComplaintsPage";
+import SupportPage from "@/pages/SupportPage";
 import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminLayout from "@/pages/admin/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -88,6 +89,7 @@ function AnimatedRoutes() {
           <Route path="/referral" element={<ProtectedRoute><ReferralPage /></ProtectedRoute>} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/my-complaints" element={<ProtectedRoute><MyComplaintsPage /></ProtectedRoute>} />
+          <Route path="/support" element={<SupportPage />} />
         </Route>
         {/* Admin routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
