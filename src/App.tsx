@@ -35,6 +35,7 @@ import AdminLayout from "@/pages/admin/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminOrders from "@/pages/admin/AdminOrders";
 import AdminServices from "@/pages/admin/AdminServices";
+import AdminCategories from "@/pages/admin/AdminCategories";
 import AdminPromos from "@/pages/admin/AdminPromos";
 import NotFound from "@/pages/NotFound";
 
