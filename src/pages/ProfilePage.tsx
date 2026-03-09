@@ -176,9 +176,45 @@ export default function ProfilePage() {
                   </p>
                 )}
               </div>
-              <button onClick={() => navigate("/subscriptions")} className="text-xs font-semibold text-accent-foreground underline underline-offset-2">
-                Manage
-              </button>
+              <div className="flex items-center gap-2">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="text-xs font-semibold text-accent-foreground/60 hover:text-accent-foreground underline underline-offset-2">
+                      Cancel
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Cancel Subscription?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Your <strong>{subscription.planName}</strong> plan will be cancelled immediately. You'll lose access to subscription benefits.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Keep Plan</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={async () => {
+                          if (!user || !subscription.subId) return;
+                          const { error } = await supabase
+                            .from("user_subscriptions")
+                            .update({ status: "cancelled" })
+                            .eq("id", subscription.subId)
+                            .eq("user_id", user.id);
+                          if (error) { toast.error("Failed to cancel"); return; }
+                          toast.success("Subscription cancelled");
+                          setSubscription(null);
+                        }}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Yes, Cancel
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <button onClick={() => navigate("/subscriptions")} className="text-xs font-semibold text-accent-foreground underline underline-offset-2">
+                  Manage
+                </button>
+              </div>
             </motion.div>
           ) : (
             <motion.button
