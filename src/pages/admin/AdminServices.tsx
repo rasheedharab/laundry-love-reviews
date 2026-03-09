@@ -118,10 +118,13 @@ export default function AdminServices() {
     fetchData();
   };
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     const { error } = await supabase.from("services").delete().eq("id", deleteId);
+    setDeleting(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Deleted");
     setDeleteId(null);
