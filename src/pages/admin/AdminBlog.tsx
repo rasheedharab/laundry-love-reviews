@@ -6,11 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Upload, Eye } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, Search } from "lucide-react";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
+import BulkActionBar from "@/components/admin/BulkActionBar";
 
 interface BlogPost {
   id: string;
@@ -37,6 +39,12 @@ export default function AdminBlog() {
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [search, setSearch] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const fetchPosts = async () => {
@@ -45,6 +53,10 @@ export default function AdminBlog() {
   };
 
   useEffect(() => { fetchPosts(); }, []);
+
+  const filtered = posts.filter((p) =>
+    !search.trim() || p.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   const openCreate = () => { setForm(emptyForm); setEditId(null); setOpen(true); };
   const openEdit = (p: BlogPost) => {
@@ -90,8 +102,6 @@ export default function AdminBlog() {
     }
     setOpen(false); fetchPosts();
   };
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -102,6 +112,30 @@ export default function AdminBlog() {
     toast.success("Deleted"); setDeleteId(null); fetchPosts();
   };
 
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelected(selected.size === filtered.length ? new Set() : new Set(filtered.map((p) => p.id)));
+  };
+
+  const bulkDelete = async () => {
+    if (selected.size === 0) return;
+    setBulkLoading(true);
+    const { error } = await (supabase as any).from("blog_posts").delete().in("id", Array.from(selected));
+    setBulkLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${selected.size} post${selected.size > 1 ? "s" : ""} deleted`);
+    setSelected(new Set());
+    setConfirmBulkDelete(false);
+    fetchPosts();
+  };
+
   const statusColor: Record<string, string> = {
     draft: "bg-muted text-muted-foreground",
     published: "bg-green-500/10 text-green-700",
@@ -110,7 +144,7 @@ export default function AdminBlog() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-display font-bold text-foreground">Blog Posts</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -154,11 +188,34 @@ export default function AdminBlog() {
         </Dialog>
       </div>
 
+      <div className="relative mb-3">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          className="pl-9"
+          placeholder="Search posts…"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setSelected(new Set()); }}
+        />
+      </div>
+
+      <BulkActionBar
+        selectedCount={selected.size}
+        onDelete={() => setConfirmBulkDelete(true)}
+        onClear={() => setSelected(new Set())}
+        loading={bulkLoading}
+      />
+
       <div className="rounded-2xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary/50">
+                <th className="px-4 py-3 w-10">
+                  <Checkbox
+                    checked={filtered.length > 0 && selected.size === filtered.length}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Title</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Date</th>
@@ -166,8 +223,14 @@ export default function AdminBlog() {
               </tr>
             </thead>
             <tbody>
-              {posts.map((p) => (
-                <tr key={p.id} className="border-b border-border last:border-0">
+              {filtered.map((p) => (
+                <tr
+                  key={p.id}
+                  className={`border-b border-border last:border-0 ${selected.has(p.id) ? "bg-primary/5" : ""}`}
+                >
+                  <td className="px-4 py-3">
+                    <Checkbox checked={selected.has(p.id)} onCheckedChange={() => toggleSelect(p.id)} />
+                  </td>
                   <td className="px-4 py-3 font-medium text-foreground">{p.title}</td>
                   <td className="px-4 py-3"><Badge variant="secondary" className={statusColor[p.status] ?? ""}>{p.status}</Badge></td>
                   <td className="px-4 py-3 text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</td>
@@ -177,7 +240,13 @@ export default function AdminBlog() {
                   </td>
                 </tr>
               ))}
-              {posts.length === 0 && <tr><td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">No posts</td></tr>}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                    {search ? "No posts match your search" : "No posts"}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -190,6 +259,14 @@ export default function AdminBlog() {
         loading={deleting}
         title="Delete blog post?"
         description="This will permanently remove this post and it cannot be recovered."
+      />
+      <ConfirmDeleteDialog
+        open={confirmBulkDelete}
+        onOpenChange={(open) => !open && setConfirmBulkDelete(false)}
+        onConfirm={bulkDelete}
+        loading={bulkLoading}
+        title={`Delete ${selected.size} post${selected.size > 1 ? "s" : ""}?`}
+        description="This will permanently delete the selected blog posts."
       />
     </div>
   );

@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Search } from "lucide-react";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import BulkActionBar from "@/components/admin/BulkActionBar";
 import type { Tables } from "@/integrations/supabase/types";
@@ -24,6 +24,8 @@ export default function AdminPromos() {
   const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [search, setSearch] = useState("");
 
   const fetchData = async () => {
     const { data } = await supabase.from("promo_codes").select("*").order("created_at", { ascending: false });
@@ -31,6 +33,10 @@ export default function AdminPromos() {
   };
 
   useEffect(() => { fetchData(); }, []);
+
+  const filtered = promos.filter((p) =>
+    !search.trim() || p.code.toLowerCase().includes(search.toLowerCase())
+  );
 
   const handleCreate = async () => {
     const payload: any = {
@@ -72,16 +78,13 @@ export default function AdminPromos() {
   };
 
   const toggleSelectAll = () => {
-    setSelected(selected.size === promos.length ? new Set() : new Set(promos.map((p) => p.id)));
+    setSelected(selected.size === filtered.length ? new Set() : new Set(filtered.map((p) => p.id)));
   };
 
   const bulkSetActive = async (value: boolean) => {
     if (selected.size === 0) return;
     setBulkLoading(true);
-    const { error } = await supabase
-      .from("promo_codes")
-      .update({ is_active: value })
-      .in("id", Array.from(selected));
+    const { error } = await supabase.from("promo_codes").update({ is_active: value }).in("id", Array.from(selected));
     setBulkLoading(false);
     if (error) { toast.error(error.message); return; }
     toast.success(`${selected.size} promo${selected.size > 1 ? "s" : ""} ${value ? "activated" : "deactivated"}`);
@@ -89,9 +92,21 @@ export default function AdminPromos() {
     fetchData();
   };
 
+  const bulkDelete = async () => {
+    if (selected.size === 0) return;
+    setBulkLoading(true);
+    const { error } = await supabase.from("promo_codes").delete().in("id", Array.from(selected));
+    setBulkLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${selected.size} promo${selected.size > 1 ? "s" : ""} deleted`);
+    setSelected(new Set());
+    setConfirmBulkDelete(false);
+    fetchData();
+  };
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-display font-bold text-foreground">Promo Codes</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -126,10 +141,21 @@ export default function AdminPromos() {
         </Dialog>
       </div>
 
+      <div className="relative mb-3">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          className="pl-9"
+          placeholder="Search promo codes…"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setSelected(new Set()); }}
+        />
+      </div>
+
       <BulkActionBar
         selectedCount={selected.size}
         onActivate={() => bulkSetActive(true)}
         onDeactivate={() => bulkSetActive(false)}
+        onDelete={() => setConfirmBulkDelete(true)}
         onClear={() => setSelected(new Set())}
         loading={bulkLoading}
       />
@@ -141,7 +167,7 @@ export default function AdminPromos() {
               <tr className="border-b border-border bg-secondary/50">
                 <th className="px-4 py-3 w-10">
                   <Checkbox
-                    checked={promos.length > 0 && selected.size === promos.length}
+                    checked={filtered.length > 0 && selected.size === filtered.length}
                     onCheckedChange={toggleSelectAll}
                   />
                 </th>
@@ -153,7 +179,7 @@ export default function AdminPromos() {
               </tr>
             </thead>
             <tbody>
-              {promos.map((p) => (
+              {filtered.map((p) => (
                 <tr
                   key={p.id}
                   className={`border-b border-border last:border-0 ${selected.has(p.id) ? "bg-primary/5" : ""}`}
@@ -178,9 +204,11 @@ export default function AdminPromos() {
                   </td>
                 </tr>
               ))}
-              {promos.length === 0 && (
+              {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No promo codes</td>
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                    {search ? "No promo codes match your search" : "No promo codes"}
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -195,6 +223,14 @@ export default function AdminPromos() {
         loading={deleting}
         title="Delete promo code?"
         description="This will permanently remove this promo code."
+      />
+      <ConfirmDeleteDialog
+        open={confirmBulkDelete}
+        onOpenChange={(open) => !open && setConfirmBulkDelete(false)}
+        onConfirm={bulkDelete}
+        loading={bulkLoading}
+        title={`Delete ${selected.size} promo${selected.size > 1 ? "s" : ""}?`}
+        description="This will permanently delete the selected promo codes."
       />
     </div>
   );

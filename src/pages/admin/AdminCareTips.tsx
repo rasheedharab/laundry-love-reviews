@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import BulkActionBar from "@/components/admin/BulkActionBar";
 
@@ -32,6 +32,8 @@ export default function AdminCareTips() {
   const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [search, setSearch] = useState("");
 
   const fetchData = async () => {
     const { data } = await supabase.from("care_tips").select("*").order("sort_order");
@@ -39,6 +41,10 @@ export default function AdminCareTips() {
   };
 
   useEffect(() => { fetchData(); }, []);
+
+  const filtered = tips.filter((t) =>
+    !search.trim() || t.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   const openCreate = () => { setForm(emptyForm); setEditId(null); setOpen(true); };
 
@@ -63,7 +69,6 @@ export default function AdminCareTips() {
       sort_order: parseInt(form.sort_order) || 0,
       is_active: form.is_active,
     };
-
     if (editId) {
       const { error } = await supabase.from("care_tips").update(payload).eq("id", editId);
       if (error) { toast.error(error.message); return; }
@@ -96,20 +101,29 @@ export default function AdminCareTips() {
   };
 
   const toggleSelectAll = () => {
-    setSelected(selected.size === tips.length ? new Set() : new Set(tips.map((t) => t.id)));
+    setSelected(selected.size === filtered.length ? new Set() : new Set(filtered.map((t) => t.id)));
   };
 
   const bulkSetActive = async (value: boolean) => {
     if (selected.size === 0) return;
     setBulkLoading(true);
-    const { error } = await supabase
-      .from("care_tips")
-      .update({ is_active: value })
-      .in("id", Array.from(selected));
+    const { error } = await supabase.from("care_tips").update({ is_active: value }).in("id", Array.from(selected));
     setBulkLoading(false);
     if (error) { toast.error(error.message); return; }
     toast.success(`${selected.size} tip${selected.size > 1 ? "s" : ""} ${value ? "activated" : "deactivated"}`);
     setSelected(new Set());
+    fetchData();
+  };
+
+  const bulkDelete = async () => {
+    if (selected.size === 0) return;
+    setBulkLoading(true);
+    const { error } = await supabase.from("care_tips").delete().in("id", Array.from(selected));
+    setBulkLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${selected.size} tip${selected.size > 1 ? "s" : ""} deleted`);
+    setSelected(new Set());
+    setConfirmBulkDelete(false);
     fetchData();
   };
 
@@ -125,10 +139,21 @@ export default function AdminCareTips() {
         </Button>
       </div>
 
+      <div className="relative mb-3">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          className="pl-9"
+          placeholder="Search tips…"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setSelected(new Set()); }}
+        />
+      </div>
+
       <BulkActionBar
         selectedCount={selected.size}
         onActivate={() => bulkSetActive(true)}
         onDeactivate={() => bulkSetActive(false)}
+        onDelete={() => setConfirmBulkDelete(true)}
         onClear={() => setSelected(new Set())}
         loading={bulkLoading}
       />
@@ -139,7 +164,7 @@ export default function AdminCareTips() {
             <tr>
               <th className="px-4 py-3 w-10">
                 <Checkbox
-                  checked={tips.length > 0 && selected.size === tips.length}
+                  checked={filtered.length > 0 && selected.size === filtered.length}
                   onCheckedChange={toggleSelectAll}
                 />
               </th>
@@ -151,7 +176,7 @@ export default function AdminCareTips() {
             </tr>
           </thead>
           <tbody>
-            {tips.map((tip) => (
+            {filtered.map((tip) => (
               <tr
                 key={tip.id}
                 className={`border-t border-border hover:bg-muted/30 ${selected.has(tip.id) ? "bg-primary/5" : ""}`}
@@ -182,8 +207,12 @@ export default function AdminCareTips() {
                 </td>
               </tr>
             ))}
-            {tips.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No care tips yet</td></tr>
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                  {search ? "No tips match your search" : "No care tips yet"}
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
@@ -229,6 +258,14 @@ export default function AdminCareTips() {
         loading={deleting}
         title="Delete care tip?"
         description="This will permanently remove this care tip from the homepage."
+      />
+      <ConfirmDeleteDialog
+        open={confirmBulkDelete}
+        onOpenChange={(open) => !open && setConfirmBulkDelete(false)}
+        onConfirm={bulkDelete}
+        loading={bulkLoading}
+        title={`Delete ${selected.size} tip${selected.size > 1 ? "s" : ""}?`}
+        description="This will permanently delete the selected care tips."
       />
     </div>
   );

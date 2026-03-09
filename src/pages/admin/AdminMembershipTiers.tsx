@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import BulkActionBar from "@/components/admin/BulkActionBar";
 
@@ -35,6 +35,8 @@ export default function AdminMembershipTiers() {
   const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [search, setSearch] = useState("");
 
   const fetchData = async () => {
     const { data } = await supabase.from("membership_tiers").select("*").order("sort_order");
@@ -42,6 +44,10 @@ export default function AdminMembershipTiers() {
   };
 
   useEffect(() => { fetchData(); }, []);
+
+  const filtered = tiers.filter((t) =>
+    !search.trim() || t.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   const openCreate = () => { setForm(emptyForm); setEditId(null); setOpen(true); };
 
@@ -74,7 +80,6 @@ export default function AdminMembershipTiers() {
       is_active: form.is_active,
       sort_order: parseInt(form.sort_order) || 0,
     };
-
     if (editId) {
       const { error } = await supabase.from("membership_tiers").update(payload).eq("id", editId);
       if (error) { toast.error(error.message); return; }
@@ -107,20 +112,29 @@ export default function AdminMembershipTiers() {
   };
 
   const toggleSelectAll = () => {
-    setSelected(selected.size === tiers.length ? new Set() : new Set(tiers.map((t) => t.id)));
+    setSelected(selected.size === filtered.length ? new Set() : new Set(filtered.map((t) => t.id)));
   };
 
   const bulkSetActive = async (value: boolean) => {
     if (selected.size === 0) return;
     setBulkLoading(true);
-    const { error } = await supabase
-      .from("membership_tiers")
-      .update({ is_active: value })
-      .in("id", Array.from(selected));
+    const { error } = await supabase.from("membership_tiers").update({ is_active: value }).in("id", Array.from(selected));
     setBulkLoading(false);
     if (error) { toast.error(error.message); return; }
     toast.success(`${selected.size} tier${selected.size > 1 ? "s" : ""} ${value ? "activated" : "deactivated"}`);
     setSelected(new Set());
+    fetchData();
+  };
+
+  const bulkDelete = async () => {
+    if (selected.size === 0) return;
+    setBulkLoading(true);
+    const { error } = await supabase.from("membership_tiers").delete().in("id", Array.from(selected));
+    setBulkLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${selected.size} tier${selected.size > 1 ? "s" : ""} deleted`);
+    setSelected(new Set());
+    setConfirmBulkDelete(false);
     fetchData();
   };
 
@@ -136,10 +150,21 @@ export default function AdminMembershipTiers() {
         </Button>
       </div>
 
+      <div className="relative mb-3">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          className="pl-9"
+          placeholder="Search tiers…"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setSelected(new Set()); }}
+        />
+      </div>
+
       <BulkActionBar
         selectedCount={selected.size}
         onActivate={() => bulkSetActive(true)}
         onDeactivate={() => bulkSetActive(false)}
+        onDelete={() => setConfirmBulkDelete(true)}
         onClear={() => setSelected(new Set())}
         loading={bulkLoading}
       />
@@ -150,7 +175,7 @@ export default function AdminMembershipTiers() {
             <tr>
               <th className="px-4 py-3 w-10">
                 <Checkbox
-                  checked={tiers.length > 0 && selected.size === tiers.length}
+                  checked={filtered.length > 0 && selected.size === filtered.length}
                   onCheckedChange={toggleSelectAll}
                 />
               </th>
@@ -163,7 +188,7 @@ export default function AdminMembershipTiers() {
             </tr>
           </thead>
           <tbody>
-            {tiers.map((tier) => {
+            {filtered.map((tier) => {
               const features = Array.isArray(tier.features) ? tier.features : [];
               return (
                 <tr
@@ -198,8 +223,12 @@ export default function AdminMembershipTiers() {
                 </tr>
               );
             })}
-            {tiers.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">No membership tiers yet</td></tr>
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                  {search ? "No tiers match your search" : "No membership tiers yet"}
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
@@ -237,7 +266,7 @@ export default function AdminMembershipTiers() {
             </div>
             <div>
               <Label>Features (one per line)</Label>
-              <Textarea value={form.features} onChange={(e) => setForm({ ...form, features: e.target.value })} rows={4} placeholder="Free pickup & delivery&#10;Priority processing&#10;10% discount on all services" />
+              <Textarea value={form.features} onChange={(e) => setForm({ ...form, features: e.target.value })} rows={4} placeholder={"Free pickup & delivery\nPriority processing\n10% discount on all services"} />
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
@@ -261,6 +290,14 @@ export default function AdminMembershipTiers() {
         loading={deleting}
         title="Delete membership tier?"
         description="This will permanently remove this membership plan."
+      />
+      <ConfirmDeleteDialog
+        open={confirmBulkDelete}
+        onOpenChange={(open) => !open && setConfirmBulkDelete(false)}
+        onConfirm={bulkDelete}
+        loading={bulkLoading}
+        title={`Delete ${selected.size} tier${selected.size > 1 ? "s" : ""}?`}
+        description="This will permanently delete the selected membership tiers."
       />
     </div>
   );

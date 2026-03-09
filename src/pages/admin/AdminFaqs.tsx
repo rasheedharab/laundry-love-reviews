@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import BulkActionBar from "@/components/admin/BulkActionBar";
 
@@ -31,6 +31,8 @@ export default function AdminFaqs() {
   const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [search, setSearch] = useState("");
 
   const fetchData = async () => {
     const { data } = await supabase.from("faqs").select("*").order("sort_order");
@@ -38,6 +40,10 @@ export default function AdminFaqs() {
   };
 
   useEffect(() => { fetchData(); }, []);
+
+  const filtered = faqs.filter((f) =>
+    !search.trim() || f.question.toLowerCase().includes(search.toLowerCase())
+  );
 
   const openCreate = () => { setForm(emptyForm); setEditId(null); setOpen(true); };
 
@@ -60,7 +66,6 @@ export default function AdminFaqs() {
       sort_order: parseInt(form.sort_order) || 0,
       is_active: form.is_active,
     };
-
     if (editId) {
       const { error } = await supabase.from("faqs").update(payload).eq("id", editId);
       if (error) { toast.error(error.message); return; }
@@ -93,20 +98,29 @@ export default function AdminFaqs() {
   };
 
   const toggleSelectAll = () => {
-    setSelected(selected.size === faqs.length ? new Set() : new Set(faqs.map((f) => f.id)));
+    setSelected(selected.size === filtered.length ? new Set() : new Set(filtered.map((f) => f.id)));
   };
 
   const bulkSetActive = async (value: boolean) => {
     if (selected.size === 0) return;
     setBulkLoading(true);
-    const { error } = await supabase
-      .from("faqs")
-      .update({ is_active: value })
-      .in("id", Array.from(selected));
+    const { error } = await supabase.from("faqs").update({ is_active: value }).in("id", Array.from(selected));
     setBulkLoading(false);
     if (error) { toast.error(error.message); return; }
     toast.success(`${selected.size} FAQ${selected.size > 1 ? "s" : ""} ${value ? "activated" : "deactivated"}`);
     setSelected(new Set());
+    fetchData();
+  };
+
+  const bulkDelete = async () => {
+    if (selected.size === 0) return;
+    setBulkLoading(true);
+    const { error } = await supabase.from("faqs").delete().in("id", Array.from(selected));
+    setBulkLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${selected.size} FAQ${selected.size > 1 ? "s" : ""} deleted`);
+    setSelected(new Set());
+    setConfirmBulkDelete(false);
     fetchData();
   };
 
@@ -122,10 +136,21 @@ export default function AdminFaqs() {
         </Button>
       </div>
 
+      <div className="relative mb-3">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          className="pl-9"
+          placeholder="Search questions…"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setSelected(new Set()); }}
+        />
+      </div>
+
       <BulkActionBar
         selectedCount={selected.size}
         onActivate={() => bulkSetActive(true)}
         onDeactivate={() => bulkSetActive(false)}
+        onDelete={() => setConfirmBulkDelete(true)}
         onClear={() => setSelected(new Set())}
         loading={bulkLoading}
       />
@@ -136,7 +161,7 @@ export default function AdminFaqs() {
             <tr>
               <th className="px-4 py-3 w-10">
                 <Checkbox
-                  checked={faqs.length > 0 && selected.size === faqs.length}
+                  checked={filtered.length > 0 && selected.size === filtered.length}
                   onCheckedChange={toggleSelectAll}
                 />
               </th>
@@ -147,7 +172,7 @@ export default function AdminFaqs() {
             </tr>
           </thead>
           <tbody>
-            {faqs.map((faq) => (
+            {filtered.map((faq) => (
               <tr
                 key={faq.id}
                 className={`border-t border-border hover:bg-muted/30 ${selected.has(faq.id) ? "bg-primary/5" : ""}`}
@@ -177,8 +202,12 @@ export default function AdminFaqs() {
                 </td>
               </tr>
             ))}
-            {faqs.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">No FAQs yet</td></tr>
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                  {search ? "No FAQs match your search" : "No FAQs yet"}
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
@@ -218,6 +247,14 @@ export default function AdminFaqs() {
         loading={deleting}
         title="Delete FAQ?"
         description="This will permanently remove this FAQ from the support page."
+      />
+      <ConfirmDeleteDialog
+        open={confirmBulkDelete}
+        onOpenChange={(open) => !open && setConfirmBulkDelete(false)}
+        onConfirm={bulkDelete}
+        loading={bulkLoading}
+        title={`Delete ${selected.size} FAQ${selected.size > 1 ? "s" : ""}?`}
+        description="This will permanently delete the selected FAQs."
       />
     </div>
   );

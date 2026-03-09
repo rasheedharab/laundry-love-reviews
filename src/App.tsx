@@ -55,6 +55,7 @@ import AdminCareTips from "@/pages/admin/AdminCareTips";
 import AdminFaqs from "@/pages/admin/AdminFaqs";
 import AdminMembershipTiers from "@/pages/admin/AdminMembershipTiers";
 import AdminSiteSettings from "@/pages/admin/AdminSiteSettings";
+import AdminReviews from "@/pages/admin/AdminReviews";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -106,6 +107,7 @@ function AnimatedRoutes() {
           <Route path="services" element={<AdminServices />} />
           <Route path="outlets" element={<AdminOutlets />} />
           <Route path="complaints" element={<AdminComplaints />} />
+          <Route path="reviews" element={<AdminReviews />} />
           <Route path="blog" element={<AdminBlog />} />
           <Route path="promos" element={<AdminPromos />} />
           <Route path="ritual-steps" element={<AdminRitualSteps />} />

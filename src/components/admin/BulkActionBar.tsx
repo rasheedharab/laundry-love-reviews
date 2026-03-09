@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { CheckSquare, EyeOff, Eye, X } from "lucide-react";
+import { CheckSquare, EyeOff, Eye, Trash2, X } from "lucide-react";
 
 interface BulkActionBarProps {
   selectedCount: number;
-  onActivate: () => void;
-  onDeactivate: () => void;
+  onActivate?: () => void;
+  onDeactivate?: () => void;
+  onDelete?: () => void;
   onClear: () => void;
   loading?: boolean;
 }
@@ -13,6 +14,7 @@ export default function BulkActionBar({
   selectedCount,
   onActivate,
   onDeactivate,
+  onDelete,
   onClear,
   loading = false,
 }: BulkActionBarProps) {
@@ -25,26 +27,42 @@ export default function BulkActionBar({
         {selectedCount} selected
       </span>
       <div className="flex items-center gap-2 ml-2">
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-7 gap-1.5 text-xs"
-          disabled={loading}
-          onClick={onActivate}
-        >
-          <Eye className="h-3 w-3" />
-          Activate
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-7 gap-1.5 text-xs"
-          disabled={loading}
-          onClick={onDeactivate}
-        >
-          <EyeOff className="h-3 w-3" />
-          Deactivate
-        </Button>
+        {onActivate && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 gap-1.5 text-xs"
+            disabled={loading}
+            onClick={onActivate}
+          >
+            <Eye className="h-3 w-3" />
+            Activate
+          </Button>
+        )}
+        {onDeactivate && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 gap-1.5 text-xs"
+            disabled={loading}
+            onClick={onDeactivate}
+          >
+            <EyeOff className="h-3 w-3" />
+            Deactivate
+          </Button>
+        )}
+        {onDelete && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 gap-1.5 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
+            disabled={loading}
+            onClick={onDelete}
+          >
+            <Trash2 className="h-3 w-3" />
+            Delete
+          </Button>
+        )}
       </div>
       <button
         onClick={onClear}
