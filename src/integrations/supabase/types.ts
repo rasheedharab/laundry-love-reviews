@@ -790,6 +790,7 @@ export type Database = {
           original_price: number | null
           price: number
           sort_order: number | null
+          starts_at: string | null
         }
         Insert: {
           billing_cycle?: string
@@ -803,6 +804,7 @@ export type Database = {
           original_price?: number | null
           price: number
           sort_order?: number | null
+          starts_at?: string | null
         }
         Update: {
           billing_cycle?: string
@@ -816,6 +818,7 @@ export type Database = {
           original_price?: number | null
           price?: number
           sort_order?: number | null
+          starts_at?: string | null
         }
         Relationships: []
       }
