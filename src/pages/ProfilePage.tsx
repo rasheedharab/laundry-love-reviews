@@ -153,6 +153,48 @@ export default function ProfilePage() {
           ))}
         </div>
 
+        {/* My Subscription Section */}
+        <div className="mb-6">
+          {subscription ? (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl glass-accent p-4 flex items-center gap-4"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-foreground/10">
+                <Crown className="h-6 w-6 text-accent-foreground" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-accent-foreground">{subscription.planName} Plan</p>
+                {subscription.endsAt && (
+                  <p className="text-xs text-accent-foreground/70">
+                    Renews {new Date(subscription.endsAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                  </p>
+                )}
+              </div>
+              <button onClick={() => navigate("/subscriptions")} className="text-xs font-semibold text-accent-foreground underline underline-offset-2">
+                Manage
+              </button>
+            </motion.div>
+          ) : (
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              onClick={() => navigate("/subscriptions")}
+              className="w-full rounded-2xl glass p-4 flex items-center gap-4 text-left transition-colors hover:bg-secondary/50"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
+                <Sparkles className="h-6 w-6 text-accent" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">Get a Subscription Plan</p>
+                <p className="text-xs text-muted-foreground">Save up to ₹3,589/year · Unlimited pickups</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </motion.button>
+          )}
+        </div>
+
         {/* Loyalty Points Widget */}
         <div className="mb-6">
           <LoyaltyWidget />
