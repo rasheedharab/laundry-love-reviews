@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Star, Sun, Moon, Monitor, User, MessageSquareWarning, FileWarning, ShoppingBag, Calendar } from "lucide-react";
+import { MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Star, Sun, Moon, Monitor, User, MessageSquareWarning, FileWarning, ShoppingBag, Calendar, Crown, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import ComplaintDialog from "@/components/ComplaintDialog";
 import LoyaltyWidget from "@/components/LoyaltyWidget";
@@ -19,15 +19,17 @@ export default function ProfilePage() {
   const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
   const [stats, setStats] = useState({ totalOrders: 0, totalSpent: 0, loyaltyPoints: 0 });
+  const [subscription, setSubscription] = useState<{ planName: string; endsAt: string } | null>(null);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchAll = async () => {
-      const [profileRes, ordersRes, pointsRes] = await Promise.all([
+      const [profileRes, ordersRes, pointsRes, subRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("user_id", user.id).single(),
         supabase.from("orders").select("total, status").eq("user_id", user.id),
         supabase.from("loyalty_points").select("points, type").eq("user_id", user.id),
+        supabase.from("user_subscriptions").select("status, ends_at, subscription_plans(name)").eq("user_id", user.id).eq("status", "active").maybeSingle(),
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
@@ -44,6 +46,13 @@ export default function ProfilePage() {
         totalSpent,
         loyaltyPoints: Math.max(0, totalPoints),
       });
+
+      if (subRes.data && subRes.data.subscription_plans) {
+        const plan = subRes.data.subscription_plans as { name: string };
+        setSubscription({ planName: plan.name, endsAt: subRes.data.ends_at || "" });
+      } else {
+        setSubscription(null);
+      }
     };
 
     fetchAll();
@@ -142,6 +151,48 @@ export default function ProfilePage() {
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
             </motion.div>
           ))}
+        </div>
+
+        {/* My Subscription Section */}
+        <div className="mb-6">
+          {subscription ? (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl glass-accent p-4 flex items-center gap-4"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-foreground/10">
+                <Crown className="h-6 w-6 text-accent-foreground" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-accent-foreground">{subscription.planName} Plan</p>
+                {subscription.endsAt && (
+                  <p className="text-xs text-accent-foreground/70">
+                    Renews {new Date(subscription.endsAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                  </p>
+                )}
+              </div>
+              <button onClick={() => navigate("/subscriptions")} className="text-xs font-semibold text-accent-foreground underline underline-offset-2">
+                Manage
+              </button>
+            </motion.div>
+          ) : (
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              onClick={() => navigate("/subscriptions")}
+              className="w-full rounded-2xl glass p-4 flex items-center gap-4 text-left transition-colors hover:bg-secondary/50"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
+                <Sparkles className="h-6 w-6 text-accent" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">Get a Subscription Plan</p>
+                <p className="text-xs text-muted-foreground">Save up to ₹3,589/year · Unlimited pickups</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </motion.button>
+          )}
         </div>
 
         {/* Loyalty Points Widget */}
