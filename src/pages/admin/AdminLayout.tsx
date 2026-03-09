@@ -20,6 +20,7 @@ import {
   Settings,
   Crown,
   Star,
+  CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -41,6 +42,7 @@ const navItems = [
   { to: "/admin/membership", icon: Crown, label: "Membership" },
   { to: "/admin/site-settings", icon: Settings, label: "Site Settings" },
   { to: "/admin/users", icon: Shield, label: "Users & Roles" },
+  { to: "/admin/subscriptions", icon: CreditCard, label: "Subscriptions" },
 ];
 
 export default function AdminLayout() {

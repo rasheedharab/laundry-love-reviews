@@ -8,6 +8,10 @@ import { motion } from "framer-motion";
 import ComplaintDialog from "@/components/ComplaintDialog";
 import LoyaltyWidget from "@/components/LoyaltyWidget";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import AnimatedPage from "@/components/AnimatedPage";
 import logoImg from "@/assets/logo.png";
@@ -19,7 +23,7 @@ export default function ProfilePage() {
   const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
   const [stats, setStats] = useState({ totalOrders: 0, totalSpent: 0, loyaltyPoints: 0 });
-  const [subscription, setSubscription] = useState<{ planName: string; endsAt: string } | null>(null);
+  const [subscription, setSubscription] = useState<{ planName: string; endsAt: string; subId: string } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -29,7 +33,7 @@ export default function ProfilePage() {
         supabase.from("profiles").select("*").eq("user_id", user.id).single(),
         supabase.from("orders").select("total, status").eq("user_id", user.id),
         supabase.from("loyalty_points").select("points, type").eq("user_id", user.id),
-        supabase.from("user_subscriptions").select("status, ends_at, subscription_plans(name)").eq("user_id", user.id).eq("status", "active").maybeSingle(),
+        supabase.from("user_subscriptions").select("id, status, ends_at, subscription_plans(name)").eq("user_id", user.id).eq("status", "active").maybeSingle(),
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
@@ -49,7 +53,7 @@ export default function ProfilePage() {
 
       if (subRes.data && subRes.data.subscription_plans) {
         const plan = subRes.data.subscription_plans as { name: string };
-        setSubscription({ planName: plan.name, endsAt: subRes.data.ends_at || "" });
+        setSubscription({ planName: plan.name, endsAt: subRes.data.ends_at || "", subId: subRes.data.id });
       } else {
         setSubscription(null);
       }
@@ -172,9 +176,45 @@ export default function ProfilePage() {
                   </p>
                 )}
               </div>
-              <button onClick={() => navigate("/subscriptions")} className="text-xs font-semibold text-accent-foreground underline underline-offset-2">
-                Manage
-              </button>
+              <div className="flex items-center gap-2">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="text-xs font-semibold text-accent-foreground/60 hover:text-accent-foreground underline underline-offset-2">
+                      Cancel
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Cancel Subscription?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Your <strong>{subscription.planName}</strong> plan will be cancelled immediately. You'll lose access to subscription benefits.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Keep Plan</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={async () => {
+                          if (!user || !subscription.subId) return;
+                          const { error } = await supabase
+                            .from("user_subscriptions")
+                            .update({ status: "cancelled" })
+                            .eq("id", subscription.subId)
+                            .eq("user_id", user.id);
+                          if (error) { toast.error("Failed to cancel"); return; }
+                          toast.success("Subscription cancelled");
+                          setSubscription(null);
+                        }}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Yes, Cancel
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <button onClick={() => navigate("/subscriptions")} className="text-xs font-semibold text-accent-foreground underline underline-offset-2">
+                  Manage
+                </button>
+              </div>
             </motion.div>
           ) : (
             <motion.button
