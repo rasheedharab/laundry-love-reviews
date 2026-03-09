@@ -32,6 +32,7 @@ const navItems = [
   { to: "/admin/services", icon: Sparkles, label: "Services" },
   { to: "/admin/outlets", icon: MapPin, label: "Outlets" },
   { to: "/admin/complaints", icon: MessageSquare, label: "Complaints" },
+  { to: "/admin/reviews", icon: Star, label: "Reviews" },
   { to: "/admin/blog", icon: FileText, label: "Blog" },
   { to: "/admin/promos", icon: Tag, label: "Promo Codes" },
   { to: "/admin/ritual-steps", icon: ListOrdered, label: "Ritual Steps" },
