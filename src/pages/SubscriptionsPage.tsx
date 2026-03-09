@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import AnimatedPage from "@/components/AnimatedPage";
-import { format, addMonths, addYears } from "date-fns";
+import { format, addMonths, addYears, isAfter } from "date-fns";
 
 type BillingCycle = "monthly" | "quarterly" | "yearly";
 
