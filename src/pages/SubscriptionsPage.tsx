@@ -29,6 +29,7 @@ interface Plan {
   kg_limit: number | null;
   features: string[];
   is_popular: boolean;
+  starts_at: string | null;
 }
 
 const cycleLabels: Record<BillingCycle, string> = {
