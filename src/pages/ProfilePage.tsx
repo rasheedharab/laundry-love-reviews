@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Star, Sun, Moon, Monitor, User, MessageSquareWarning, FileWarning, ShoppingBag, Calendar } from "lucide-react";
+import { MapPin, CreditCard, ClipboardList, Gift, Headphones, LogOut, ChevronRight, Settings, Star, Sun, Moon, Monitor, User, MessageSquareWarning, FileWarning, ShoppingBag, Calendar, Crown, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import ComplaintDialog from "@/components/ComplaintDialog";
 import LoyaltyWidget from "@/components/LoyaltyWidget";
