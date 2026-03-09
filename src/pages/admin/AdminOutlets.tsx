@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, MapPin } from "lucide-react";
+import { Plus, Pencil, Trash2, MapPin, Search } from "lucide-react";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import BulkActionBar from "@/components/admin/BulkActionBar";
 
@@ -39,6 +39,8 @@ export default function AdminOutlets() {
   const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [search, setSearch] = useState("");
 
   const fetchData = async () => {
     const { data } = await (supabase as any).from("outlets").select("*").order("name");
@@ -46,6 +48,12 @@ export default function AdminOutlets() {
   };
 
   useEffect(() => { fetchData(); }, []);
+
+  const filtered = outlets.filter((o) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return o.name.toLowerCase().includes(q) || (o.city ?? "").toLowerCase().includes(q);
+  });
 
   const openCreate = () => { setForm(emptyForm); setEditId(null); setOpen(true); };
   const openEdit = (o: Outlet) => {
@@ -101,16 +109,13 @@ export default function AdminOutlets() {
   };
 
   const toggleSelectAll = () => {
-    setSelected(selected.size === outlets.length ? new Set() : new Set(outlets.map((o) => o.id)));
+    setSelected(selected.size === filtered.length ? new Set() : new Set(filtered.map((o) => o.id)));
   };
 
   const bulkSetActive = async (value: boolean) => {
     if (selected.size === 0) return;
     setBulkLoading(true);
-    const { error } = await (supabase as any)
-      .from("outlets")
-      .update({ is_active: value })
-      .in("id", Array.from(selected));
+    const { error } = await (supabase as any).from("outlets").update({ is_active: value }).in("id", Array.from(selected));
     setBulkLoading(false);
     if (error) { toast.error(error.message); return; }
     toast.success(`${selected.size} outlet${selected.size > 1 ? "s" : ""} ${value ? "activated" : "deactivated"}`);
@@ -118,9 +123,21 @@ export default function AdminOutlets() {
     fetchData();
   };
 
+  const bulkDelete = async () => {
+    if (selected.size === 0) return;
+    setBulkLoading(true);
+    const { error } = await (supabase as any).from("outlets").delete().in("id", Array.from(selected));
+    setBulkLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${selected.size} outlet${selected.size > 1 ? "s" : ""} deleted`);
+    setSelected(new Set());
+    setConfirmBulkDelete(false);
+    fetchData();
+  };
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-display font-bold text-foreground">Outlets</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -156,10 +173,21 @@ export default function AdminOutlets() {
         </Dialog>
       </div>
 
+      <div className="relative mb-3">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          className="pl-9"
+          placeholder="Search by name or city…"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setSelected(new Set()); }}
+        />
+      </div>
+
       <BulkActionBar
         selectedCount={selected.size}
         onActivate={() => bulkSetActive(true)}
         onDeactivate={() => bulkSetActive(false)}
+        onDelete={() => setConfirmBulkDelete(true)}
         onClear={() => setSelected(new Set())}
         loading={bulkLoading}
       />
@@ -171,7 +199,7 @@ export default function AdminOutlets() {
               <tr className="border-b border-border bg-secondary/50">
                 <th className="px-4 py-3 w-10">
                   <Checkbox
-                    checked={outlets.length > 0 && selected.size === outlets.length}
+                    checked={filtered.length > 0 && selected.size === filtered.length}
                     onCheckedChange={toggleSelectAll}
                   />
                 </th>
@@ -184,7 +212,7 @@ export default function AdminOutlets() {
               </tr>
             </thead>
             <tbody>
-              {outlets.map((o) => (
+              {filtered.map((o) => (
                 <tr
                   key={o.id}
                   className={`border-b border-border last:border-0 ${selected.has(o.id) ? "bg-primary/5" : ""}`}
@@ -209,7 +237,13 @@ export default function AdminOutlets() {
                   </td>
                 </tr>
               ))}
-              {outlets.length === 0 && <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">No outlets</td></tr>}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                    {search ? "No outlets match your search" : "No outlets"}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -222,6 +256,14 @@ export default function AdminOutlets() {
         loading={deleting}
         title="Delete outlet?"
         description="This will permanently remove this outlet location."
+      />
+      <ConfirmDeleteDialog
+        open={confirmBulkDelete}
+        onOpenChange={(open) => !open && setConfirmBulkDelete(false)}
+        onConfirm={bulkDelete}
+        loading={bulkLoading}
+        title={`Delete ${selected.size} outlet${selected.size > 1 ? "s" : ""}?`}
+        description="This will permanently delete the selected outlets."
       />
     </div>
   );
