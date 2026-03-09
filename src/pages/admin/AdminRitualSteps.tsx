@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import BulkActionBar from "@/components/admin/BulkActionBar";
 
@@ -40,6 +40,8 @@ export default function AdminRitualSteps() {
   const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [search, setSearch] = useState("");
 
   const fetchData = async () => {
     const { data } = await supabase.from("ritual_steps").select("*").order("step_number");
@@ -47,6 +49,10 @@ export default function AdminRitualSteps() {
   };
 
   useEffect(() => { fetchData(); }, []);
+
+  const filtered = steps.filter((s) =>
+    !search.trim() || s.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   const openCreate = () => {
     setForm({ ...emptyForm, step_number: String((steps.length || 0) + 1) });
@@ -77,7 +83,6 @@ export default function AdminRitualSteps() {
       color_class: form.color_class || null,
       is_active: form.is_active,
     };
-
     if (editId) {
       const { error } = await supabase.from("ritual_steps").update(payload).eq("id", editId);
       if (error) { toast.error(error.message); return; }
@@ -110,20 +115,29 @@ export default function AdminRitualSteps() {
   };
 
   const toggleSelectAll = () => {
-    setSelected(selected.size === steps.length ? new Set() : new Set(steps.map((s) => s.id)));
+    setSelected(selected.size === filtered.length ? new Set() : new Set(filtered.map((s) => s.id)));
   };
 
   const bulkSetActive = async (value: boolean) => {
     if (selected.size === 0) return;
     setBulkLoading(true);
-    const { error } = await supabase
-      .from("ritual_steps")
-      .update({ is_active: value })
-      .in("id", Array.from(selected));
+    const { error } = await supabase.from("ritual_steps").update({ is_active: value }).in("id", Array.from(selected));
     setBulkLoading(false);
     if (error) { toast.error(error.message); return; }
     toast.success(`${selected.size} step${selected.size > 1 ? "s" : ""} ${value ? "activated" : "deactivated"}`);
     setSelected(new Set());
+    fetchData();
+  };
+
+  const bulkDelete = async () => {
+    if (selected.size === 0) return;
+    setBulkLoading(true);
+    const { error } = await supabase.from("ritual_steps").delete().in("id", Array.from(selected));
+    setBulkLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${selected.size} step${selected.size > 1 ? "s" : ""} deleted`);
+    setSelected(new Set());
+    setConfirmBulkDelete(false);
     fetchData();
   };
 
@@ -139,10 +153,21 @@ export default function AdminRitualSteps() {
         </Button>
       </div>
 
+      <div className="relative mb-3">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          className="pl-9"
+          placeholder="Search steps…"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setSelected(new Set()); }}
+        />
+      </div>
+
       <BulkActionBar
         selectedCount={selected.size}
         onActivate={() => bulkSetActive(true)}
         onDeactivate={() => bulkSetActive(false)}
+        onDelete={() => setConfirmBulkDelete(true)}
         onClear={() => setSelected(new Set())}
         loading={bulkLoading}
       />
@@ -153,7 +178,7 @@ export default function AdminRitualSteps() {
             <tr>
               <th className="px-4 py-3 w-10">
                 <Checkbox
-                  checked={steps.length > 0 && selected.size === steps.length}
+                  checked={filtered.length > 0 && selected.size === filtered.length}
                   onCheckedChange={toggleSelectAll}
                 />
               </th>
@@ -165,7 +190,7 @@ export default function AdminRitualSteps() {
             </tr>
           </thead>
           <tbody>
-            {steps.map((step) => (
+            {filtered.map((step) => (
               <tr
                 key={step.id}
                 className={`border-t border-border hover:bg-muted/30 ${selected.has(step.id) ? "bg-primary/5" : ""}`}
@@ -196,8 +221,12 @@ export default function AdminRitualSteps() {
                 </td>
               </tr>
             ))}
-            {steps.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No ritual steps yet</td></tr>
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                  {search ? "No steps match your search" : "No ritual steps yet"}
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
@@ -247,6 +276,14 @@ export default function AdminRitualSteps() {
         loading={deleting}
         title="Delete ritual step?"
         description="This will permanently remove this step from the ritual."
+      />
+      <ConfirmDeleteDialog
+        open={confirmBulkDelete}
+        onOpenChange={(open) => !open && setConfirmBulkDelete(false)}
+        onConfirm={bulkDelete}
+        loading={bulkLoading}
+        title={`Delete ${selected.size} step${selected.size > 1 ? "s" : ""}?`}
+        description="This will permanently delete the selected ritual steps."
       />
     </div>
   );
