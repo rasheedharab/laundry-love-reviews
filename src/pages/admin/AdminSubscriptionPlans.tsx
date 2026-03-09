@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
@@ -12,9 +14,12 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import type { Tables } from "@/integrations/supabase/types";
 import BulkActionBar from "@/components/admin/BulkActionBar";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 type Plan = Tables<"subscription_plans">;
 
@@ -30,6 +35,7 @@ interface FormState {
   is_popular: boolean;
   is_active: boolean;
   sort_order: string;
+  starts_at: Date | undefined;
 }
 
 const defaultForm: FormState = {
@@ -42,6 +48,7 @@ const defaultForm: FormState = {
   is_popular: false,
   is_active: true,
   sort_order: "0",
+  starts_at: undefined,
 };
 
 function planToForm(p: Plan): FormState {
@@ -55,6 +62,7 @@ function planToForm(p: Plan): FormState {
     is_popular: p.is_popular ?? false,
     is_active: p.is_active ?? true,
     sort_order: String(p.sort_order ?? 0),
+    starts_at: (p as any).starts_at ? new Date((p as any).starts_at) : undefined,
   };
 }
 
@@ -66,6 +74,9 @@ export default function AdminSubscriptionPlans() {
   const [form, setForm] = useState<FormState>(defaultForm);
   const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchPlans = async () => {
     const { data } = await supabase.from("subscription_plans").select("*").order("sort_order");
@@ -90,7 +101,7 @@ export default function AdminSubscriptionPlans() {
   const handleSave = async () => {
     if (!form.name || !form.price) { toast.error("Name and price are required"); return; }
     setSaving(true);
-    const payload = {
+    const payload: any = {
       name: form.name,
       billing_cycle: form.billing_cycle,
       price: Number(form.price),
@@ -100,6 +111,7 @@ export default function AdminSubscriptionPlans() {
       is_popular: form.is_popular,
       is_active: form.is_active,
       sort_order: Number(form.sort_order) || 0,
+      starts_at: form.starts_at ? form.starts_at.toISOString() : null,
     };
 
     let error;
@@ -117,17 +129,24 @@ export default function AdminSubscriptionPlans() {
     setSaving(false);
   };
 
-  const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("subscription_plans").delete().eq("id", id);
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    const { error } = await supabase.from("subscription_plans").delete().eq("id", deleteTarget);
     if (error) toast.error(error.message);
     else { toast.success("Plan deleted"); fetchPlans(); }
+    setDeleting(false);
+    setDeleteTarget(null);
   };
 
-  const handleBulkDelete = async () => {
+  const confirmBulkDelete = async () => {
     const ids = Array.from(selected);
+    setDeleting(true);
     const { error } = await supabase.from("subscription_plans").delete().in("id", ids);
     if (error) toast.error(error.message);
     else { toast.success(`${ids.length} plan(s) deleted`); setSelected(new Set()); fetchPlans(); }
+    setDeleting(false);
+    setBulkDeleting(false);
   };
 
   const toggle = (id: string) => {
@@ -151,7 +170,7 @@ export default function AdminSubscriptionPlans() {
       </div>
 
       {selected.size > 0 && (
-        <BulkActionBar selectedCount={selected.size} onClear={() => setSelected(new Set())} onDelete={handleBulkDelete} />
+        <BulkActionBar selectedCount={selected.size} onClear={() => setSelected(new Set())} onDelete={() => setBulkDeleting(true)} />
       )}
 
       {loading ? (
@@ -171,11 +190,31 @@ export default function AdminSubscriptionPlans() {
                 <p className="text-xs text-muted-foreground">₹{p.price}{p.kg_limit ? ` · ${p.kg_limit} kg` : ""}</p>
               </div>
               <Button variant="ghost" size="icon" onClick={() => openEdit(p)}><Pencil className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="icon" onClick={() => handleDelete(p.id)} className="text-destructive hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => setDeleteTarget(p.id)} className="text-destructive hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
             </div>
           ))}
         </div>
       )}
+
+      {/* Single delete confirmation */}
+      <ConfirmDeleteDialog
+        open={!!deleteTarget}
+        onOpenChange={open => { if (!open) setDeleteTarget(null); }}
+        onConfirm={confirmDelete}
+        title="Delete subscription plan?"
+        description="This will permanently delete this plan. Users currently on this plan won't be affected."
+        loading={deleting}
+      />
+
+      {/* Bulk delete confirmation */}
+      <ConfirmDeleteDialog
+        open={bulkDeleting}
+        onOpenChange={setBulkDeleting}
+        onConfirm={confirmBulkDelete}
+        title={`Delete ${selected.size} plan(s)?`}
+        description="This will permanently delete the selected plans."
+        loading={deleting}
+      />
 
       <Dialog open={creating} onOpenChange={setCreating}>
         <DialogContent className="max-w-md">
@@ -198,6 +237,37 @@ export default function AdminSubscriptionPlans() {
               <Input type="number" placeholder="KG limit" value={form.kg_limit} onChange={e => setForm(f => ({ ...f, kg_limit: e.target.value }))} />
               <Input type="number" placeholder="Sort order" value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: e.target.value }))} />
             </div>
+
+            {/* Start date picker */}
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">Start Date (optional)</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn("w-full justify-start text-left font-normal", !form.starts_at && "text-muted-foreground")}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {form.starts_at ? format(form.starts_at, "PPP") : "Pick a start date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={form.starts_at}
+                    onSelect={d => setForm(f => ({ ...f, starts_at: d }))}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+              {form.starts_at && (
+                <button onClick={() => setForm(f => ({ ...f, starts_at: undefined }))} className="text-xs text-muted-foreground hover:text-foreground mt-1">
+                  Clear date
+                </button>
+              )}
+            </div>
+
             <textarea
               placeholder="Features (one per line)"
               value={form.features}
