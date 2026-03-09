@@ -97,6 +97,7 @@ function AnimatedRoutes() {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/my-complaints" element={<ProtectedRoute><MyComplaintsPage /></ProtectedRoute>} />
           <Route path="/support" element={<SupportPage />} />
+          <Route path="/subscriptions" element={<ProtectedRoute><SubscriptionsPage /></ProtectedRoute>} />
         </Route>
         {/* Admin routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
