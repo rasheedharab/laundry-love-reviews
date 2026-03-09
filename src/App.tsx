@@ -55,6 +55,7 @@ import AdminCareTips from "@/pages/admin/AdminCareTips";
 import AdminFaqs from "@/pages/admin/AdminFaqs";
 import AdminMembershipTiers from "@/pages/admin/AdminMembershipTiers";
 import AdminSiteSettings from "@/pages/admin/AdminSiteSettings";
+import AdminReviews from "@/pages/admin/AdminReviews";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
