@@ -219,6 +219,7 @@ export default function AdminOutlets() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete outlet?"
         description="This will permanently remove this outlet location."
       />

@@ -206,6 +206,7 @@ export default function AdminCategories() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete category?"
         description="This will remove the category. Services within it won't be deleted."
       />

@@ -187,6 +187,7 @@ export default function AdminBlog() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete blog post?"
         description="This will permanently remove this post and it cannot be recovered."
       />

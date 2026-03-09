@@ -258,6 +258,7 @@ export default function AdminMembershipTiers() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete membership tier?"
         description="This will permanently remove this membership plan."
       />

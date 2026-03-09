@@ -192,6 +192,7 @@ export default function AdminPromos() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete promo code?"
         description="This will permanently remove this promo code."
       />

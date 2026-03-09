@@ -226,6 +226,7 @@ export default function AdminCareTips() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete care tip?"
         description="This will permanently remove this care tip from the homepage."
       />

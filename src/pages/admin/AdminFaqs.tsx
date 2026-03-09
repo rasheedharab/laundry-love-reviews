@@ -215,6 +215,7 @@ export default function AdminFaqs() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete FAQ?"
         description="This will permanently remove this FAQ from the support page."
       />

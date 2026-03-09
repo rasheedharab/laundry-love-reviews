@@ -244,6 +244,7 @@ export default function AdminRitualSteps() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete ritual step?"
         description="This will permanently remove this step from the ritual."
       />
