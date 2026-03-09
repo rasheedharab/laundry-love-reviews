@@ -53,7 +53,7 @@ export default function ProfilePage() {
 
       if (subRes.data && subRes.data.subscription_plans) {
         const plan = subRes.data.subscription_plans as { name: string };
-        setSubscription({ planName: plan.name, endsAt: subRes.data.ends_at || "" });
+        setSubscription({ planName: plan.name, endsAt: subRes.data.ends_at || "", subId: subRes.data.id });
       } else {
         setSubscription(null);
       }
