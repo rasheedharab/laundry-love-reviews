@@ -42,7 +42,8 @@ const navItems = [
   { to: "/admin/membership", icon: Crown, label: "Membership" },
   { to: "/admin/site-settings", icon: Settings, label: "Site Settings" },
   { to: "/admin/users", icon: Shield, label: "Users & Roles" },
-  { to: "/admin/subscriptions", icon: CreditCard, label: "Subscriptions" },
+  { to: "/admin/subscriptions", icon: CreditCard, label: "Sub Plans" },
+  { to: "/admin/user-subscriptions", icon: CreditCard, label: "User Subs" },
 ];
 
 export default function AdminLayout() {

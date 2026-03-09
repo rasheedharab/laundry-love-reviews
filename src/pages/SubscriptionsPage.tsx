@@ -247,6 +247,12 @@ export default function SubscriptionsPage() {
                       </div>
                     ))}
                   </div>
+                  {plan.starts_at && isAfter(new Date(plan.starts_at), new Date()) && (
+                    <div className="flex items-center gap-1.5 mb-3 text-xs text-muted-foreground">
+                      <CalendarDays className="h-3.5 w-3.5" />
+                      <span>Starts {format(new Date(plan.starts_at), "dd MMM yyyy")}</span>
+                    </div>
+                  )}
                   <Button
                     onClick={() => setSelectedPlan(plan)}
                     className={`w-full h-11 rounded-xl text-xs font-bold uppercase tracking-wider ${
