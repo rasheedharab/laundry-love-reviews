@@ -25,10 +25,11 @@ export default function ProfilePage() {
     if (!user) return;
 
     const fetchAll = async () => {
-      const [profileRes, ordersRes, pointsRes] = await Promise.all([
+      const [profileRes, ordersRes, pointsRes, subRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("user_id", user.id).single(),
         supabase.from("orders").select("total, status").eq("user_id", user.id),
         supabase.from("loyalty_points").select("points, type").eq("user_id", user.id),
+        supabase.from("user_subscriptions").select("status, ends_at, subscription_plans(name)").eq("user_id", user.id).eq("status", "active").maybeSingle(),
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
