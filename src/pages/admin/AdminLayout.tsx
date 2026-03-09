@@ -20,6 +20,7 @@ import {
   Settings,
   Crown,
   Star,
+  CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
