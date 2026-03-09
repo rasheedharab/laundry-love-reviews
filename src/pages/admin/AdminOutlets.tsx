@@ -36,6 +36,7 @@ export default function AdminOutlets() {
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
@@ -84,7 +85,9 @@ export default function AdminOutlets() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     const { error } = await (supabase as any).from("outlets").delete().eq("id", deleteId);
+    setDeleting(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Deleted"); setDeleteId(null); fetchData();
   };
@@ -216,6 +219,7 @@ export default function AdminOutlets() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete outlet?"
         description="This will permanently remove this outlet location."
       />

@@ -21,6 +21,7 @@ export default function AdminPromos() {
   const [form, setForm] = useState(emptyForm);
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
@@ -53,7 +54,9 @@ export default function AdminPromos() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     const { error } = await supabase.from("promo_codes").delete().eq("id", deleteId);
+    setDeleting(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Deleted");
     setDeleteId(null);
@@ -189,6 +192,7 @@ export default function AdminPromos() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete promo code?"
         description="This will permanently remove this promo code."
       />

@@ -32,6 +32,7 @@ export default function AdminMembershipTiers() {
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
@@ -89,7 +90,9 @@ export default function AdminMembershipTiers() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     await supabase.from("membership_tiers").delete().eq("id", deleteId);
+    setDeleting(false);
     toast.success("Tier deleted");
     setDeleteId(null);
     fetchData();
@@ -255,6 +258,7 @@ export default function AdminMembershipTiers() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete membership tier?"
         description="This will permanently remove this membership plan."
       />

@@ -29,6 +29,7 @@ export default function AdminCareTips() {
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
@@ -78,7 +79,9 @@ export default function AdminCareTips() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     await supabase.from("care_tips").delete().eq("id", deleteId);
+    setDeleting(false);
     toast.success("Tip deleted");
     setDeleteId(null);
     fetchData();
@@ -223,6 +226,7 @@ export default function AdminCareTips() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete care tip?"
         description="This will permanently remove this care tip from the homepage."
       />

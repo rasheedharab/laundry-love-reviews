@@ -91,10 +91,13 @@ export default function AdminBlog() {
     setOpen(false); fetchPosts();
   };
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     const { error } = await (supabase as any).from("blog_posts").delete().eq("id", deleteId);
+    setDeleting(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Deleted"); setDeleteId(null); fetchPosts();
   };
@@ -184,6 +187,7 @@ export default function AdminBlog() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete blog post?"
         description="This will permanently remove this post and it cannot be recovered."
       />

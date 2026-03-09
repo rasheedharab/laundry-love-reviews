@@ -28,6 +28,7 @@ export default function AdminFaqs() {
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
@@ -75,7 +76,9 @@ export default function AdminFaqs() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     await supabase.from("faqs").delete().eq("id", deleteId);
+    setDeleting(false);
     toast.success("FAQ deleted");
     setDeleteId(null);
     fetchData();
@@ -212,6 +215,7 @@ export default function AdminFaqs() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete FAQ?"
         description="This will permanently remove this FAQ from the support page."
       />

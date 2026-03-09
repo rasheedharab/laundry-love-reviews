@@ -37,6 +37,7 @@ export default function AdminRitualSteps() {
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
@@ -92,7 +93,9 @@ export default function AdminRitualSteps() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     await supabase.from("ritual_steps").delete().eq("id", deleteId);
+    setDeleting(false);
     toast.success("Step deleted");
     setDeleteId(null);
     fetchData();
@@ -241,6 +244,7 @@ export default function AdminRitualSteps() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete ritual step?"
         description="This will permanently remove this step from the ritual."
       />

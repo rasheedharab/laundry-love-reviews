@@ -25,6 +25,7 @@ export default function AdminSiteSettings() {
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchData = async () => {
     const { data } = await supabase.from("site_settings").select("*").order("key");
@@ -69,7 +70,9 @@ export default function AdminSiteSettings() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     await supabase.from("site_settings").delete().eq("id", deleteId);
+    setDeleting(false);
     toast.success("Setting deleted");
     setDeleteId(null);
     fetchData();
@@ -156,6 +159,7 @@ export default function AdminSiteSettings() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete site setting?"
         description="This will permanently remove this configuration. Features depending on it may break."
       />
