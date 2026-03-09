@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, MapPin } from "lucide-react";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
+import BulkActionBar from "@/components/admin/BulkActionBar";
 
 interface Outlet {
   id: string;
@@ -33,13 +35,16 @@ export default function AdminOutlets() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
-  const fetch = async () => {
+  const fetchData = async () => {
     const { data } = await (supabase as any).from("outlets").select("*").order("name");
     setOutlets(data ?? []);
   };
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const openCreate = () => { setForm(emptyForm); setEditId(null); setOpen(true); };
   const openEdit = (o: Outlet) => {
@@ -74,15 +79,40 @@ export default function AdminOutlets() {
       if (error) { toast.error(error.message); return; }
       toast.success("Outlet created");
     }
-    setOpen(false); fetch();
+    setOpen(false); fetchData();
   };
-  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleDelete = async () => {
     if (!deleteId) return;
     const { error } = await (supabase as any).from("outlets").delete().eq("id", deleteId);
     if (error) { toast.error(error.message); return; }
-    toast.success("Deleted"); setDeleteId(null); fetch();
+    toast.success("Deleted"); setDeleteId(null); fetchData();
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelected(selected.size === outlets.length ? new Set() : new Set(outlets.map((o) => o.id)));
+  };
+
+  const bulkSetActive = async (value: boolean) => {
+    if (selected.size === 0) return;
+    setBulkLoading(true);
+    const { error } = await (supabase as any)
+      .from("outlets")
+      .update({ is_active: value })
+      .in("id", Array.from(selected));
+    setBulkLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${selected.size} outlet${selected.size > 1 ? "s" : ""} ${value ? "activated" : "deactivated"}`);
+    setSelected(new Set());
+    fetchData();
   };
 
   return (
@@ -123,11 +153,25 @@ export default function AdminOutlets() {
         </Dialog>
       </div>
 
+      <BulkActionBar
+        selectedCount={selected.size}
+        onActivate={() => bulkSetActive(true)}
+        onDeactivate={() => bulkSetActive(false)}
+        onClear={() => setSelected(new Set())}
+        loading={bulkLoading}
+      />
+
       <div className="rounded-2xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary/50">
+                <th className="px-4 py-3 w-10">
+                  <Checkbox
+                    checked={outlets.length > 0 && selected.size === outlets.length}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Outlet</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">City</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Phone</th>
@@ -138,8 +182,16 @@ export default function AdminOutlets() {
             </thead>
             <tbody>
               {outlets.map((o) => (
-                <tr key={o.id} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3 font-medium text-foreground flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-muted-foreground" />{o.name}</td>
+                <tr
+                  key={o.id}
+                  className={`border-b border-border last:border-0 ${selected.has(o.id) ? "bg-primary/5" : ""}`}
+                >
+                  <td className="px-4 py-3">
+                    <Checkbox checked={selected.has(o.id)} onCheckedChange={() => toggleSelect(o.id)} />
+                  </td>
+                  <td className="px-4 py-3 font-medium text-foreground">
+                    <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-muted-foreground" />{o.name}</div>
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">{o.city || "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{o.phone || "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{o.operating_hours?.open ?? "—"} – {o.operating_hours?.close ?? "—"}</td>
@@ -154,7 +206,7 @@ export default function AdminOutlets() {
                   </td>
                 </tr>
               ))}
-              {outlets.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No outlets</td></tr>}
+              {outlets.length === 0 && <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">No outlets</td></tr>}
             </tbody>
           </table>
         </div>

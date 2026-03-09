@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
+import BulkActionBar from "@/components/admin/BulkActionBar";
 
 interface Tier {
   id: string;
@@ -30,6 +32,8 @@ export default function AdminMembershipTiers() {
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   const fetchData = async () => {
     const { data } = await supabase.from("membership_tiers").select("*").order("sort_order");
@@ -91,6 +95,32 @@ export default function AdminMembershipTiers() {
     fetchData();
   };
 
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelected(selected.size === tiers.length ? new Set() : new Set(tiers.map((t) => t.id)));
+  };
+
+  const bulkSetActive = async (value: boolean) => {
+    if (selected.size === 0) return;
+    setBulkLoading(true);
+    const { error } = await supabase
+      .from("membership_tiers")
+      .update({ is_active: value })
+      .in("id", Array.from(selected));
+    setBulkLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${selected.size} tier${selected.size > 1 ? "s" : ""} ${value ? "activated" : "deactivated"}`);
+    setSelected(new Set());
+    fetchData();
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -103,10 +133,24 @@ export default function AdminMembershipTiers() {
         </Button>
       </div>
 
+      <BulkActionBar
+        selectedCount={selected.size}
+        onActivate={() => bulkSetActive(true)}
+        onDeactivate={() => bulkSetActive(false)}
+        onClear={() => setSelected(new Set())}
+        loading={bulkLoading}
+      />
+
       <div className="rounded-xl border border-border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
+              <th className="px-4 py-3 w-10">
+                <Checkbox
+                  checked={tiers.length > 0 && selected.size === tiers.length}
+                  onCheckedChange={toggleSelectAll}
+                />
+              </th>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">Order</th>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">Name</th>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">Price</th>
@@ -119,7 +163,13 @@ export default function AdminMembershipTiers() {
             {tiers.map((tier) => {
               const features = Array.isArray(tier.features) ? tier.features : [];
               return (
-                <tr key={tier.id} className="border-t border-border hover:bg-muted/30">
+                <tr
+                  key={tier.id}
+                  className={`border-t border-border hover:bg-muted/30 ${selected.has(tier.id) ? "bg-primary/5" : ""}`}
+                >
+                  <td className="px-4 py-3">
+                    <Checkbox checked={selected.has(tier.id)} onCheckedChange={() => toggleSelect(tier.id)} />
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">{tier.sort_order}</td>
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">{tier.name}</p>
@@ -146,7 +196,7 @@ export default function AdminMembershipTiers() {
               );
             })}
             {tiers.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No membership tiers yet</td></tr>
+              <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">No membership tiers yet</td></tr>
             )}
           </tbody>
         </table>
