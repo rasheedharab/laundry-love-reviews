@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, GripVertical } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
+import BulkActionBar from "@/components/admin/BulkActionBar";
 
 interface RitualStep {
   id: string;
@@ -35,6 +37,8 @@ export default function AdminRitualSteps() {
   const [editId, setEditId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   const fetchData = async () => {
     const { data } = await supabase.from("ritual_steps").select("*").order("step_number");
@@ -94,6 +98,32 @@ export default function AdminRitualSteps() {
     fetchData();
   };
 
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelected(selected.size === steps.length ? new Set() : new Set(steps.map((s) => s.id)));
+  };
+
+  const bulkSetActive = async (value: boolean) => {
+    if (selected.size === 0) return;
+    setBulkLoading(true);
+    const { error } = await supabase
+      .from("ritual_steps")
+      .update({ is_active: value })
+      .in("id", Array.from(selected));
+    setBulkLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${selected.size} step${selected.size > 1 ? "s" : ""} ${value ? "activated" : "deactivated"}`);
+    setSelected(new Set());
+    fetchData();
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -106,10 +136,24 @@ export default function AdminRitualSteps() {
         </Button>
       </div>
 
+      <BulkActionBar
+        selectedCount={selected.size}
+        onActivate={() => bulkSetActive(true)}
+        onDeactivate={() => bulkSetActive(false)}
+        onClear={() => setSelected(new Set())}
+        loading={bulkLoading}
+      />
+
       <div className="rounded-xl border border-border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
+              <th className="px-4 py-3 w-10">
+                <Checkbox
+                  checked={steps.length > 0 && selected.size === steps.length}
+                  onCheckedChange={toggleSelectAll}
+                />
+              </th>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">#</th>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">Title</th>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden md:table-cell">Icon</th>
@@ -119,7 +163,13 @@ export default function AdminRitualSteps() {
           </thead>
           <tbody>
             {steps.map((step) => (
-              <tr key={step.id} className="border-t border-border hover:bg-muted/30">
+              <tr
+                key={step.id}
+                className={`border-t border-border hover:bg-muted/30 ${selected.has(step.id) ? "bg-primary/5" : ""}`}
+              >
+                <td className="px-4 py-3">
+                  <Checkbox checked={selected.has(step.id)} onCheckedChange={() => toggleSelect(step.id)} />
+                </td>
                 <td className="px-4 py-3 font-bold text-foreground">{step.step_number}</td>
                 <td className="px-4 py-3">
                   <p className="font-medium text-foreground">{step.title}</p>
@@ -144,7 +194,7 @@ export default function AdminRitualSteps() {
               </tr>
             ))}
             {steps.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">No ritual steps yet</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No ritual steps yet</td></tr>
             )}
           </tbody>
         </table>

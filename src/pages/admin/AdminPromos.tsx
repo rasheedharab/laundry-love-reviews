@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
-import { Badge } from "@/components/ui/badge";
+import BulkActionBar from "@/components/admin/BulkActionBar";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Promo = Tables<"promo_codes">;
@@ -19,13 +20,16 @@ export default function AdminPromos() {
   const [promos, setPromos] = useState<Promo[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [open, setOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
-  const fetch = async () => {
+  const fetchData = async () => {
     const { data } = await supabase.from("promo_codes").select("*").order("created_at", { ascending: false });
     setPromos(data ?? []);
   };
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const handleCreate = async () => {
     const payload: any = {
@@ -39,14 +43,13 @@ export default function AdminPromos() {
     toast.success("Promo created");
     setOpen(false);
     setForm(emptyForm);
-    fetch();
+    fetchData();
   };
 
   const toggleActive = async (id: string, current: boolean) => {
     await supabase.from("promo_codes").update({ is_active: !current }).eq("id", id);
-    fetch();
+    fetchData();
   };
-  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -54,7 +57,33 @@ export default function AdminPromos() {
     if (error) { toast.error(error.message); return; }
     toast.success("Deleted");
     setDeleteId(null);
-    fetch();
+    fetchData();
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelected(selected.size === promos.length ? new Set() : new Set(promos.map((p) => p.id)));
+  };
+
+  const bulkSetActive = async (value: boolean) => {
+    if (selected.size === 0) return;
+    setBulkLoading(true);
+    const { error } = await supabase
+      .from("promo_codes")
+      .update({ is_active: value })
+      .in("id", Array.from(selected));
+    setBulkLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${selected.size} promo${selected.size > 1 ? "s" : ""} ${value ? "activated" : "deactivated"}`);
+    setSelected(new Set());
+    fetchData();
   };
 
   return (
@@ -94,11 +123,25 @@ export default function AdminPromos() {
         </Dialog>
       </div>
 
+      <BulkActionBar
+        selectedCount={selected.size}
+        onActivate={() => bulkSetActive(true)}
+        onDeactivate={() => bulkSetActive(false)}
+        onClear={() => setSelected(new Set())}
+        loading={bulkLoading}
+      />
+
       <div className="rounded-2xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary/50">
+                <th className="px-4 py-3 w-10">
+                  <Checkbox
+                    checked={promos.length > 0 && selected.size === promos.length}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Code</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Discount</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Expires</th>
@@ -108,7 +151,13 @@ export default function AdminPromos() {
             </thead>
             <tbody>
               {promos.map((p) => (
-                <tr key={p.id} className="border-b border-border last:border-0">
+                <tr
+                  key={p.id}
+                  className={`border-b border-border last:border-0 ${selected.has(p.id) ? "bg-primary/5" : ""}`}
+                >
+                  <td className="px-4 py-3">
+                    <Checkbox checked={selected.has(p.id)} onCheckedChange={() => toggleSelect(p.id)} />
+                  </td>
                   <td className="px-4 py-3 font-mono font-semibold text-foreground">{p.code}</td>
                   <td className="px-4 py-3 text-foreground">
                     {p.discount_percent ? `${p.discount_percent}%` : p.discount_amount ? `₹${p.discount_amount}` : "—"}
@@ -128,7 +177,7 @@ export default function AdminPromos() {
               ))}
               {promos.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">No promo codes</td>
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No promo codes</td>
                 </tr>
               )}
             </tbody>
