@@ -58,6 +58,7 @@ import AdminMembershipTiers from "@/pages/admin/AdminMembershipTiers";
 import AdminSiteSettings from "@/pages/admin/AdminSiteSettings";
 import AdminReviews from "@/pages/admin/AdminReviews";
 import AdminSubscriptionPlans from "@/pages/admin/AdminSubscriptionPlans";
+import AdminUserSubscriptions from "@/pages/admin/AdminUserSubscriptions";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
