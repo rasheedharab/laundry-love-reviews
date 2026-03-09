@@ -159,6 +159,7 @@ export default function AdminSiteSettings() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDelete}
+        loading={deleting}
         title="Delete site setting?"
         description="This will permanently remove this configuration. Features depending on it may break."
       />
