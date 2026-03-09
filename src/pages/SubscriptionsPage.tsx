@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import AnimatedPage from "@/components/AnimatedPage";
-import { format, addMonths, addYears } from "date-fns";
+import { format, addMonths, addYears, isAfter } from "date-fns";
 
 type BillingCycle = "monthly" | "quarterly" | "yearly";
 
@@ -29,6 +29,7 @@ interface Plan {
   kg_limit: number | null;
   features: string[];
   is_popular: boolean;
+  starts_at: string | null;
 }
 
 const cycleLabels: Record<BillingCycle, string> = {
@@ -60,7 +61,7 @@ export default function SubscriptionsPage() {
   useEffect(() => {
     supabase
       .from("subscription_plans")
-      .select("id, name, billing_cycle, price, original_price, kg_limit, features, is_popular")
+      .select("id, name, billing_cycle, price, original_price, kg_limit, features, is_popular, starts_at")
       .eq("is_active", true)
       .order("sort_order")
       .then(({ data }) => {
@@ -246,6 +247,12 @@ export default function SubscriptionsPage() {
                       </div>
                     ))}
                   </div>
+                  {plan.starts_at && isAfter(new Date(plan.starts_at), new Date()) && (
+                    <div className="flex items-center gap-1.5 mb-3 text-xs text-muted-foreground">
+                      <CalendarDays className="h-3.5 w-3.5" />
+                      <span>Starts {format(new Date(plan.starts_at), "dd MMM yyyy")}</span>
+                    </div>
+                  )}
                   <Button
                     onClick={() => setSelectedPlan(plan)}
                     className={`w-full h-11 rounded-xl text-xs font-bold uppercase tracking-wider ${

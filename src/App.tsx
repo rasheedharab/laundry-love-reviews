@@ -58,6 +58,7 @@ import AdminMembershipTiers from "@/pages/admin/AdminMembershipTiers";
 import AdminSiteSettings from "@/pages/admin/AdminSiteSettings";
 import AdminReviews from "@/pages/admin/AdminReviews";
 import AdminSubscriptionPlans from "@/pages/admin/AdminSubscriptionPlans";
+import AdminUserSubscriptions from "@/pages/admin/AdminUserSubscriptions";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -120,6 +121,7 @@ function AnimatedRoutes() {
           <Route path="site-settings" element={<AdminSiteSettings />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="subscriptions" element={<AdminSubscriptionPlans />} />
+          <Route path="user-subscriptions" element={<AdminUserSubscriptions />} />
         </Route>
         <Route path="/garment-advisor" element={<GarmentAdvisor />} />
         <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
