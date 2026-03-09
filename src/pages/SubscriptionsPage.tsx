@@ -61,7 +61,7 @@ export default function SubscriptionsPage() {
   useEffect(() => {
     supabase
       .from("subscription_plans")
-      .select("id, name, billing_cycle, price, original_price, kg_limit, features, is_popular")
+      .select("id, name, billing_cycle, price, original_price, kg_limit, features, is_popular, starts_at")
       .eq("is_active", true)
       .order("sort_order")
       .then(({ data }) => {
