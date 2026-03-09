@@ -112,6 +112,7 @@ export default function AdminUserSubscriptions() {
   };
 
   const filtered = subs.filter(s => {
+    if (statusFilter !== "all" && s.status !== statusFilter) return false;
     if (!search) return true;
     const q = search.toLowerCase();
     return (
