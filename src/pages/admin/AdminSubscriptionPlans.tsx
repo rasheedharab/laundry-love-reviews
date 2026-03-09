@@ -151,7 +151,7 @@ export default function AdminSubscriptionPlans() {
       </div>
 
       {selected.size > 0 && (
-        <BulkActionBar count={selected.size} onClear={() => setSelected(new Set())} onDelete={handleBulkDelete} />
+        <BulkActionBar selectedCount={selected.size} onClear={() => setSelected(new Set())} onDelete={handleBulkDelete} />
       )}
 
       {loading ? (
