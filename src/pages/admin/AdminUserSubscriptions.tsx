@@ -43,6 +43,7 @@ export default function AdminUserSubscriptions() {
   const [subs, setSubs] = useState<UserSub[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [editing, setEditing] = useState<UserSub | null>(null);
   const [formStatus, setFormStatus] = useState("active");
   const [formStartsAt, setFormStartsAt] = useState<Date | undefined>();
