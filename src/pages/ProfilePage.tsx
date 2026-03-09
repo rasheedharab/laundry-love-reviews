@@ -23,7 +23,7 @@ export default function ProfilePage() {
   const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
   const [stats, setStats] = useState({ totalOrders: 0, totalSpent: 0, loyaltyPoints: 0 });
-  const [subscription, setSubscription] = useState<{ planName: string; endsAt: string } | null>(null);
+  const [subscription, setSubscription] = useState<{ planName: string; endsAt: string; subId: string } | null>(null);
 
   useEffect(() => {
     if (!user) return;
