@@ -85,7 +85,9 @@ export default function AdminOutlets() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     const { error } = await (supabase as any).from("outlets").delete().eq("id", deleteId);
+    setDeleting(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Deleted"); setDeleteId(null); fetchData();
   };

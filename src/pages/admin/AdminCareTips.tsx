@@ -79,7 +79,9 @@ export default function AdminCareTips() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     await supabase.from("care_tips").delete().eq("id", deleteId);
+    setDeleting(false);
     toast.success("Tip deleted");
     setDeleteId(null);
     fetchData();

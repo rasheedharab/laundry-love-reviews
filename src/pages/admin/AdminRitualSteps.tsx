@@ -93,7 +93,9 @@ export default function AdminRitualSteps() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     await supabase.from("ritual_steps").delete().eq("id", deleteId);
+    setDeleting(false);
     toast.success("Step deleted");
     setDeleteId(null);
     fetchData();

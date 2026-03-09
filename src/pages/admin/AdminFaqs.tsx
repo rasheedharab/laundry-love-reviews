@@ -76,7 +76,9 @@ export default function AdminFaqs() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     await supabase.from("faqs").delete().eq("id", deleteId);
+    setDeleting(false);
     toast.success("FAQ deleted");
     setDeleteId(null);
     fetchData();

@@ -54,7 +54,9 @@ export default function AdminPromos() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     const { error } = await supabase.from("promo_codes").delete().eq("id", deleteId);
+    setDeleting(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Deleted");
     setDeleteId(null);

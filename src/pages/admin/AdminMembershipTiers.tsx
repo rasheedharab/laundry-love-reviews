@@ -90,7 +90,9 @@ export default function AdminMembershipTiers() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    setDeleting(true);
     await supabase.from("membership_tiers").delete().eq("id", deleteId);
+    setDeleting(false);
     toast.success("Tier deleted");
     setDeleteId(null);
     fetchData();
