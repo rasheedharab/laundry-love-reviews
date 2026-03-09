@@ -222,7 +222,7 @@ export default function SubscriptionsPage() {
                     {savings && (
                       <Badge
                         variant="secondary"
-                        className="text-[9px] font-bold uppercase tracking-wider bg-green-500/10 text-green-500 border-0"
+                        className="text-[9px] font-bold uppercase tracking-wider bg-accent/10 text-accent border-0"
                       >
                         Save {formatPrice(savings)}
                       </Badge>
