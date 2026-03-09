@@ -8,6 +8,10 @@ import { motion } from "framer-motion";
 import ComplaintDialog from "@/components/ComplaintDialog";
 import LoyaltyWidget from "@/components/LoyaltyWidget";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import AnimatedPage from "@/components/AnimatedPage";
 import logoImg from "@/assets/logo.png";
