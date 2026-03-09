@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, Crown, Sparkles, CalendarDays, Package } from "lucide-react";
+import { ArrowLeft, Check, Crown, Sparkles, CalendarDays, Package, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,6 +17,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import AnimatedPage from "@/components/AnimatedPage";
 import { format, addMonths, addYears, isAfter } from "date-fns";
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 type BillingCycle = "monthly" | "quarterly" | "yearly";
 
@@ -57,6 +63,17 @@ export default function SubscriptionsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+
+  // Load Razorpay script
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => setRazorpayLoaded(true);
+    document.body.appendChild(script);
+    return () => { document.body.removeChild(script); };
+  }, []);
 
   useEffect(() => {
     supabase
@@ -77,6 +94,29 @@ export default function SubscriptionsPage() {
 
   const filtered = plans.filter((p) => p.billing_cycle === cycle);
 
+  const activateSubscription = async (plan: Plan) => {
+    if (!user) return;
+    const startDate = new Date().toISOString();
+    const endDate = computeEndDate(plan.billing_cycle as BillingCycle).toISOString();
+
+    // Cancel any existing active subscription first
+    await supabase
+      .from("user_subscriptions")
+      .update({ status: "cancelled" })
+      .eq("user_id", user.id)
+      .eq("status", "active");
+
+    const { error } = await supabase.from("user_subscriptions").insert({
+      user_id: user.id,
+      plan_id: plan.id,
+      status: "active",
+      starts_at: startDate,
+      ends_at: endDate,
+    });
+
+    if (error) throw error;
+  };
+
   const handleSubscribe = async () => {
     if (!user) {
       toast.error("Please sign in first");
@@ -87,33 +127,93 @@ export default function SubscriptionsPage() {
 
     setConfirming(true);
     try {
-      const startDate = new Date().toISOString();
-      const endDate = computeEndDate(selectedPlan.billing_cycle as BillingCycle).toISOString();
-
-      // Cancel any existing active subscription first
-      await supabase
-        .from("user_subscriptions")
-        .update({ status: "cancelled" })
-        .eq("user_id", user.id)
-        .eq("status", "active");
-
-      const { error } = await supabase.from("user_subscriptions").insert({
-        user_id: user.id,
-        plan_id: selectedPlan.id,
-        status: "active",
-        starts_at: startDate,
-        ends_at: endDate,
+      // Step 1: Create Razorpay order via edge function
+      const { data, error: fnError } = await supabase.functions.invoke("create-razorpay-order", {
+        body: {
+          amount: selectedPlan.price,
+          currency: "INR",
+          receipt: `sub_${selectedPlan.id.slice(0, 8)}`,
+          notes: { plan_id: selectedPlan.id, user_id: user.id, type: "subscription" },
+        },
       });
 
-      if (error) throw error;
+      if (fnError) throw fnError;
 
-      toast.success(`You're now on the ${selectedPlan.name} plan!`);
-      setSelectedPlan(null);
-      navigate("/profile");
+      // Demo mode — keys not configured, activate directly
+      if (data.demo_mode) {
+        toast.info("Payment gateway in demo mode. Activating subscription directly.");
+        await activateSubscription(selectedPlan);
+        toast.success(`You're now on the ${selectedPlan.name} plan!`);
+        setSelectedPlan(null);
+        navigate("/profile");
+        return;
+      }
+
+      if (!razorpayLoaded || !window.Razorpay) {
+        toast.error("Payment gateway not loaded. Please try again.");
+        setConfirming(false);
+        return;
+      }
+
+      // Step 2: Open Razorpay checkout
+      const options = {
+        key: data.key_id,
+        amount: data.amount,
+        currency: data.currency,
+        name: "White Rabbit",
+        description: `${selectedPlan.name} — ${selectedPlan.billing_cycle} plan`,
+        order_id: data.order_id,
+        handler: async (response: any) => {
+          try {
+            // Step 3: Verify payment
+            const { data: verifyData, error: verifyError } = await supabase.functions.invoke(
+              "verify-razorpay-payment",
+              {
+                body: {
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                },
+              }
+            );
+
+            if (verifyError || !verifyData?.verified) {
+              toast.error("Payment verification failed");
+              setConfirming(false);
+              return;
+            }
+
+            // Step 4: Activate subscription after verified payment
+            await activateSubscription(selectedPlan);
+            toast.success(`Payment successful! You're now on the ${selectedPlan.name} plan.`);
+            setSelectedPlan(null);
+            navigate("/profile");
+          } catch (err: any) {
+            console.error(err);
+            toast.error(err.message || "Failed to activate subscription after payment");
+          } finally {
+            setConfirming(false);
+          }
+        },
+        theme: { color: "#c46a32" },
+        modal: {
+          ondismiss: () => {
+            setConfirming(false);
+            toast.info("Payment cancelled");
+          },
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", (res: any) => {
+        console.error("Payment failed:", res.error);
+        toast.error(res.error.description || "Payment failed");
+        setConfirming(false);
+      });
+      rzp.open();
     } catch (err: any) {
       console.error(err);
-      toast.error(err.message || "Failed to activate subscription");
-    } finally {
+      toast.error(err.message || "Failed to initiate payment");
       setConfirming(false);
     }
   };
@@ -275,7 +375,7 @@ export default function SubscriptionsPage() {
             <DialogHeader>
               <DialogTitle className="text-foreground">Confirm Subscription</DialogTitle>
               <DialogDescription>
-                Review your plan details before activating.
+                Review your plan details and proceed to payment.
               </DialogDescription>
             </DialogHeader>
 
@@ -326,6 +426,14 @@ export default function SubscriptionsPage() {
                   </div>
                 </div>
 
+                {/* Payment info */}
+                <div className="rounded-xl border border-accent/20 bg-accent/5 p-3 flex items-center gap-2.5">
+                  <CreditCard className="h-4 w-4 text-accent shrink-0" />
+                  <p className="text-xs text-muted-foreground">
+                    You'll be redirected to Razorpay to complete payment securely.
+                  </p>
+                </div>
+
                 {/* Features recap */}
                 {selectedPlan.features.length > 0 && (
                   <div className="space-y-1.5">
@@ -344,9 +452,10 @@ export default function SubscriptionsPage() {
               <Button
                 onClick={handleSubscribe}
                 disabled={confirming}
-                className="w-full h-11 rounded-xl bg-accent text-accent-foreground hover:bg-accent/90 text-xs font-bold uppercase tracking-wider"
+                className="w-full h-11 rounded-xl bg-accent text-accent-foreground hover:bg-accent/90 text-xs font-bold uppercase tracking-wider gap-2"
               >
-                {confirming ? "Activating…" : "Confirm & Activate"}
+                <CreditCard className="h-4 w-4" />
+                {confirming ? "Processing…" : "Pay & Subscribe"}
               </Button>
               <Button
                 variant="ghost"

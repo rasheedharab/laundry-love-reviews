@@ -43,6 +43,7 @@ export default function AdminUserSubscriptions() {
   const [subs, setSubs] = useState<UserSub[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [editing, setEditing] = useState<UserSub | null>(null);
   const [formStatus, setFormStatus] = useState("active");
   const [formStartsAt, setFormStartsAt] = useState<Date | undefined>();
@@ -111,6 +112,7 @@ export default function AdminUserSubscriptions() {
   };
 
   const filtered = subs.filter(s => {
+    if (statusFilter !== "all" && s.status !== statusFilter) return false;
     if (!search) return true;
     const q = search.toLowerCase();
     return (
@@ -130,14 +132,27 @@ export default function AdminUserSubscriptions() {
         </div>
       </div>
 
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search by user, plan, or status…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="pl-9"
-        />
+      <div className="flex gap-2 mb-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by user, plan…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="All statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All statuses</SelectItem>
+            {STATUS_OPTIONS.map(s => (
+              <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {loading ? (
