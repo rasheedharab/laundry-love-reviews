@@ -119,6 +119,7 @@ function AnimatedRoutes() {
           <Route path="membership" element={<AdminMembershipTiers />} />
           <Route path="site-settings" element={<AdminSiteSettings />} />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="subscriptions" element={<AdminSubscriptionPlans />} />
         </Route>
         <Route path="/garment-advisor" element={<GarmentAdvisor />} />
         <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
