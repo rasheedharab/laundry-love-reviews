@@ -46,6 +46,13 @@ export default function ProfilePage() {
         totalSpent,
         loyaltyPoints: Math.max(0, totalPoints),
       });
+
+      if (subRes.data && subRes.data.subscription_plans) {
+        const plan = subRes.data.subscription_plans as { name: string };
+        setSubscription({ planName: plan.name, endsAt: subRes.data.ends_at || "" });
+      } else {
+        setSubscription(null);
+      }
     };
 
     fetchAll();
