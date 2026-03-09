@@ -38,6 +38,7 @@ import ReferralPage from "@/pages/ReferralPage";
 import BlogPage from "@/pages/BlogPage";
 import MyComplaintsPage from "@/pages/MyComplaintsPage";
 import SupportPage from "@/pages/SupportPage";
+import SubscriptionsPage from "@/pages/SubscriptionsPage";
 import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminLayout from "@/pages/admin/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -96,6 +97,7 @@ function AnimatedRoutes() {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/my-complaints" element={<ProtectedRoute><MyComplaintsPage /></ProtectedRoute>} />
           <Route path="/support" element={<SupportPage />} />
+          <Route path="/subscriptions" element={<ProtectedRoute><SubscriptionsPage /></ProtectedRoute>} />
         </Route>
         {/* Admin routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
