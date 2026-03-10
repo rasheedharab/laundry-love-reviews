@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Award, BadgeCheck, Calendar, CalendarRange, ChevronRight, Check } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import RippleTouch from "@/components/RippleTouch";
 import type { Tables } from "@/integrations/supabase/types";
@@ -15,6 +15,7 @@ interface Props {
 
 export default function SubscriptionShowcase({ compact = false }: Props) {
   const navigate = useNavigate();
+  const prefersReducedMotion = useReducedMotion();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -76,13 +77,17 @@ export default function SubscriptionShowcase({ compact = false }: Props) {
           return (
             <motion.div
               key={plan.id}
-              initial={{ opacity: 0, y: 16 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.4,
-                delay: index * 0.08,
-                ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
-              }}
+              transition={
+                prefersReducedMotion
+                  ? { duration: 0 }
+                  : {
+                      duration: 0.4,
+                      delay: index * 0.08,
+                      ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
+                    }
+              }
               className="snap-center shrink-0"
               style={{ width: cardWidth }}
             >
@@ -95,11 +100,24 @@ export default function SubscriptionShowcase({ compact = false }: Props) {
               >
                 {/* Popular ribbon */}
                 {plan.is_popular && (
-                  <div className="absolute right-0 top-0 z-10">
+                  <motion.div
+                    initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={
+                      prefersReducedMotion
+                        ? { duration: 0 }
+                        : {
+                            duration: 0.35,
+                            delay: index * 0.08 + 0.2,
+                            ease: [0.25, 0.46, 0.45, 0.94],
+                          }
+                    }
+                    className="absolute right-0 top-0 z-10"
+                  >
                     <div className="flex items-center gap-1 rounded-bl-lg bg-accent px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-accent-foreground">
                       <BadgeCheck className="h-3 w-3" /> Popular
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Subtle corner gradient accent */}
@@ -119,7 +137,7 @@ export default function SubscriptionShowcase({ compact = false }: Props) {
                       {cycleLabel(plan.billing_cycle)}
                     </span>
                     <div
-                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-sm ${
+                      className={`subscription-icon-wrap flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-sm ${
                         plan.is_popular
                           ? "bg-gradient-to-br from-accent/30 to-accent/10"
                           : "bg-gradient-to-br from-accent/15 to-accent/5"
@@ -159,15 +177,26 @@ export default function SubscriptionShowcase({ compact = false }: Props) {
                   {/* Features - fixed height for consistent card layout */}
                   <ul className="mt-4 min-h-[72px] flex-1 space-y-2.5">
                     {features.slice(0, 3).map((f, i) => (
-                      <li
+                      <motion.li
                         key={i}
+                        initial={prefersReducedMotion ? false : { opacity: 0, x: -6 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={
+                          prefersReducedMotion
+                            ? { duration: 0 }
+                            : {
+                                duration: 0.35,
+                                delay: index * 0.08 + 0.15 + i * 0.05,
+                                ease: [0.25, 0.46, 0.45, 0.94],
+                              }
+                        }
                         className="flex items-start gap-2.5 text-[13px] text-muted-foreground"
                       >
                         <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10">
                           <Check className="h-2.5 w-2.5 text-accent" strokeWidth={2.5} />
                         </span>
                         <span className="line-clamp-2">{String(f)}</span>
-                      </li>
+                      </motion.li>
                     ))}
                   </ul>
 
@@ -176,7 +205,7 @@ export default function SubscriptionShowcase({ compact = false }: Props) {
                   <Button
                     type="button"
                     size="lg"
-                    className={`w-full shrink-0 rounded-xl text-xs font-bold uppercase tracking-wider h-12 ${
+                    className={`subscription-cta-btn w-full shrink-0 rounded-xl text-xs font-bold uppercase tracking-wider h-12 ${
                       plan.is_popular
                         ? "bg-accent text-accent-foreground hover:bg-accent/90"
                         : "bg-foreground text-background hover:bg-foreground/90"

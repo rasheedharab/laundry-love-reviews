@@ -269,7 +269,9 @@
 
 /* Subscription card surfaces (design system shadows & shades) */
 .subscription-card {
-  @apply rounded-2xl border transition-shadow duration-300;
+  @apply rounded-2xl border;
+  transition: transform 0.25s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.3s cubic-bezier(0.33, 1, 0.68, 1);
   /* Warm cream luxury surface - not white */
   background: linear-gradient(
     165deg,
@@ -283,20 +285,77 @@
     0 1px 3px hsl(var(--foreground) / 0.04);
 }
 .subscription-card:hover {
+  transform: translateY(-4px);
   box-shadow:
     0 0 20px hsl(var(--accent) / 0.15),
     0 8px 32px hsl(var(--foreground) / 0.1);
 }
+.subscription-card:active {
+  transform: translateY(-2px) scale(0.985);
+}
 .subscription-card-popular {
-  @apply rounded-2xl border-2 border-accent bg-accent/5 transition-shadow duration-300;
+  @apply rounded-2xl border-2 border-accent bg-accent/5;
+  transition: transform 0.25s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.3s cubic-bezier(0.33, 1, 0.68, 1);
   box-shadow:
     0 2px 12px hsl(var(--accent) / 0.08),
     0 1px 3px hsl(var(--foreground) / 0.04);
 }
 .subscription-card-popular:hover {
+  transform: translateY(-4px);
   box-shadow:
     0 0 24px hsl(var(--accent) / 0.18),
     0 8px 32px hsl(var(--accent) / 0.12);
+}
+.subscription-card-popular:active {
+  transform: translateY(-2px) scale(0.985);
+}
+/* CTA button micro-interaction inside subscription cards */
+.subscription-card .subscription-cta-btn,
+.subscription-card-popular .subscription-cta-btn {
+  transition: transform 0.2s cubic-bezier(0.33, 1, 0.68, 1),
+    background-color 0.2s ease;
+}
+.subscription-card:hover .subscription-cta-btn,
+.subscription-card-popular:hover .subscription-cta-btn {
+  transform: scale(1.02);
+}
+.subscription-card:active .subscription-cta-btn,
+.subscription-card-popular:active .subscription-cta-btn {
+  transform: scale(0.98);
+}
+/* Icon subtle scale on card hover */
+.subscription-icon-wrap {
+  transition: transform 0.25s cubic-bezier(0.33, 1, 0.68, 1);
+}
+.subscription-card:hover .subscription-icon-wrap,
+.subscription-card-popular:hover .subscription-icon-wrap {
+  transform: scale(1.06);
+}
+@media (prefers-reduced-motion: reduce) {
+  .subscription-card,
+  .subscription-card-popular {
+    transition: box-shadow 0.2s ease;
+  }
+  .subscription-card:hover,
+  .subscription-card-popular:hover,
+  .subscription-card:active,
+  .subscription-card-popular:active {
+    transform: none;
+  }
+  .subscription-card .subscription-cta-btn,
+  .subscription-card-popular .subscription-cta-btn,
+  .subscription-icon-wrap {
+    transition: none;
+  }
+  .subscription-card:hover .subscription-cta-btn,
+  .subscription-card-popular:hover .subscription-cta-btn,
+  .subscription-card:active .subscription-cta-btn,
+  .subscription-card-popular:active .subscription-cta-btn,
+  .subscription-card:hover .subscription-icon-wrap,
+  .subscription-card-popular:hover .subscription-icon-wrap {
+    transform: none;
+  }
 }
 .subscription-card-more {
   @apply rounded-2xl border border-accent/20 bg-accent/5 transition-all duration-300;
