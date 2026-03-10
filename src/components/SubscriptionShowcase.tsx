@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Crown, ChevronRight, Check } from "lucide-react";
+import { Crown, ChevronRight, Check, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import type { Tables } from "@/integrations/supabase/types";
@@ -43,14 +43,21 @@ export default function SubscriptionShowcase({ compact = false }: Props) {
   if (loading || plans.length === 0) return null;
 
   return (
-    <div className={compact ? "mt-5" : "mt-8 px-5"}>
-      {/* Header */}
-      <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Crown className="h-4 w-4 text-accent" />
-          <h2 className={`font-display font-bold text-foreground ${compact ? "text-sm" : "text-lg"}`}>
-            Subscription Plans
-          </h2>
+    <div className={compact ? "mt-6" : "mt-8 px-5"}>
+      {/* Section Header */}
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-0.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10">
+              <Crown className="h-3.5 w-3.5 text-accent" />
+            </div>
+            <h2 className={`font-display font-bold text-foreground ${compact ? "text-sm" : "text-lg"}`}>
+              Subscription Plans
+            </h2>
+          </div>
+          {!compact && (
+            <p className="text-[11px] text-muted-foreground ml-9">Save more with a plan that fits your lifestyle</p>
+          )}
         </div>
         {compact && (
           <button onClick={() => navigate("/subscriptions")} className="text-[11px] font-semibold text-accent uppercase tracking-wider flex items-center gap-0.5">
@@ -60,23 +67,23 @@ export default function SubscriptionShowcase({ compact = false }: Props) {
       </div>
 
       {/* Cycle Toggle */}
-      <div className="mb-4 flex gap-1 rounded-xl bg-muted p-1">
+      <div className="mb-4 inline-flex gap-0.5 rounded-full bg-secondary p-0.5">
         {cycles.map((c) => (
           <button
             key={c.value}
             onClick={() => setCycle(c.value)}
-            className={`relative flex-1 rounded-lg py-1.5 text-xs font-semibold transition-colors ${
-              cycle === c.value ? "text-primary-foreground" : "text-muted-foreground"
-            }`}
+            className="relative rounded-full px-4 py-1.5 text-[11px] font-semibold transition-colors"
           >
             {cycle === c.value && (
               <motion.div
-                layoutId={compact ? "cycle-bg-compact" : "cycle-bg"}
-                className="absolute inset-0 rounded-lg bg-primary"
+                layoutId={compact ? "sub-pill-compact" : "sub-pill"}
+                className="absolute inset-0 rounded-full bg-accent shadow-sm"
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               />
             )}
-            <span className="relative z-10">{c.label}</span>
+            <span className={`relative z-10 ${cycle === c.value ? "text-accent-foreground" : "text-muted-foreground"}`}>
+              {c.label}
+            </span>
           </button>
         ))}
       </div>
@@ -85,14 +92,14 @@ export default function SubscriptionShowcase({ compact = false }: Props) {
       <AnimatePresence mode="wait">
         <motion.div
           key={cycle}
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.25 }}
-          className={compact ? "space-y-3" : "flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide"}
+          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          className={compact ? "space-y-3" : "flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide -mx-1 px-1"}
         >
           {displayed.length === 0 ? (
-            <p className="text-xs text-muted-foreground py-4 text-center">No plans for this cycle yet.</p>
+            <p className="text-xs text-muted-foreground py-6 text-center w-full">No plans for this cycle yet.</p>
           ) : (
             displayed.map((plan) => {
               const features = Array.isArray(plan.features) ? (plan.features as string[]) : [];
@@ -103,61 +110,90 @@ export default function SubscriptionShowcase({ compact = false }: Props) {
               return (
                 <motion.div
                   key={plan.id}
-                  whileTap={{ scale: 0.98 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => navigate("/subscriptions")}
-                  className={`relative cursor-pointer rounded-2xl border p-4 transition-shadow hover:shadow-md snap-center shrink-0 ${
+                  className={`relative cursor-pointer snap-center shrink-0 overflow-hidden rounded-2xl transition-shadow hover:shadow-lg ${
+                    compact ? "w-full" : "w-[270px]"
+                  } ${
                     plan.is_popular
-                      ? "border-accent/40 bg-accent/5"
-                      : "border-border bg-card"
-                  } ${compact ? "" : "w-[260px]"}`}
+                      ? "bg-gradient-to-br from-accent/10 via-card to-accent/5 border-2 border-accent/30 shadow-md shadow-accent/10"
+                      : "glass border border-border"
+                  }`}
                 >
+                  {/* Popular ribbon */}
                   {plan.is_popular && (
-                    <span className="absolute -top-2.5 left-4 rounded-full bg-accent px-2.5 py-0.5 text-[9px] font-bold text-accent-foreground uppercase tracking-wider">
-                      Popular
-                    </span>
+                    <div className="flex items-center gap-1 bg-accent px-3 py-1">
+                      <Zap className="h-2.5 w-2.5 text-accent-foreground" />
+                      <span className="text-[9px] font-bold text-accent-foreground uppercase tracking-widest">Most Popular</span>
+                    </div>
                   )}
 
-                  <p className="text-sm font-bold text-foreground">{plan.name}</p>
-                  {plan.kg_limit && (
-                    <p className="text-[10px] text-muted-foreground mt-0.5">Up to {plan.kg_limit} kg</p>
-                  )}
+                  <div className={`p-4 ${plan.is_popular ? "pt-3" : ""}`}>
+                    {/* Plan name + kg */}
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-display font-bold text-foreground">{plan.name}</p>
+                        {plan.kg_limit && (
+                          <p className="text-[10px] text-muted-foreground mt-0.5">Up to {plan.kg_limit} kg / cycle</p>
+                        )}
+                      </div>
+                      {savings && (
+                        <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[9px] font-bold text-accent whitespace-nowrap">
+                          {savings}% off
+                        </span>
+                      )}
+                    </div>
 
-                  <div className="mt-2 flex items-baseline gap-1.5">
-                    <span className="text-xl font-bold text-foreground">₹{plan.price.toLocaleString()}</span>
-                    {plan.original_price && (
-                      <span className="text-xs text-muted-foreground line-through">₹{plan.original_price.toLocaleString()}</span>
+                    {/* Pricing */}
+                    <div className="mt-3 flex items-baseline gap-2">
+                      <span className="text-2xl font-bold font-display text-foreground">₹{plan.price.toLocaleString()}</span>
+                      <span className="text-[10px] text-muted-foreground">/{cycle === "monthly" ? "mo" : cycle === "quarterly" ? "qtr" : "yr"}</span>
+                      {plan.original_price && plan.original_price > plan.price && (
+                        <span className="text-xs text-muted-foreground/60 line-through">₹{plan.original_price.toLocaleString()}</span>
+                      )}
+                    </div>
+
+                    {/* Features */}
+                    {features.length > 0 && (
+                      <ul className={`mt-3 space-y-1.5 ${compact ? "" : "border-t border-border/50 pt-3"}`}>
+                        {features.slice(0, compact ? 2 : 3).map((f, i) => (
+                          <li key={i} className="flex items-start gap-2 text-[11px] text-foreground/70">
+                            <Check className="h-3 w-3 mt-0.5 text-accent shrink-0" />
+                            <span>{String(f)}</span>
+                          </li>
+                        ))}
+                      </ul>
                     )}
-                    {savings && (
-                      <span className="ml-1 rounded-full bg-green-500/10 px-1.5 py-0.5 text-[9px] font-bold text-green-600">
-                        Save {savings}%
-                      </span>
-                    )}
+
+                    {/* CTA */}
+                    <Button
+                      size="sm"
+                      className={`mt-4 w-full rounded-xl text-xs font-semibold h-9 ${
+                        plan.is_popular
+                          ? "bg-accent text-accent-foreground hover:bg-accent/90 shadow-sm"
+                          : ""
+                      }`}
+                      variant={plan.is_popular ? "default" : "outline"}
+                    >
+                      {plan.is_popular ? "Get Started" : "Choose Plan"}
+                    </Button>
                   </div>
-
-                  {!compact && features.length > 0 && (
-                    <ul className="mt-3 space-y-1.5">
-                      {features.slice(0, 3).map((f, i) => (
-                        <li key={i} className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
-                          <Check className="h-3 w-3 mt-0.5 text-accent shrink-0" />
-                          {String(f)}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  <Button
-                    size="sm"
-                    className="mt-3 w-full rounded-xl text-xs h-8"
-                    variant={plan.is_popular ? "default" : "outline"}
-                  >
-                    Subscribe
-                  </Button>
                 </motion.div>
               );
             })
           )}
         </motion.div>
       </AnimatePresence>
+
+      {/* View all link for full mode */}
+      {!compact && (
+        <button
+          onClick={() => navigate("/subscriptions")}
+          className="mt-3 flex items-center gap-1 text-xs font-semibold text-accent"
+        >
+          View all plans <ChevronRight className="h-3 w-3" />
+        </button>
+      )}
     </div>
   );
 }
