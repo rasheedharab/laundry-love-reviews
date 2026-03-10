@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import BottomNav from "./BottomNav";
 import SwipeBack from "./SwipeBack";
+import FloatingCartButton from "./FloatingCartButton";
 
 const pageTransition = {
   initial: { opacity: 0, y: 10 },
