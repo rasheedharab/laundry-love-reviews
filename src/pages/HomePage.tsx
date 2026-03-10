@@ -65,6 +65,7 @@ export default function HomePage() {
   const [careTips, setCareTips] = useState<CareTipDB[]>([]);
   const heroRef = useRef<HTMLDivElement>(null);
   const recentlyViewed = useRecentlyViewed();
+  const { itemCount } = useCart();
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
