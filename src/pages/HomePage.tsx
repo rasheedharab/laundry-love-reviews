@@ -17,6 +17,7 @@ import TiltCard from "@/components/TiltCard";
 import RippleTouch from "@/components/RippleTouch";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import SubscriptionShowcase from "@/components/SubscriptionShowcase";
 import type { Tables } from "@/integrations/supabase/types";
 
 import catPartyWear from "@/assets/cat-party-wear.jpg";
@@ -428,6 +429,11 @@ export default function HomePage() {
                 </div>
               </button>
             </div>
+          </ScrollReveal>
+
+          {/* Subscription Plans */}
+          <ScrollReveal delay={0.05}>
+            <SubscriptionShowcase />
           </ScrollReveal>
 
           {/* Garment Care Tips */}
