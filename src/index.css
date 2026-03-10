@@ -126,10 +126,12 @@
 }
 
 /* Hide scrollbar for mobile feel */
-.no-scrollbar::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
-.no-scrollbar {
+.no-scrollbar,
+.scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -263,4 +265,73 @@
   box-shadow:
     0 0 0 2px hsl(var(--accent) / 0.3),
     0 0 20px hsl(var(--accent) / 0.15);
+}
+
+/* Subscription card surfaces (design system shadows & shades) */
+.subscription-card {
+  @apply rounded-2xl border transition-shadow duration-300;
+  /* Warm cream luxury surface - not white */
+  background: linear-gradient(
+    165deg,
+    hsl(36 22% 95%) 0%,
+    hsl(36 18% 93%) 50%,
+    hsl(36 20% 94%) 100%
+  );
+  border-color: hsl(36 16% 88%);
+  box-shadow:
+    0 2px 12px hsl(var(--foreground) / 0.06),
+    0 1px 3px hsl(var(--foreground) / 0.04);
+}
+.subscription-card:hover {
+  box-shadow:
+    0 0 20px hsl(var(--accent) / 0.15),
+    0 8px 32px hsl(var(--foreground) / 0.1);
+}
+.subscription-card-popular {
+  @apply rounded-2xl border-2 border-accent bg-accent/5 transition-shadow duration-300;
+  box-shadow:
+    0 2px 12px hsl(var(--accent) / 0.08),
+    0 1px 3px hsl(var(--foreground) / 0.04);
+}
+.subscription-card-popular:hover {
+  box-shadow:
+    0 0 24px hsl(var(--accent) / 0.18),
+    0 8px 32px hsl(var(--accent) / 0.12);
+}
+.subscription-card-more {
+  @apply rounded-2xl border border-accent/20 bg-accent/5 transition-all duration-300;
+  box-shadow:
+    0 2px 12px hsl(var(--foreground) / 0.04),
+    0 1px 3px hsl(var(--foreground) / 0.02);
+}
+.subscription-card-more:hover {
+  @apply border-accent/30 bg-accent/10;
+  box-shadow:
+    0 0 20px hsl(var(--accent) / 0.12),
+    0 6px 24px hsl(var(--foreground) / 0.08);
+}
+
+.dark .subscription-card {
+  background: linear-gradient(
+    165deg,
+    hsl(24 18% 14%) 0%,
+    hsl(24 16% 12%) 50%,
+    hsl(24 18% 13%) 100%
+  );
+  border-color: hsl(24 14% 20%);
+}
+.dark .subscription-card:hover {
+  box-shadow:
+    0 0 24px hsl(var(--accent) / 0.2),
+    0 8px 32px hsl(0 0% 0% / 0.3);
+}
+.dark .subscription-card-popular:hover {
+  box-shadow:
+    0 0 28px hsl(var(--accent) / 0.25),
+    0 8px 32px hsl(0 0% 0% / 0.3);
+}
+.dark .subscription-card-more:hover {
+  box-shadow:
+    0 0 20px hsl(var(--accent) / 0.18),
+    0 6px 24px hsl(0 0% 0% / 0.25);
 }
