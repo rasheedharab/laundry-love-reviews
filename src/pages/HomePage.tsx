@@ -430,6 +430,11 @@ export default function HomePage() {
             </div>
           </ScrollReveal>
 
+          {/* Subscription Plans */}
+          <ScrollReveal delay={0.05}>
+            <SubscriptionShowcase />
+          </ScrollReveal>
+
           {/* Garment Care Tips */}
           <ScrollReveal delay={0.1}>
             <div className="mt-8 px-5">
