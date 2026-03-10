@@ -20,11 +20,11 @@ export default function FloatingCartButton() {
           transition={{ type: "spring", stiffness: 400, damping: 24 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => navigate("/cart")}
-          className="fixed bottom-20 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30"
+          className="fixed bottom-[5.5rem] left-4 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30"
           aria-label="View cart"
         >
-          <ShoppingBag className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+          <ShoppingBag className="h-4.5 w-4.5" />
+          <span className="absolute -top-1 -right-1 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
             {itemCount > 9 ? "9+" : itemCount}
           </span>
         </motion.button>
