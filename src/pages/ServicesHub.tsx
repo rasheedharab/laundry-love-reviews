@@ -93,6 +93,9 @@ export default function ServicesHub() {
           </motion.div>
         )}
 
+        {/* Subscription Plans */}
+        <SubscriptionShowcase compact />
+
         {/* 7-Step Ritual Link */}
         <button
           onClick={() => navigate("/ritual")}

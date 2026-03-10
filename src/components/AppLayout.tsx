@@ -38,6 +38,7 @@ export default function AppLayout() {
           </motion.div>
         </AnimatePresence>
       </main>
+      <FloatingCartButton />
       <BottomNav />
     </div>
   );
