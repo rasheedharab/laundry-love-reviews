@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { OutletProvider } from "@/contexts/OutletContext";
 import AppLayout from "@/components/AppLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import SplashScreen from "@/components/SplashScreen";
@@ -143,8 +144,10 @@ function AppShell() {
       <Toaster />
       <Sonner />
       <InAppNotificationListener />
-      <BrowserRouter>
-        <AnimatedRoutes />
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <div className="relative min-h-screen">
+          <AnimatedRoutes />
+        </div>
       </BrowserRouter>
     </>
   );
@@ -155,9 +158,11 @@ const App = () => (
     <ThemeProvider>
     <AuthProvider>
       <CartProvider>
-        <TooltipProvider>
-          <AppShell />
-        </TooltipProvider>
+        <OutletProvider>
+          <TooltipProvider>
+            <AppShell />
+          </TooltipProvider>
+        </OutletProvider>
       </CartProvider>
     </AuthProvider>
     </ThemeProvider>

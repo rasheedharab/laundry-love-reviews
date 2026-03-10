@@ -1,16 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Sparkles, Wind, Briefcase, Layers, Armchair, Shirt, ChevronRight } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Sparkles, Wind, Briefcase, Layers, Armchair, Shirt, ChevronRight, Bell, MapPin, ChevronDown } from "lucide-react";
 import CardGridSkeleton from "@/components/skeletons/CardGridSkeleton";
 import AnimatedPage from "@/components/AnimatedPage";
 import PullToRefresh from "@/components/PullToRefresh";
 import ServiceSearch from "@/components/ServiceSearch";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import TiltCard from "@/components/TiltCard";
 import RippleTouch from "@/components/RippleTouch";
 import SubscriptionShowcase from "@/components/SubscriptionShowcase";
+import { useOutlet } from "@/contexts/OutletContext";
 import type { Tables } from "@/integrations/supabase/types";
+
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+}
 
 import catPartyWear from "@/assets/cat-party-wear.jpg";
 import catDryCleaning from "@/assets/cat-dry-cleaning.jpg";
@@ -34,27 +43,82 @@ const iconMap: Record<string, React.ElementType> = {
 
 export default function ServicesHub() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { selectedOutlet } = useOutlet();
   const [categories, setCategories] = useState<Tables<"service_categories">[]>([]);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<{ full_name: string | null } | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase.from("service_categories").select("*").order("sort_order");
-    if (data) setCategories(data);
+    const [catsRes, profileRes, notifRes] = await Promise.all([
+      supabase.from("service_categories").select("*").order("sort_order"),
+      user ? supabase.from("profiles").select("full_name").eq("user_id", user.id).single() : Promise.resolve({ data: null }),
+      user ? supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("is_read", false) : Promise.resolve({ count: 0 }),
+    ]);
+    if (catsRes.data) setCategories(catsRes.data);
+    if (profileRes.data) setProfile(profileRes.data);
+    setUnreadCount(notifRes.count ?? 0);
     setLoading(false);
-  };
+  }, [user]);
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   return (
     <AnimatedPage>
       <PullToRefresh onRefresh={fetchData}>
       <div className="px-5 pt-6 pb-4">
+        {/* Header - same as home page */}
+        <div className="flex items-center justify-between pb-2 mb-4">
+          <div>
+            {user && profile?.full_name ? (
+              <p className="text-sm text-muted-foreground">{getGreeting()},</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">{getGreeting()}</p>
+            )}
+            <p className="text-lg font-display font-bold text-foreground">
+              {user && profile?.full_name ? profile.full_name.split(" ")[0] : "Welcome"}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <motion.button
+              onClick={() => navigate("/notifications")}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              className="relative flex h-11 w-11 items-center justify-center rounded-full glass-sm"
+            >
+              <Bell className="h-5 w-5 text-foreground" />
+              <AnimatePresence>
+                {unreadCount > 0 && (
+                  <motion.span
+                    key="badge"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-accent-foreground"
+                  >
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
+          </div>
+        </div>
+
         <h1 className="mb-1 text-2xl font-display font-bold text-foreground">Services</h1>
         <p className="mb-4 text-sm text-muted-foreground">Premium care for everything you own</p>
-        <div className="mb-5">
+        <div className="mb-4">
           <ServiceSearch />
         </div>
+        <button onClick={() => navigate("/select-outlet")} className="flex items-center gap-1.5 mb-5">
+          <MapPin className="h-4 w-4 text-accent" />
+          <span className="text-sm font-medium text-foreground">
+            {selectedOutlet ? selectedOutlet.name + (selectedOutlet.city ? `, ${selectedOutlet.city}` : "") : "Select Outlet/City"}
+          </span>
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        </button>
 
         {loading ? (
           <CardGridSkeleton count={4} columns={2} height="h-48" />

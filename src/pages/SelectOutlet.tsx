@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import MapPlaceholder from "@/components/MapPlaceholder";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { useOutlet } from "@/contexts/OutletContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface Outlet {
   id: string;
@@ -18,6 +21,8 @@ interface Outlet {
 
 export default function SelectOutlet() {
   const navigate = useNavigate();
+  const { setSelectedOutlet } = useOutlet();
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [outlets, setOutlets] = useState<Outlet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,6 +50,23 @@ export default function SelectOutlet() {
   const formatHours = (hours: any) => {
     if (!hours?.closing) return "Hours not available";
     return `Open until ${hours.closing}`;
+  };
+
+  const handleSelect = async (outlet: Outlet) => {
+    const selected = { id: outlet.id, name: outlet.name, city: outlet.city };
+    setSelectedOutlet(selected);
+    if (user) {
+      try {
+        await supabase
+          .from("profiles")
+          .update({ preferred_outlet_id: outlet.id })
+          .eq("user_id", user.id);
+      } catch {
+        // preferred_outlet_id column may not exist yet; selection still saved to localStorage
+      }
+    }
+    toast.success(`${outlet.name} selected`);
+    navigate(-1);
   };
 
   return (
@@ -111,7 +133,7 @@ export default function SelectOutlet() {
                   </div>
                   <Button
                     className="h-9 px-6 rounded-xl bg-foreground text-primary-foreground text-xs font-bold uppercase tracking-wider hover:bg-foreground/90"
-                    onClick={() => navigate(-1)}
+                    onClick={() => handleSelect(b)}
                   >
                     Select
                   </Button>

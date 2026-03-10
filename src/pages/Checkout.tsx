@@ -146,8 +146,14 @@ export default function Checkout() {
     }
   };
 
+  // Redirect to cart when empty (must be in useEffect to avoid setState during render)
+  useEffect(() => {
+    if (items.length === 0) {
+      navigate("/cart");
+    }
+  }, [items.length, navigate]);
+
   if (items.length === 0) {
-    navigate("/cart");
     return null;
   }
 

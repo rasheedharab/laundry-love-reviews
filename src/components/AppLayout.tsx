@@ -16,8 +16,8 @@ export default function AppLayout() {
   const isRoot = rootPaths.includes(location.pathname);
 
   return (
-    <div className="mx-auto min-h-screen max-w-lg bg-background">
-      <main className="pb-20">
+    <div className="relative mx-auto min-h-screen max-w-lg bg-background">
+      <main className="pb-20 relative">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={location.pathname}
@@ -26,6 +26,7 @@ export default function AppLayout() {
             animate="animate"
             exit="exit"
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="relative min-h-[50vh]"
           >
             {isRoot ? (
               <Outlet />

@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { MapPin, ChevronDown, ArrowRight, User, Truck, MessageCircle, Crown, Gift, ChevronRight, Sparkles, Copy, BookOpen, Bell, LogIn, Search, Leaf, CloudSun, Shirt, ShieldCheck, Package, Scissors, Briefcase, Wind, ShoppingBag } from "lucide-react";
+import { MapPin, ChevronDown, ArrowRight, Truck, MessageCircle, Crown, Gift, ChevronRight, Sparkles, Copy, BookOpen, Bell, LogIn, Search, Leaf, CloudSun, Shirt, ShieldCheck, Package, Scissors, Briefcase, Wind } from "lucide-react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ import RippleTouch from "@/components/RippleTouch";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import SubscriptionShowcase from "@/components/SubscriptionShowcase";
-import { useCart } from "@/contexts/CartContext";
+import { useOutlet } from "@/contexts/OutletContext";
 import type { Tables } from "@/integrations/supabase/types";
 
 import catPartyWear from "@/assets/cat-party-wear.jpg";
@@ -65,7 +65,7 @@ export default function HomePage() {
   const [careTips, setCareTips] = useState<CareTipDB[]>([]);
   const heroRef = useRef<HTMLDivElement>(null);
   const recentlyViewed = useRecentlyViewed();
-  const { itemCount } = useCart();
+  const { selectedOutlet } = useOutlet();
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
@@ -99,7 +99,7 @@ export default function HomePage() {
   return (
     <AnimatedPage>
       <PullToRefresh onRefresh={fetchData}>
-        <div className="min-h-screen bg-background">
+        <div className="relative min-h-screen bg-background">
           {/* Header */}
           <div className="flex items-center justify-between px-5 pt-6 pb-2">
             <div>
@@ -113,28 +113,6 @@ export default function HomePage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <motion.button
-                onClick={() => navigate("/cart")}
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.92 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className="relative flex h-11 w-11 items-center justify-center rounded-full glass-sm"
-              >
-                <ShoppingBag className="h-5 w-5 text-foreground" />
-                <AnimatePresence>
-                  {itemCount > 0 && (
-                    <motion.span
-                      key="cart-badge"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-accent-foreground"
-                    >
-                      {itemCount > 9 ? "9+" : itemCount}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.button>
               <motion.button
                 onClick={() => navigate("/notifications")}
                 whileHover={{ scale: 1.08 }}
@@ -156,15 +134,6 @@ export default function HomePage() {
                     </motion.span>
                   )}
                 </AnimatePresence>
-              </motion.button>
-              <motion.button
-                onClick={() => navigate("/profile")}
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.92 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className="flex h-11 w-11 items-center justify-center rounded-full glass-sm"
-              >
-                <User className="h-5 w-5 text-foreground" />
               </motion.button>
             </div>
           </div>
@@ -200,7 +169,9 @@ export default function HomePage() {
             <ServiceSearch />
             <button onClick={() => navigate("/select-outlet")} className="flex items-center gap-1.5">
               <MapPin className="h-4 w-4 text-accent" />
-              <span className="text-sm font-medium text-foreground">Select Outlet/City</span>
+              <span className="text-sm font-medium text-foreground">
+                {selectedOutlet ? selectedOutlet.name + (selectedOutlet.city ? `, ${selectedOutlet.city}` : "") : "Select Outlet/City"}
+              </span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </button>
           </div>
