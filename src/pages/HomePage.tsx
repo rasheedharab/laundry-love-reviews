@@ -112,6 +112,28 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-2">
               <motion.button
+                onClick={() => navigate("/cart")}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="relative flex h-11 w-11 items-center justify-center rounded-full glass-sm"
+              >
+                <ShoppingBag className="h-5 w-5 text-foreground" />
+                <AnimatePresence>
+                  {itemCount > 0 && (
+                    <motion.span
+                      key="cart-badge"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-accent-foreground"
+                    >
+                      {itemCount > 9 ? "9+" : itemCount}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.button>
+              <motion.button
                 onClick={() => navigate("/notifications")}
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.92 }}
