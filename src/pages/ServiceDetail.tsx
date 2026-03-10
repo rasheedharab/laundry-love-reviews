@@ -84,6 +84,9 @@ export default function ServiceDetail() {
       tier,
       price,
       turnaround: turnaround || "",
+      priceExpress: service.price_express ?? null,
+      turnaroundStandard: service.turnaround_standard,
+      turnaroundExpress: service.turnaround_express,
     });
     setJustAdded(true);
     toast.success(`${service.name} added to bag`);

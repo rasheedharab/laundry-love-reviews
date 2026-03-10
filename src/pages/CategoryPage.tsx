@@ -80,6 +80,9 @@ export default function CategoryPage() {
       price: Number(svc.price_standard),
       tier: "standard",
       turnaround: svc.turnaround_standard || "3-5 days",
+      priceExpress: svc.price_express ?? null,
+      turnaroundStandard: svc.turnaround_standard,
+      turnaroundExpress: svc.turnaround_express,
     });
     toast.success(`${svc.name} added to cart`);
   };

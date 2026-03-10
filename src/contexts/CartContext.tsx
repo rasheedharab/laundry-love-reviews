@@ -7,7 +7,14 @@ export interface CartItem {
   tier: "standard" | "express";
   price: number;
   quantity: number;
+  /** Human-readable turnaround currently applied to this line item */
   turnaround: string;
+  /** Optional express-tier price for this service, if available */
+  priceExpress?: number | null;
+  /** Optional standard turnaround label for this service */
+  turnaroundStandard?: string | null;
+  /** Optional express turnaround label for this service */
+  turnaroundExpress?: string | null;
 }
 
 interface CartContextType {
@@ -15,6 +22,8 @@ interface CartContextType {
   addItem: (item: Omit<CartItem, "quantity">) => void;
   removeItem: (serviceId: string, tier: string) => void;
   updateQuantity: (serviceId: string, tier: string, quantity: number) => void;
+  /** Upgrade a standard-tier line to express when pricing is available */
+  upgradeToExpress: (serviceId: string, tier: "standard" | "express") => void;
   clearCart: () => void;
   total: number;
   itemCount: number;
@@ -46,7 +55,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (existing) {
         return prev.map((i) =>
           i.serviceId === item.serviceId && i.tier === item.tier
-            ? { ...i, quantity: i.quantity + 1 }
+            ? {
+                ...i,
+                quantity: i.quantity + 1,
+                // Preserve or enrich express pricing/turnaround metadata when available
+                priceExpress: item.priceExpress ?? i.priceExpress,
+                turnaroundStandard: item.turnaroundStandard ?? i.turnaroundStandard,
+                turnaroundExpress: item.turnaroundExpress ?? i.turnaroundExpress,
+              }
             : i
         );
       }
@@ -70,11 +86,45 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem(STORAGE_KEY);
   };
 
+  const upgradeToExpress = (serviceId: string, tier: "standard" | "express") => {
+    if (tier !== "standard") return;
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.serviceId !== serviceId || item.tier !== "standard") return item;
+        if (!item.priceExpress) return item;
+
+        const nextTurnaround =
+          item.turnaroundExpress ??
+          item.turnaround ??
+          item.turnaroundStandard ??
+          item.turnaround;
+
+        return {
+          ...item,
+          tier: "express",
+          price: item.priceExpress,
+          turnaround: nextTurnaround,
+        };
+      })
+    );
+  };
+
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, total, itemCount }}>
+    <CartContext.Provider
+      value={{
+        items,
+        addItem,
+        removeItem,
+        updateQuantity,
+        upgradeToExpress,
+        clearCart,
+        total,
+        itemCount,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
