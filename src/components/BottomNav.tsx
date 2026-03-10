@@ -1,4 +1,4 @@
-import { Home, Grid3X3, ClipboardList, User } from "lucide-react";
+import { Home, Grid3X3, ShoppingBag, ClipboardList, User } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 const tabs = [
   { path: "/home", icon: Home, label: "Home" },
   { path: "/services", icon: Grid3X3, label: "Services" },
+  { path: "/cart", icon: ShoppingBag, label: "Cart" },
   { path: "/orders", icon: ClipboardList, label: "Orders" },
   { path: "/profile", icon: User, label: "Profile" },
 ];
@@ -49,12 +50,12 @@ export default function BottomNav() {
                 <Icon className="h-5 w-5" strokeWidth={isActive ? 2.2 : 1.5} />
               </motion.div>
               <span className="text-[10px] font-medium">{label}</span>
-              {label === "Services" && itemCount > 0 && (
+              {label === "Cart" && itemCount > 0 && (
                 <span
                   key={badgeKey.current}
                   className="absolute -top-0.5 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-accent-foreground animate-bounce-once"
                 >
-                  {itemCount}
+                  {itemCount > 9 ? "9+" : itemCount}
                 </span>
               )}
             </motion.button>

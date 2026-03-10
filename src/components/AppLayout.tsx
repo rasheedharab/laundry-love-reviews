@@ -2,7 +2,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import BottomNav from "./BottomNav";
 import SwipeBack from "./SwipeBack";
-import FloatingCartButton from "./FloatingCartButton";
 
 const pageTransition = {
   initial: { opacity: 0, y: 10 },
@@ -10,7 +9,7 @@ const pageTransition = {
   exit: { opacity: 0, y: -8 },
 };
 
-const rootPaths = ["/home", "/services", "/orders", "/profile"];
+const rootPaths = ["/home", "/services", "/orders", "/profile", "/cart"];
 
 export default function AppLayout() {
   const location = useLocation();
@@ -38,7 +37,6 @@ export default function AppLayout() {
           </motion.div>
         </AnimatePresence>
       </main>
-      <FloatingCartButton />
       <BottomNav />
     </div>
   );
